@@ -1,26 +1,159 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* Pretendard Font */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
+
+/*
+=== Design Tokens ===
+Typo_Semantic, Unit_Semantic 제외하고 적용 완료
+*/
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Fonts */
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  /* Font Sizes */
+  --font-size-4xl: 28px;
+  --font-size-3xl: 26px;
+  --font-size-2xl: 24px;
+  --font-size-xl: 22px;
+  --font-size-lg: 20px;
+  --font-size-base: 18px;
+  --font-size-sm: 16px;
+
+  /* Font Weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line Heights */
+  --line-height-4xl: 34px;
+  --line-height-3xl: 32px;
+  --line-height-2xl: 30px;
+  --line-height-xl: 28px;
+  --line-height-lg: 26px;
+  --line-height-base: 24px;
+  --line-height-sm: 22px;
+
+  /* Letter Spacing */
+  --letter-spacing-normal: 0;
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-tighter: -0.025em;
+
+  /* Border Radius */
+  --radius-100: 8px;
+  --radius-300: 16px;
+  --radius-350: 18px;
+  --radius-400: 20px;
+  --radius-600: 40px;
+  --radius-full: 99999px;
+
+  /* Spacing */
+  --spacing-1: 30px;
+  --spacing-2: 20px;
+  --spacing-3: 16px;
+  --spacing-4: 14px;
+  --spacing-5: 12px;
+  --spacing-6: 10px;
+  --spacing-7: 8px;
+  --spacing-8: 4px;
+
+  /* Blue Scale */
+  --color-blue-50: #EBF4FF;
+  --color-blue-100: #B8DAFF;
+  --color-blue-200: #85C0FF;
+  --color-blue-300: #53A6FF;
+  --color-blue-400: #1F8BFF;
+  --color-blue-500: #006FE5;
+  --color-blue-600: #0059B8;
+  --color-blue-700: #004085;
+  --color-blue-800: #002752;
+  --color-blue-900: #000F1F;
+
+  /* Gray Scale */
+  --color-gray-50: #FAFAFA;
+  --color-gray-80: #F2F2F3;
+  --color-gray-100: #EFEFEF;
+  --color-gray-150: #EEEEEE;
+  --color-gray-200: #EAEAEA;
+  --color-gray-300: #DBDBDB;
+  --color-gray-400: #BDBDBD;
+  --color-gray-500: #999999;
+  --color-gray-600: #666666;
+  --color-gray-700: #424242;
+  --color-gray-800: #222222;
+  --color-gray-900: #121212;
+  --color-white: #FFFFFF;
+  --color-black: #000000;
+
+  /* Green Scale */
+  --color-green-50: #D9FDE3;
+  --color-green-100: #24A84E;
+
+  /* Orange Scale */
+  --color-orange-50: #FFF2E4;
+  --color-orange-100: #EC8313;
+
+  /* Red Scale */
+  --color-red-50: #FFEAEA;
+  --color-red-100: #F53333;
+
+  /* === Semantic Colors === */
+
+  /* Text Colors */
+  --color-text-primary: var(--color-gray-900);
+  --color-text-secondary: var(--color-gray-600);
+  --color-text-tertiary: var(--color-gray-500);
+  --color-text-disabled: var(--color-gray-400);
+  --color-text-inverse: var(--color-white);
+
+  /* Background/Surface Colors */
+  --color-bg-canvas: var(--color-white);
+  --color-bg-section: var(--color-gray-50);
+
+  /* Border Colors */
+  --color-border-default: var(--color-gray-300);
+  --color-border-strong: var(--color-gray-900);
+  --color-border-subtle: var(--color-gray-80);
+  --color-border-focus: var(--color-gray-400);
+  --color-border-active: var(--color-gray-500);
+
+  /* Icon Colors */
+  --color-icon-default: var(--color-gray-900);
+  --color-icon-secondary: var(--color-gray-600);
+  --color-icon-tertiary: var(--color-gray-500);
+  --color-icon-disabled: var(--color-gray-400);
+  --color-icon-inverse: var(--color-white);
+
+  /* Accent Primary Colors */
+  --color-accent-primary-default: var(--color-blue-300);
+  --color-accent-primary-hover: var(--color-blue-100);
+  --color-accent-primary-pressed: var(--color-blue-400);
+  --color-accent-primary-disabled: var(--color-gray-80);
+
+  /* Accent Secondary Colors */
+  --color-accent-secondary-default: var(--color-gray-300);
+  --color-accent-secondary-hover: var(--color-gray-150);
+  --color-accent-secondary-pressed: var(--color-gray-400);
+  --color-accent-secondary-disabled: var(--color-gray-80);
+
+  /* Badge Colors */
+  --color-badge-green-bg: var(--color-green-50);
+  --color-badge-green-text: var(--color-green-100);
+  --color-badge-red-bg: var(--color-red-50);
+  --color-badge-red-text: var(--color-red-100);
+  --color-badge-blue-fill-bg: var(--color-blue-50);
+  --color-badge-blue-fill-text: var(--color-blue-500);
+  --color-badge-blue-outline-bg: var(--color-white);
+  --color-badge-blue-outline-text: var(--color-blue-500);
+  --color-badge-gray-bg: var(--color-gray-100);
+  --color-badge-gray-text: var(--color-gray-500);
+  --color-badge-orange-bg: var(--color-orange-50);
+  --color-badge-orange-text: var(--color-orange-100);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
