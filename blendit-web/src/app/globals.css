@@ -1,7 +1,5 @@
-@import "tailwindcss";
-
-/* Pretendard Font */
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
+@import "tailwindcss";
 
 /*
 === Design Tokens ===
@@ -103,12 +101,12 @@ Typo_Semantic, Unit_Semantic 제외하고 적용 완료
   /* === Semantic Colors === */
 
   /* Text Colors */
-  --color-text-primary: var(--color-gray-900);
-  --color-text-secondary: var(--color-gray-600);
-  --color-text-tertiary: var(--color-gray-500);
-  --color-text-disabled: var(--color-gray-400);
-  --color-text-inverse: var(--color-white);
-
+  --text-primary: var(--color-gray-900);
+  --text-secondary: var(--color-gray-600);
+  --text-tertiary: var(--color-gray-500);
+  --text-disabled: var(--color-gray-400);
+  --text-inverse: var(--color-white);
+  
   /* Background/Surface Colors */
   --color-bg-canvas: var(--color-white);
   --color-bg-section: var(--color-gray-50);
@@ -128,16 +126,16 @@ Typo_Semantic, Unit_Semantic 제외하고 적용 완료
   --color-icon-inverse: var(--color-white);
 
   /* Accent Primary Colors */
-  --color-accent-primary-default: var(--color-blue-300);
-  --color-accent-primary-hover: var(--color-blue-100);
-  --color-accent-primary-pressed: var(--color-blue-400);
-  --color-accent-primary-disabled: var(--color-gray-80);
+  --accent-primary-default: var(--color-blue-300);
+  --accent-primary-hover: var(--color-blue-100);
+  --accent-primary-pressed: var(--color-blue-400);
+  --accent-primary-disabled: var(--color-gray-80);
 
   /* Accent Secondary Colors */
-  --color-accent-secondary-default: var(--color-gray-300);
-  --color-accent-secondary-hover: var(--color-gray-150);
-  --color-accent-secondary-pressed: var(--color-gray-400);
-  --color-accent-secondary-disabled: var(--color-gray-80);
+  --accent-secondary-default: var(--color-gray-300);
+  --accent-secondary-hover: var(--color-gray-150);
+  --accent-secondary-pressed: var(--color-gray-400);
+  --accent-secondary-disabled: var(--color-gray-80);
 
   /* Badge Colors */
   --color-badge-green-bg: var(--color-green-50);
