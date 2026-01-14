@@ -30,23 +30,22 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     // 베이스 스타일
     const baseStyles =
-      'inline-flex items-center justify-center gap-[10px] rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed';
+      'inline-flex items-center justify-center gap-[10px] rounded-lg font-medium transition-colors disabled:cursor-not-allowed';
 
     // variant별 스타일
     const variantStyles = {
       // Fill_Main_Btn
       primary: cn(
         'bg-(--accent-primary-default) text-(--text-inverse)',
-        'focus:ring-white',
         !isLoading && 'hover:bg-(--accent-primary-hover) active:bg-(--accent-primary-pressed)',
         disabled && !isLoading && 'disabled:bg-(--accent-secondary-disabled) disabled:text-(--text-disabled)'
       ),
       // Fill_Second_Btn
       secondary: cn(
-        'bg-[#DBDBDB] text-[#666666]',
-        !isLoading && 'hover:bg-[#EEEEEE] active:bg-[#BDBDBD]',
-        disabled && !isLoading && 'disabled:bg-[#F2F2F3] disabled:text-[#BDBDBD]',
-        'focus:ring-[#DBDBDB]'
+        'bg-(--accent-secondary-default) text-(--text-secondary)',
+        !isLoading && 'hover:bg-(--accent-secondary-hover) active:bg-(--accent-secondary-pressed)',
+        disabled && !isLoading && 'disabled:bg-(--accent-secondary-disabled) disabled:text-(--text-disabled)',
+        
       ),
     };
 
@@ -58,9 +57,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         lg: 'h-[56px] px-[28px] py-[15px] text-lg leading-6',           // 56px
       },
       secondary: {
-        sm: 'h-12 px-[18px] py-[15px] text-lg',      // 48px
-        md: 'h-[52px] px-5 py-[15px] text-lg',       // 52px
-        lg: 'h-14 px-6 py-[15px] text-lg',           // 56px
+        sm: 'h-[48px] px-[18px] py-[15px] text-lg leading-6',      // 48px
+        md: 'h-[52px] px-[20px] py-[15px] text-lg leading-6',       // 52px
+        lg: 'h-[56px] px-[24px] py-[15px] text-lg leading-6',           // 56px
       },
     };
 

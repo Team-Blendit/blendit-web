@@ -106,18 +106,18 @@ Typo_Semantic, Unit_Semantic 제외하고 적용 완료
   --text-tertiary: var(--color-gray-500);
   --text-disabled: var(--color-gray-400);
   --text-inverse: var(--color-white);
-  
+
   /* Background/Surface Colors */
   --color-bg-canvas: var(--color-white);
   --color-bg-section: var(--color-gray-50);
 
   /* Border Colors */
-  --color-border-default: var(--color-gray-300);
-  --color-border-strong: var(--color-gray-900);
-  --color-border-subtle: var(--color-gray-80);
-  --color-border-focus: var(--color-gray-400);
-  --color-border-active: var(--color-gray-500);
-
+  --border-default: var(--color-gray-300);
+  --border-strong: var(--color-gray-900);
+  --border-subtle: var(--color-gray-80);
+  --border-focus: var(--color-gray-400);
+  --border-active: var(--color-gray-500);
+  
   /* Icon Colors */
   --color-icon-default: var(--color-gray-900);
   --color-icon-secondary: var(--color-gray-600);

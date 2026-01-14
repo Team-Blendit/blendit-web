@@ -1,4 +1,5 @@
 import { Button } from '@/components/common/Button';
+import { SocialLoginButton } from '@/components/common/SocialLoginButton';
 
 // Alarm 아이콘
 const AlarmIcon = () => (
@@ -16,10 +17,10 @@ const AlarmIcon = () => (
   </svg>
 );
 
-export default function ButtonTestPage() {
+export default function ComponentTestPage() {
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold mb-8">Button Components Test</h1>
+      <h1 className="text-3xl font-bold mb-8">Components Test</h1>
 
       {/* Primary Buttons */}
       <section className="mb-8 bg-white p-6 rounded-lg">
@@ -95,37 +96,14 @@ export default function ButtonTestPage() {
         </div>
       </section>
 
-      {/* Comparison */}
-      <section className="bg-white p-6 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">Side by Side Comparison</h2>
-        <div className="grid grid-cols-2 gap-8">
-          <div>
-            <h3 className="text-sm font-medium mb-3">Primary (Main)</h3>
-            <div className="space-y-2">
-              <Button variant="primary" size="sm" className="w-full">Small Primary</Button>
-              <Button variant="primary" size="md" className="w-full">Medium Primary</Button>
-              <Button variant="primary" size="lg" className="w-full">Large Primary</Button>
-            </div>
-          </div>
-          <div>
-            <h3 className="text-sm font-medium mb-3">Secondary</h3>
-            <div className="space-y-2">
-              <Button variant="secondary" size="sm" className="w-full">Small Secondary</Button>
-              <Button variant="secondary" size="md" className="w-full">Medium Secondary</Button>
-              <Button variant="secondary" size="lg" className="w-full">Large Secondary</Button>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Without Icons */}
+      {/* Social Login Buttons */}
       <section className="mt-8 bg-white p-6 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">Without Icons</h2>
-        <div className="flex gap-4 items-center flex-wrap">
-          <Button variant="primary">Primary Button</Button>
-          <Button variant="secondary">Secondary Button</Button>
-          <Button variant="primary" size="sm">Small</Button>
-          <Button variant="secondary" size="lg">Large</Button>
+        <h2 className="text-xl font-semibold mb-4">Social Login Buttons</h2>
+        <div className="space-y-4 max-w-[440px]">
+          <SocialLoginButton provider="kakao" />
+          <SocialLoginButton provider="google" />
+          <SocialLoginButton provider="naver" />
         </div>
       </section>
     </div>
