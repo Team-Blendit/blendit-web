@@ -52,10 +52,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div
       className={cn(
-        'flex items-center justify-between w-[394px] h-[52px]',
+        'flex items-center h-[52px]',
         'bg-(--bg-canvas) border border-(--border-active) rounded-[40px]',
-        'pl-[28px] pr-0 overflow-hidden',
-        className
+        'pl-[28px] pr-[28px] overflow-hidden',
+        className || 'w-[394px]'
       )}
     >
       <input
@@ -66,15 +66,16 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         placeholder={placeholder}
         className={cn(
           'flex-1 font-normal text-xl leading-[26px] text-(--text-primary) placeholder:text-(--text-tertiary)',
-          'bg-transparent border-none outline-none'
+          'bg-transparent border-none outline-none',
+          'min-w-0'
         )}
       />
       <button
         type="button"
         onClick={handleSearchClick}
         className={cn(
-          'flex items-center justify-center h-full',
-          'pl-[14px] pr-[28px] rounded-r-full',
+          'flex items-center justify-center h-full flex-shrink-0',
+          'pl-[14px]',
           'cursor-pointer'
         )}
         aria-label="검색"

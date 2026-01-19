@@ -39,7 +39,7 @@ export default function FilterSet({ filters, className }: FilterSetProps) {
               label={filter.label}
               selected={filter.selected}
               size="large"
-              variant="fill"
+              variant="line"
               onClick={() => {
                 if (filter.onChange) {
                   filter.onChange(!filter.selected);

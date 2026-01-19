@@ -160,4 +160,5 @@ Typo_Semantic, Unit_Semantic 제외하고 적용 완료
 
 body {
   font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  background-color: --var(--bg-canvas);
 }
