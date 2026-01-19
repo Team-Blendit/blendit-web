@@ -106,10 +106,11 @@ Typo_Semantic, Unit_Semantic 제외하고 적용 완료
   --text-tertiary: var(--color-gray-500);
   --text-disabled: var(--color-gray-400);
   --text-inverse: var(--color-white);
+  --text-error: var(--color-red-100);
 
   /* Background/Surface Colors */
-  --color-bg-canvas: var(--color-white);
-  --color-bg-section: var(--color-gray-50);
+  --bg-canvas: var(--color-white);
+  --bg-section: var(--color-gray-50);
 
   /* Border Colors */
   --border-default: var(--color-gray-300);
@@ -117,14 +118,15 @@ Typo_Semantic, Unit_Semantic 제외하고 적용 완료
   --border-subtle: var(--color-gray-80);
   --border-focus: var(--color-gray-400);
   --border-active: var(--color-gray-500);
-  
-  /* Icon Colors */
-  --color-icon-default: var(--color-gray-900);
-  --color-icon-secondary: var(--color-gray-600);
-  --color-icon-tertiary: var(--color-gray-500);
-  --color-icon-disabled: var(--color-gray-400);
-  --color-icon-inverse: var(--color-white);
+  --border-error: var(--color-red-100);
 
+  /* Icon Colors */
+  --icon-default: var(--color-gray-900);
+  --icon-secondary: var(--color-gray-600);
+  --icon-tertiary: var(--color-gray-500);
+  --icon-disabled: var(--color-gray-400);
+  --icon-inverse: var(--color-white);
+  
   /* Accent Primary Colors */
   --accent-primary-default: var(--color-blue-300);
   --accent-primary-hover: var(--color-blue-100);
@@ -138,18 +140,18 @@ Typo_Semantic, Unit_Semantic 제외하고 적용 완료
   --accent-secondary-disabled: var(--color-gray-80);
 
   /* Badge Colors */
-  --color-badge-green-bg: var(--color-green-50);
-  --color-badge-green-text: var(--color-green-100);
-  --color-badge-red-bg: var(--color-red-50);
-  --color-badge-red-text: var(--color-red-100);
-  --color-badge-blue-fill-bg: var(--color-blue-50);
-  --color-badge-blue-fill-text: var(--color-blue-500);
-  --color-badge-blue-outline-bg: var(--color-white);
-  --color-badge-blue-outline-text: var(--color-blue-500);
-  --color-badge-gray-bg: var(--color-gray-100);
-  --color-badge-gray-text: var(--color-gray-500);
-  --color-badge-orange-bg: var(--color-orange-50);
-  --color-badge-orange-text: var(--color-orange-100);
+  --badge-green-bg: var(--color-green-50);
+  --badge-green-text: var(--color-green-100);
+  --badge-red-bg: var(--color-red-50);
+  --badge-red-text: var(--color-red-100);
+  --badge-blue-fill-bg: var(--color-blue-50);
+  --badge-blue-fill-text: var(--color-blue-500);
+  --badge-blue-outline-bg: var(--color-white);
+  --badge-blue-outline-text: var(--color-blue-500);
+  --badge-gray-bg: var(--color-gray-100);
+  --badge-gray-text: var(--color-gray-500);
+  --badge-orange-bg: var(--color-orange-50);
+  --badge-orange-text: var(--color-orange-100);
 }
 
 body {

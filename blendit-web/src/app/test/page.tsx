@@ -1,5 +1,20 @@
+'use client';
+
 import { Button } from '@/components/common/Button';
 import { SocialLoginButton } from '@/components/common/SocialLoginButton';
+import { StepIndicator } from '@/components/common/StepIndicator';
+import { Badge } from '@/components/common/Badge';
+import { SelectField } from '@/components/common/SelectField';
+import { InputField } from '@/components/common/InputField';
+import { SearchBar } from '@/components/common/SearchBar';
+import PageButton from '@/components/common/PageButton';
+import PageInfo from '@/components/common/PageInfo';
+import Pagination from '@/components/common/Pagination';
+import Tab from '@/components/common/Tab';
+import FilterChip from '@/components/common/FilterChip';
+import SelectChip from '@/components/common/SelectChip';
+import FilterSet from '@/components/common/FilterSet';
+import { useState } from 'react';
 
 // Alarm 아이콘
 const AlarmIcon = () => (
@@ -18,6 +33,19 @@ const AlarmIcon = () => (
 );
 
 export default function ComponentTestPage() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [activeTab, setActiveTab] = useState('tab1');
+  const [selectedFilter, setSelectedFilter] = useState('');
+  const [selectedChips, setSelectedChips] = useState<string[]>([]);
+  const [filterValues, setFilterValues] = useState({
+    job: '',
+    keyword: '',
+    region: '',
+    people: '',
+    recruiting: false,
+    bookmark: false,
+  });
+  
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
       <h1 className="text-3xl font-bold mb-8">Components Test</h1>
@@ -106,6 +134,456 @@ export default function ComponentTestPage() {
           <SocialLoginButton provider="naver" />
         </div>
       </section>
+
+      {/* Step Indicator */}
+      <section className="mt-8 bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Step Indicator</h2>
+        <div className="space-y-6">
+          <div>
+            <p className="text-sm text-gray-600 mb-2">Step 1</p>
+            <StepIndicator currentStep={1} />
+          </div>
+          <div>
+            <p className="text-sm text-gray-600 mb-2">Step 2</p>
+            <StepIndicator currentStep={2} />
+          </div>
+          <div>
+            <p className="text-sm text-gray-600 mb-2">Step 3</p>
+            <StepIndicator currentStep={3} />
+          </div>
+          <div>
+            <p className="text-sm text-gray-600 mb-2">Step 4</p>
+            <StepIndicator currentStep={4} />
+          </div>
+        </div>
+      </section>
+
+      {/* Badges */}
+      <section className="mt-8 bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Badges</h2>
+        
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-sm font-medium mb-2">Solid Style</h3>
+            <div className="flex gap-2 items-center flex-wrap">
+              <Badge color="blue" style="solid" text="Badge" />
+              <Badge color="gray" style="solid" text="Badge" />
+              <Badge color="red" style="solid" text="Badge" />
+              <Badge color="orange" style="solid" text="Badge" />
+              <Badge color="green" style="solid" text="Badge" />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">Outline Style</h3>
+            <div className="flex gap-2 items-center flex-wrap">
+              <Badge color="blue" style="outline" text="Badge" />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">Recruit Style (모집 인원)</h3>
+            <div className="flex gap-2 items-center flex-wrap">
+              <Badge color="gray" style="recruit" currentNum={0} totalNum={0} />
+              <Badge color="gray" style="recruit" currentNum={2} totalNum={4} />
+              <Badge color="gray" style="recruit" currentNum={10} totalNum={20} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Select Field */}
+      <section className="mt-8 bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Select Field</h2>
+        
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-sm font-medium mb-2">Single Select</h3>
+            <SelectField 
+              label="Text" 
+              required={true}
+              placeholder="Text"
+              layout="single"
+            />
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">Single Select with Error</h3>
+            <SelectField 
+              label="Text" 
+              required={true}
+              placeholder="Text"
+              layout="single"
+              error="필수 항목을 선택해 주세요."
+            />
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">Double Select</h3>
+            <SelectField 
+              label="Text" 
+              required={true}
+              placeholder="Text"
+              placeholder2="Text"
+              layout="double"
+            />
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">Double Select with Error</h3>
+            <SelectField 
+              label="Text" 
+              required={true}
+              placeholder="Text"
+              placeholder2="Text"
+              layout="double"
+              error="필수 항목을 선택해 주세요."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Input Field */}
+      <section className="mt-8 bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Input Field</h2>
+        
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-sm font-medium mb-2">Default</h3>
+            <InputField 
+              label="Text" 
+              required={true}
+              placeholder="내용을 입력해주세요"
+            />
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">With Error</h3>
+            <InputField 
+              label="Text" 
+              required={true}
+              placeholder="내용을 입력해주세요"
+              error="필수 내용을 입력해주세요"
+            />
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">Email Type</h3>
+            <InputField 
+              label="이메일" 
+              required={true}
+              placeholder="이메일을 입력해주세요"
+              type="email"
+            />
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">Password Type</h3>
+            <InputField 
+              label="비밀번호" 
+              required={true}
+              placeholder="비밀번호를 입력해주세요"
+              type="password"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Search Bar */}
+      <section className="mt-8 bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Search Bar</h2>
+        
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-sm font-medium mb-2">Default</h3>
+            <SearchBar placeholder="Text" />
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">Search Example</h3>
+            <SearchBar 
+              placeholder="검색어를 입력하세요" 
+              onSearch={(value) => console.log('Search:', value)}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Page Button */}
+      <section className="mb-8 bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">PageButton</h2>
+        
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-sm font-medium mb-2">Directions</h3>
+            <div className="flex gap-4 items-center">
+              <PageButton direction="left" onClick={() => console.log('Previous')} />
+              <PageButton direction="right" onClick={() => console.log('Next')} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Page Info */}
+      <section className="mb-8 bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">PageInfo</h2>
+        
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-sm font-medium mb-2">Page Display</h3>
+            <div className="flex gap-8 items-center">
+              <PageInfo currentPage={1} totalPages={3} />
+              <PageInfo currentPage={5} totalPages={10} />
+              <PageInfo currentPage={23} totalPages={100} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pagination */}
+      <section className="mb-8 bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Pagination</h2>
+        
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-sm font-medium mb-2">Interactive Pagination</h3>
+            <Pagination 
+              currentPage={currentPage} 
+              totalPages={5} 
+              onPageChange={setCurrentPage}
+            />
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">Static Examples</h3>
+            <div className="space-y-4">
+              <Pagination currentPage={1} totalPages={3} onPageChange={() => {}} />
+              <Pagination currentPage={2} totalPages={3} onPageChange={() => {}} />
+              <Pagination currentPage={3} totalPages={3} onPageChange={() => {}} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Tab */}
+      <section className="mb-8 bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Tab</h2>
+        
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-sm font-medium mb-2">Basic States</h3>
+            <div className="flex gap-4 items-end">
+              <Tab label="Active" active={true} />
+              <Tab label="Inactive" active={false} />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">With Notification Badge</h3>
+            <div className="flex gap-4 items-end">
+              <Tab label="Active" active={true} notification={true} />
+              <Tab label="Inactive" active={false} notification={true} />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">Interactive Tabs</h3>
+            <div className="flex gap-2 border-b border-gray-200">
+              <Tab 
+                label="Tab 1" 
+                active={activeTab === 'tab1'} 
+                onClick={() => setActiveTab('tab1')}
+              />
+              <Tab 
+                label="Tab 2" 
+                active={activeTab === 'tab2'} 
+                notification={true}
+                onClick={() => setActiveTab('tab2')}
+              />
+              <Tab 
+                label="Tab 3" 
+                active={activeTab === 'tab3'} 
+                onClick={() => setActiveTab('tab3')}
+              />
+            </div>
+            <div className="mt-4 p-4 bg-gray-50 rounded">
+              <p className="text-sm">Selected: {activeTab}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FilterChip */}
+      <section className="mb-8 bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">FilterChip</h2>
+        
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-sm font-medium mb-2">Basic Usage</h3>
+            <div className="flex gap-4 items-start">
+              <FilterChip 
+                label="직무" 
+                options={['개발자', '디자이너', '기획자', 'PM', '마케터']}
+                value={selectedFilter}
+                onChange={setSelectedFilter}
+              />
+            </div>
+            {selectedFilter && (
+              <div className="mt-4 p-4 bg-gray-50 rounded">
+                <p className="text-sm">Selected: {selectedFilter}</p>
+              </div>
+            )}
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">Multiple FilterChips</h3>
+            <div className="flex gap-4 items-start flex-wrap">
+              <FilterChip 
+                label="분야" 
+                options={['프론트엔드', '백엔드', '풀스택', 'DevOps', 'AI/ML']}
+              />
+              <FilterChip 
+                label="경력" 
+                options={['신입', '1-3년', '3-5년', '5년 이상']}
+              />
+              <FilterChip 
+                label="지역" 
+                options={['서울', '경기', '부산', '대구', '기타']}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SelectChip */}
+      <section className="mb-8 bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">SelectChip</h2>
+        
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-sm font-medium mb-2">Large Size - Line Style</h3>
+            <div className="flex gap-3 items-center flex-wrap">
+              <SelectChip label="Text" size="large" variant="line" selected={false} />
+              <SelectChip label="Text" size="large" variant="line" selected={true} />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">Large Size - Fill Style</h3>
+            <div className="flex gap-3 items-center flex-wrap">
+              <SelectChip label="Text" size="large" variant="fill" selected={false} />
+              <SelectChip label="Text" size="large" variant="fill" selected={true} />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">Small Size - Line Style</h3>
+            <div className="flex gap-3 items-center flex-wrap">
+              <SelectChip label="Text" size="small" variant="line" selected={false} />
+              <SelectChip label="Text" size="small" variant="line" selected={true} />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">Small Size - Fill Style</h3>
+            <div className="flex gap-3 items-center flex-wrap">
+              <SelectChip label="Text" size="small" variant="fill" selected={false} />
+              <SelectChip label="Text" size="small" variant="fill" selected={true} />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">Interactive Example</h3>
+            <div className="flex gap-3 items-center flex-wrap">
+              {['React', 'TypeScript', 'Next.js', 'Tailwind', 'Node.js'].map((tech) => (
+                <SelectChip
+                  key={tech}
+                  label={tech}
+                  size="large"
+                  variant="fill"
+                  selected={selectedChips.includes(tech)}
+                  onClick={() => {
+                    setSelectedChips(prev => 
+                      prev.includes(tech) 
+                        ? prev.filter(t => t !== tech)
+                        : [...prev, tech]
+                    );
+                  }}
+                />
+              ))}
+            </div>
+            {selectedChips.length > 0 && (
+              <div className="mt-4 p-4 bg-gray-50 rounded">
+                <p className="text-sm">Selected: {selectedChips.join(', ')}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* FilterSet */}
+      <section className="mb-8 bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">FilterSet</h2>
+        
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-sm font-medium mb-2">Complete Filter Set</h3>
+            <FilterSet
+              filters={[
+                {
+                  type: 'dropdown',
+                  label: '직군',
+                  options: ['개발자', '디자이너', '기획자', 'PM', '마케터'],
+                  value: filterValues.job,
+                  onChange: (value) => setFilterValues(prev => ({ ...prev, job: value as string })),
+                },
+                {
+                  type: 'dropdown',
+                  label: '키워드',
+                  options: ['React', 'TypeScript', 'Next.js', 'Tailwind', 'Node.js'],
+                  value: filterValues.keyword,
+                  onChange: (value) => setFilterValues(prev => ({ ...prev, keyword: value as string })),
+                },
+                {
+                  type: 'dropdown',
+                  label: '지역',
+                  options: ['서울', '경기', '부산', '대구', '기타'],
+                  value: filterValues.region,
+                  onChange: (value) => setFilterValues(prev => ({ ...prev, region: value as string })),
+                },
+                {
+                  type: 'dropdown',
+                  label: '인원수',
+                  options: ['1-2명', '3-5명', '6-10명', '10명 이상'],
+                  value: filterValues.people,
+                  onChange: (value) => setFilterValues(prev => ({ ...prev, people: value as string })),
+                },
+                {
+                  type: 'select',
+                  label: '모집중',
+                  selected: filterValues.recruiting,
+                  onChange: (value) => setFilterValues(prev => ({ ...prev, recruiting: value as boolean })),
+                },
+                {
+                  type: 'select',
+                  label: '북마크',
+                  selected: filterValues.bookmark,
+                  onChange: (value) => setFilterValues(prev => ({ ...prev, bookmark: value as boolean })),
+                },
+              ]}
+            />
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">Applied Filters</h3>
+            <div className="p-4 bg-gray-50 rounded">
+              <pre className="text-xs">{JSON.stringify(filterValues, null, 2)}</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="h-16" />
     </div>
   );
 }
