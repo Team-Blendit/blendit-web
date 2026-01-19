@@ -12,6 +12,7 @@ export interface InputFieldProps {
   onChange?: (value: string) => void;
   className?: string;
   type?: 'text' | 'email' | 'password' | 'number';
+  disabled?: boolean;
 }
 
 export const InputField: React.FC<InputFieldProps> = ({
@@ -23,40 +24,46 @@ export const InputField: React.FC<InputFieldProps> = ({
   onChange,
   className,
   type = 'text',
+  disabled = false,
 }) => {
   return (
-    <div className={cn('flex flex-col gap-[12px] w-full max-w-[560px]', className)}>
+    <div className={cn('flex flex-col gap-3 w-full max-w-[560px]', className)}>
       {/* Label */}
       <div className="flex items-start gap-[2px]">
-        <label className="font-semibold text-[22px] text-(--text-secondary)">
+        <label className="font-semibold text-xl text-[var(--text-secondary)]">
           {label}
         </label>
         {required && (
-          <div className="w-[6px] h-[6px] rounded-full bg-(--border-error)" aria-label="required" />
+          <div className="w-[6px] h-[6px] rounded-full bg-[var(--border-error)]" aria-label="required" />
         )}
       </div>
 
       {/* Field Group */}
-      <div className="flex flex-col gap-[8px] w-full">
+      <div className="flex flex-col gap-2 w-full">
         {/* Input */}
         <input
           type={type}
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
           placeholder={placeholder}
+          disabled={disabled}
           className={cn(
-            'w-full h-[60px] px-[16px] py-[16px]',
-            'bg-(--bg-canvas) border border-(--border-default) rounded-xl',
-            'font-medium text-lg text-(--text-primary) placeholder:text-(--text-tertiary)',
-            'focus:outline-none',
-            error && 'border-(--border-error)'
+            'w-full h-[60px] px-4 py-4 rounded-xl',
+            'font-medium text-base leading-base',
+            'focus:outline-none transition-colors',
+            disabled 
+              ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
+              : error
+                ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-primary)]'
+                : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-primary)] focus:border-[var(--border-focus)]',
+            'placeholder:text-[var(--text-tertiary)]'
           )}
         />
 
         {/* Error Message */}
         {error && (
           <div>
-            <p className="font-normal text-lg text-(--text-error) ps-[12px]">
+            <p className="font-normal text-base text-[var(--text-error)] ps-3">
               {error}
             </p>
           </div>

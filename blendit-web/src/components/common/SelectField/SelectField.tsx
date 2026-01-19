@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 // Down Arrow Icon
@@ -20,8 +20,11 @@ export interface SelectFieldProps {
   error?: string;
   layout?: 'single' | 'double';
   className?: string;
+  disabled?: boolean;
   // Double layout용 추가 props
   placeholder2?: string;
+  options1?: string[];
+  options2?: string[];
   onSelect1?: (value: string) => void;
   onSelect2?: (value: string) => void;
 }
@@ -33,89 +36,233 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   error,
   layout = 'single',
   className,
+  disabled = false,
   placeholder2 = 'Text',
+  options1 = ['옵션 1', '옵션 2', '옵션 3'],
+  options2 = ['옵션 1', '옵션 2', '옵션 3'],
   onSelect1,
   onSelect2,
 }) => {
+  const [isOpen1, setIsOpen1] = React.useState(false);
+  const [isOpen2, setIsOpen2] = React.useState(false);
+  const [selectedValue1, setSelectedValue1] = React.useState('');
+  const [selectedValue2, setSelectedValue2] = React.useState('');
+  
+  const dropdown1Ref = useRef<HTMLDivElement>(null);
+  const dropdown2Ref = useRef<HTMLDivElement>(null);
+
+  // 외부 클릭 감지
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdown1Ref.current && !dropdown1Ref.current.contains(event.target as Node)) {
+        setIsOpen1(false);
+      }
+      if (dropdown2Ref.current && !dropdown2Ref.current.contains(event.target as Node)) {
+        setIsOpen2(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleToggle1 = () => {
+    if (!disabled && !error) {
+      setIsOpen1(prev => !prev);
+    }
+  };
+
+  const handleToggle2 = () => {
+    if (!disabled && !error) {
+      setIsOpen2(prev => !prev);
+    }
+  };
+
+  const handleSelect1 = (value: string) => {
+    setSelectedValue1(value);
+    setIsOpen1(false);
+    onSelect1?.(value);
+  };
+
+  const handleSelect2 = (value: string) => {
+    setSelectedValue2(value);
+    setIsOpen2(false);
+    onSelect2?.(value);
+  };
+
   return (
-    <div className={cn('flex flex-col gap-[12px] w-full max-w-[560px]', className)}>
+    <div className={cn('flex flex-col gap-3 w-full max-w-[560px]', className)}>
       {/* Label */}
       <div className="flex items-start gap-[2px]">
-        <label className="font-semibold text-[22px] text-(--text-secondary)">
+        <label className="font-semibold text-xl text-[var(--text-secondary)]">
           {label}
         </label>
         {required && (
-          <div className="w-[6px] h-[6px] rounded-full bg-(--border-error)" aria-label="required" />
+          <div className="w-[6px] h-[6px] rounded-full bg-[var(--border-error)]" aria-label="required" />
         )}
       </div>
 
       {/* Field Group */}
-      <div className="flex flex-col gap-[8px] w-full">
+      <div className="flex flex-col gap-2 w-full">
         {/* Select Box(es) */}
         {layout === 'single' ? (
-          <div className="relative w-full">
-            <select
+          <div className="relative w-full" ref={dropdown1Ref}>
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={handleToggle1}
               className={cn(
-                'w-full h-[60px] px-[16px] py-[16px]',
-                'bg-(--bg-canvas) border border-(--border-default) rounded-2xl',
-                'font-medium text-lg text-(--text-tertiary)',
-                'appearance-none cursor-pointer',
-                'focus:outline-none',
-                error && 'border-(--border-error)',
+                'w-full h-[60px] px-4 py-4 rounded-xl',
+                'font-medium text-lg leading-base',
+                'flex items-center justify-between',
+                'transition-colors text-left',
+                disabled 
+                  ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
+                  : error
+                    ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
+                    : isOpen1
+                      ? 'bg-[var(--bg-canvas)] border border-[var(--border-focus)] text-[var(--text-secondary)]'
+                      : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:border-[var(--border-focus)]'
               )}
-              onChange={(e) => onSelect1?.(e.target.value)}
             >
-              <option value="">{placeholder}</option>
-            </select>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-              <DownArrowIcon />
-            </div>
+              <span>{selectedValue1 || placeholder}</span>
+              <div className={cn(
+                'transition-transform flex-shrink-0',
+                isOpen1 && !disabled && !error && 'rotate-180'
+              )}>
+                <DownArrowIcon />
+              </div>
+            </button>
+            
+            {/* Dropdown Menu */}
+            {isOpen1 && !disabled && !error && (
+              <div className="absolute z-10 w-full mt-2 bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
+                {options1.map((option, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => handleSelect1(option)}
+                    className={cn(
+                      'w-full h-[60px] px-[14px] py-[15px] text-left text-lg font-medium',
+                      'hover:bg-[#EEEEEE] transition-colors',
+                      'text-[var(--text-secondary)]',
+                      selectedValue1 === option && 'bg-[#EEEEEE]'
+                    )}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <div className="flex gap-4 w-full">
-            <div className="relative flex-1">
-              <select
+            <div className="relative flex-1" ref={dropdown1Ref}>
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={handleToggle1}
                 className={cn(
-                  'w-full h-[60px] px-[16px] py-[16px]',
-                  'bg-(--bg-canvas) border border-(--color-gray-300) rounded-2xl',
-                  'font-medium text-lg text-(--text-tertiary)',
-                  'appearance-none cursor-pointer',
-                  'focus:outline-none',
-                  error && 'border-(--border-error)'
+                  'w-full h-[60px] px-4 py-4 rounded-xl',
+                  'font-medium text-lg leading-base',
+                  'flex items-center justify-between',
+                  'transition-colors text-left',
+                  disabled 
+                    ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
+                    : error
+                      ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
+                      : isOpen1
+                        ? 'bg-[var(--bg-canvas)] border border-[var(--border-focus)] text-[var(--text-secondary)]'
+                        : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:border-[var(--border-focus)]'
                 )}
-                onChange={(e) => onSelect1?.(e.target.value)}
               >
-                <option value="">{placeholder}</option>
-              </select>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                <DownArrowIcon />
-              </div>
+                <span>{selectedValue1 || placeholder}</span>
+                <div className={cn(
+                  'transition-transform flex-shrink-0',
+                  isOpen1 && !disabled && !error && 'rotate-180'
+                )}>
+                  <DownArrowIcon />
+                </div>
+              </button>
+              
+              {/* Dropdown Menu */}
+              {isOpen1 && !disabled && !error && (
+                <div className="absolute z-10 w-full mt-2 bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
+                  {options1.map((option, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handleSelect1(option)}
+                      className={cn(
+                        'w-full h-[60px] px-[14px] py-[15px] text-left text-lg font-medium',
+                        'hover:bg-[#EEEEEE] transition-colors',
+                        'text-[var(--text-secondary)]',
+                        selectedValue1 === option && 'bg-[#EEEEEE]'
+                      )}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-            <div className="relative w-[272px]">
-              <select
+            
+            <div className="relative w-[272px]" ref={dropdown2Ref}>
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={handleToggle2}
                 className={cn(
-                  'w-full h-[60px] px-[16px] py-[16px]',
-                  'bg-(--bg-canvas) border border-(--color-gray-300) rounded-2xl',
-                  'font-medium text-lg text-(--text-tertiary)',
-                  'appearance-none cursor-pointer',
-                  'focus:outline-none',
-                  error && 'border-(--border-error)'
+                  'w-full h-[60px] px-4 py-4 rounded-xl',
+                  'font-medium text-lg leading-base',
+                  'flex items-center justify-between',
+                  'transition-colors text-left',
+                  disabled 
+                    ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
+                    : error
+                      ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
+                      : isOpen2
+                        ? 'bg-[var(--bg-canvas)] border border-[var(--border-focus)] text-[var(--text-secondary)]'
+                        : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:border-[var(--border-focus)]'
                 )}
-                onChange={(e) => onSelect2?.(e.target.value)}
               >
-                <option value="">{placeholder2}</option>
-              </select>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                <DownArrowIcon />
-              </div>
+                <span>{selectedValue2 || placeholder2}</span>
+                <div className={cn(
+                  'transition-transform flex-shrink-0',
+                  isOpen2 && !disabled && !error && 'rotate-180'
+                )}>
+                  <DownArrowIcon />
+                </div>
+              </button>
+              
+              {/* Dropdown Menu */}
+              {isOpen2 && !disabled && !error && (
+                <div className="absolute z-10 w-full mt-2 bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
+                  {options2.map((option, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handleSelect2(option)}
+                      className={cn(
+                        'w-full h-[60px] px-[14px] py-[15px] text-left text-lg font-medium',
+                        'hover:bg-[#EEEEEE] transition-colors',
+                        'text-[var(--text-secondary)]',
+                        selectedValue2 === option && 'bg-[#EEEEEE]'
+                      )}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
 
         {/* Error Message */}
         {error && (
-          <div>
-            <p className="font-normal text-lg text-(--text-error) ps-[12px]">
+          <div className="px-3">
+            <p className="font-normal text-lg text-[var(--text-error)]">
               {error}
             </p>
           </div>

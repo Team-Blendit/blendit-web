@@ -154,6 +154,10 @@ Typo_Semantic, Unit_Semantic 제외하고 적용 완료
   --badge-orange-text: var(--color-orange-100);
 }
 
+* {
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
 body {
   font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }

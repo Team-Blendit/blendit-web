@@ -14,6 +14,7 @@ import Tab from '@/components/common/Tab';
 import FilterChip from '@/components/common/FilterChip';
 import SelectChip from '@/components/common/SelectChip';
 import FilterSet from '@/components/common/FilterSet';
+import KeywordChip from '@/components/common/KeywordChip';
 import { useState } from 'react';
 
 // Alarm 아이콘
@@ -45,6 +46,7 @@ export default function ComponentTestPage() {
     recruiting: false,
     bookmark: false,
   });
+  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
   
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
@@ -578,6 +580,55 @@ export default function ComponentTestPage() {
             <h3 className="text-sm font-medium mb-2">Applied Filters</h3>
             <div className="p-4 bg-gray-50 rounded">
               <pre className="text-xs">{JSON.stringify(filterValues, null, 2)}</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* KeywordChip */}
+      <section className="mb-8 bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">KeywordChip</h2>
+        
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-sm font-medium mb-2">Basic States</h3>
+            <div className="flex gap-3 items-center flex-wrap">
+              <KeywordChip label="키워드" selected={false} />
+              <KeywordChip label="키워드" selected={true} />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">Interactive Keywords</h3>
+            <div className="flex gap-3 items-center flex-wrap">
+              {['React', 'TypeScript', 'Next.js', 'Tailwind CSS', 'Node.js', 'Python', 'Java', 'Spring'].map((keyword) => (
+                <KeywordChip
+                  key={keyword}
+                  label={keyword}
+                  selected={selectedKeywords.includes(keyword)}
+                  onClick={() => {
+                    setSelectedKeywords(prev => 
+                      prev.includes(keyword) 
+                        ? prev.filter(k => k !== keyword)
+                        : [...prev, keyword]
+                    );
+                  }}
+                />
+              ))}
+            </div>
+            {selectedKeywords.length > 0 && (
+              <div className="mt-4 p-4 bg-gray-50 rounded">
+                <p className="text-sm">Selected Keywords: {selectedKeywords.join(', ')}</p>
+              </div>
+            )}
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">Various Labels</h3>
+            <div className="flex gap-3 items-center flex-wrap">
+              <KeywordChip label="짧은글" />
+              <KeywordChip label="중간 길이의 키워드" />
+              <KeywordChip label="이것은 좀 더 긴 키워드입니다" selected />
             </div>
           </div>
         </div>
