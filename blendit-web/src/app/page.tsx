@@ -67,11 +67,12 @@ export default function HomePage() {
           {/* Filter Section */}
           <section className="flex gap-4 items-start justify-between">
             <FilterSet
+            // 수정 필요
               filters={[
                 {
                   type: 'dropdown',
                   label: '직군',
-                  options: ['개발자', '디자이너', '기획자', 'PM', '마케터'],
+                  options: ['전체', '프론트', '백엔드', '디자인', 'PM', '마케팅', '데이터', 'AI', '보안'],
                   value: filterValues.job,
                   onChange: (value) => setFilterValues(prev => ({ ...prev, job: value as string })),
                 },

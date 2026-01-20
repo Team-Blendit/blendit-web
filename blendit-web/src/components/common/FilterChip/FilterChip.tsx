@@ -18,7 +18,7 @@ const DropDownRow = ({ label, selected = false, onClick }: DropDownRowProps) => 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        'w-[134px] px-[8px] py-[12px] flex items-center justify-center',
+        'w-[134px] px-[8px] py-[12px] flex items-center justify-center rounded-[8px]',
         'font-semibold text-[22px] leading-[28px]',
         'transition-colors',
         isHovered && 'bg-(--accent-primary-hover)',
@@ -93,6 +93,26 @@ export default function FilterChip({
 
   return (
     <div ref={dropdownRef} className={cn('relative', className)}>
+      <style jsx>{`
+        .filter-chip-dropdown::-webkit-scrollbar {
+          width: 18px;
+        }
+        
+        .filter-chip-dropdown::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        
+        .filter-chip-dropdown::-webkit-scrollbar-thumb {
+          background-color: #BDBDBD;
+          border-radius: 999px;
+          border: 2px solid white;
+          width: 14px;
+        }
+        
+        .filter-chip-dropdown::-webkit-scrollbar-thumb:hover {
+          background-color: #999999;
+        }
+      `}</style>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
@@ -106,7 +126,7 @@ export default function FilterChip({
         <span className={cn(
           'flex-1 text-left overflow-hidden text-ellipsis whitespace-nowrap',
           'font-["Pretendard"] font-normal text-[20px] leading-[26px]',
-          hasSelection || isOpen ? 'text-[#121212]' : 'text-[#999999]'
+          hasSelection || isOpen ? 'text-(--text-primary)' : 'text-(--text-tertiary)'
         )}>
           {displayLabel}
         </span>
@@ -116,7 +136,7 @@ export default function FilterChip({
       </button>
 
       {isOpen && (
-        <div className="absolute top-[56px] left-0 w-[150px] bg-white border border-[#121212] rounded-lg shadow-lg overflow-hidden z-10">
+        <div className="filter-chip-dropdown max-h-[400px] absolute top-[56px] left-1/2 -translate-x-1/2 bg-white border border-(--border-focus) rounded-[20px] p-[20px] shadow-[2px_4px_12px_0px_rgba(0,0,0,0.08)] z-10 flex flex-col gap-[8px] overflow-y-auto overflow-x-hidden">
           {options.map((option, index) => (
             <DropDownRow
               key={index}

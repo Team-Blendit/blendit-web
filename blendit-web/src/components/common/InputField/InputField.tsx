@@ -27,7 +27,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   disabled = false,
 }) => {
   return (
-    <div className={cn('flex flex-col gap-3 w-full max-w-[560px]', className)}>
+    <div className={cn('flex flex-col gap-[12px] w-full items-start self-stretch', className)}>
       {/* Label */}
       <div className="flex items-start gap-[2px]">
         <label className="font-semibold text-xl text-[var(--text-secondary)]">
@@ -39,7 +39,7 @@ export const InputField: React.FC<InputFieldProps> = ({
       </div>
 
       {/* Field Group */}
-      <div className="flex flex-col gap-2 w-full">
+      <div className="flex flex-col gap-2 w-full self-stretch">
         {/* Input */}
         <input
           type={type}
@@ -49,7 +49,7 @@ export const InputField: React.FC<InputFieldProps> = ({
           disabled={disabled}
           className={cn(
             'w-full h-[60px] px-4 py-4 rounded-xl',
-            'font-medium text-base leading-base',
+            'font-medium text-[18px] leading-[24px]',
             'focus:outline-none transition-colors',
             disabled 
               ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'

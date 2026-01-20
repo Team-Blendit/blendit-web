@@ -13,20 +13,34 @@ const DownArrowIcon = () => (
   </svg>
 );
 
+// Info Icon
+const InfoIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9.98438 12.375C9.98438 12.4869 9.93993 12.5942 9.86081 12.6733C9.7817 12.7524 9.67439 12.7969 9.5625 12.7969C9.30143 12.7969 9.05105 12.6932 8.86644 12.5086C8.68184 12.324 8.57813 12.0736 8.57813 11.8125V9C8.57813 8.9627 8.56331 8.92694 8.53694 8.90056C8.51057 8.87419 8.4748 8.85938 8.4375 8.85938C8.32561 8.85938 8.21831 8.81493 8.13919 8.73581C8.06008 8.65669 8.01563 8.54939 8.01563 8.4375C8.01563 8.32561 8.06008 8.21831 8.13919 8.13919C8.21831 8.06007 8.32561 8.01562 8.4375 8.01562C8.69858 8.01562 8.94896 8.11934 9.13356 8.30394C9.31817 8.48855 9.42188 8.73893 9.42188 9V11.8125C9.42188 11.8498 9.43669 11.8856 9.46307 11.9119C9.48944 11.9383 9.52521 11.9531 9.5625 11.9531C9.67439 11.9531 9.7817 11.9976 9.86081 12.0767C9.93993 12.1558 9.98438 12.2631 9.98438 12.375ZM8.71875 6.60938C8.85782 6.60938 8.99376 6.56814 9.10939 6.49088C9.22502 6.41362 9.31514 6.3038 9.36836 6.17532C9.42157 6.04684 9.4355 5.90547 9.40837 5.76908C9.38124 5.63268 9.31427 5.5074 9.21594 5.40907C9.1176 5.31073 8.99232 5.24377 8.85593 5.21664C8.71953 5.18951 8.57816 5.20343 8.44968 5.25665C8.3212 5.30987 8.21139 5.39999 8.13413 5.51561C8.05687 5.63124 8.01563 5.76718 8.01563 5.90625C8.01563 6.09273 8.08971 6.27157 8.22157 6.40343C8.35343 6.5353 8.53227 6.60938 8.71875 6.60938ZM16.1719 9C16.1719 10.4185 15.7513 11.8051 14.9632 12.9845C14.1751 14.1639 13.055 15.0831 11.7446 15.6259C10.4341 16.1688 8.99205 16.3108 7.60084 16.0341C6.20963 15.7573 4.93173 15.0743 3.92872 14.0713C2.92572 13.0683 2.24266 11.7904 1.96593 10.3992C1.68921 9.00796 1.83123 7.56593 2.37405 6.25544C2.91688 4.94495 3.83611 3.82486 5.01552 3.0368C6.19493 2.24875 7.58154 1.82813 9 1.82812C10.9014 1.83036 12.7243 2.58668 14.0688 3.93119C15.4133 5.27569 16.1696 7.09859 16.1719 9ZM15.3281 9C15.3281 7.74841 14.957 6.52494 14.2616 5.48428C13.5663 4.44363 12.578 3.63254 11.4217 3.15357C10.2654 2.67461 8.99298 2.5493 7.76545 2.79347C6.53791 3.03764 5.41035 3.64034 4.52534 4.52534C3.64034 5.41034 3.03764 6.53791 2.79347 7.76544C2.5493 8.99298 2.67462 10.2654 3.15358 11.4217C3.63254 12.578 4.44363 13.5663 5.48429 14.2616C6.52494 14.957 7.74842 15.3281 9 15.3281C10.6778 15.3263 12.2863 14.659 13.4726 13.4726C14.659 12.2863 15.3263 10.6778 15.3281 9Z" fill="#BDBDBD"/>
+  </svg>
+);
+
 export interface SelectFieldProps {
   label?: string;
   required?: boolean;
   placeholder?: string;
   error?: string;
-  layout?: 'single' | 'double';
+  layout?: 'single' | 'double' | 'triple';
   className?: string;
   disabled?: boolean;
-  // Double layout용 추가 props
+  // Double/Triple layout용 추가 props
   placeholder2?: string;
+  placeholder3?: string;
   options1?: string[];
   options2?: string[];
+  options3?: string[];
   onSelect1?: (value: string) => void;
   onSelect2?: (value: string) => void;
+  onSelect3?: (value: string) => void;
+  // 자동승인 토글 관련 props
+  showAutoApproval?: boolean;
+  autoApprovalEnabled?: boolean;
+  onAutoApprovalChange?: (enabled: boolean) => void;
 }
 
 export const SelectField: React.FC<SelectFieldProps> = ({
@@ -38,18 +52,28 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   className,
   disabled = false,
   placeholder2 = 'Text',
+  placeholder3 = 'Text',
   options1 = ['옵션 1', '옵션 2', '옵션 3'],
   options2 = ['옵션 1', '옵션 2', '옵션 3'],
+  options3 = ['옵션 1', '옵션 2', '옵션 3'],
   onSelect1,
   onSelect2,
+  onSelect3,
+  showAutoApproval = false,
+  autoApprovalEnabled = false,
+  onAutoApprovalChange,
 }) => {
   const [isOpen1, setIsOpen1] = React.useState(false);
   const [isOpen2, setIsOpen2] = React.useState(false);
+  const [isOpen3, setIsOpen3] = React.useState(false);
   const [selectedValue1, setSelectedValue1] = React.useState('');
   const [selectedValue2, setSelectedValue2] = React.useState('');
+  const [selectedValue3, setSelectedValue3] = React.useState('');
+  const [autoApproval, setAutoApproval] = React.useState(autoApprovalEnabled);
   
   const dropdown1Ref = useRef<HTMLDivElement>(null);
   const dropdown2Ref = useRef<HTMLDivElement>(null);
+  const dropdown3Ref = useRef<HTMLDivElement>(null);
 
   // 외부 클릭 감지
   useEffect(() => {
@@ -59,6 +83,9 @@ export const SelectField: React.FC<SelectFieldProps> = ({
       }
       if (dropdown2Ref.current && !dropdown2Ref.current.contains(event.target as Node)) {
         setIsOpen2(false);
+      }
+      if (dropdown3Ref.current && !dropdown3Ref.current.contains(event.target as Node)) {
+        setIsOpen3(false);
       }
     };
 
@@ -90,20 +117,68 @@ export const SelectField: React.FC<SelectFieldProps> = ({
     onSelect2?.(value);
   };
 
+  const handleToggle3 = () => {
+    if (!disabled && !error) {
+      setIsOpen3(prev => !prev);
+    }
+  };
+
+  const handleSelect3 = (value: string) => {
+    setSelectedValue3(value);
+    setIsOpen3(false);
+    onSelect3?.(value);
+  };
+
+  const handleToggleAutoApproval = () => {
+    const newValue = !autoApproval;
+    setAutoApproval(newValue);
+    onAutoApprovalChange?.(newValue);
+  };
+
   return (
-    <div className={cn('flex flex-col gap-3 w-full max-w-[560px]', className)}>
-      {/* Label */}
-      <div className="flex items-start gap-[2px]">
-        <label className="font-semibold text-xl text-[var(--text-secondary)]">
-          {label}
-        </label>
-        {required && (
-          <div className="w-[6px] h-[6px] rounded-full bg-[var(--border-error)]" aria-label="required" />
-        )}
-      </div>
+    <div className={cn('flex flex-col items-start self-stretch w-full', label ? 'gap-[12px]' : '')}>
+      {/* Label with Auto Approval Toggle */}
+      {label && (
+        <div className="flex items-center justify-between self-stretch w-full">
+          <div className="flex items-start gap-[2px]">
+            <label className="font-semibold text-xl text-[var(--text-secondary)]">
+              {label}
+            </label>
+            {required && (
+              <div className="w-[6px] h-[6px] rounded-full bg-[var(--border-error)]" aria-label="required" />
+            )}
+          </div>
+          
+          {showAutoApproval && (
+            <div className="flex w-[126px] justify-between items-center">
+              <div className="flex items-center gap-[4px]">
+                <span className="font-semibold text-[18px] leading-[28px] text-(--text-disabled)">
+                  자동승인
+                </span>
+                <InfoIcon />
+              </div>
+              <button
+                type="button"
+                onClick={handleToggleAutoApproval}
+                className={cn(
+                  'relative h-[20px] w-[34px] rounded-[66.667px] transition-colors',
+                  autoApproval ? 'bg-(--accent-primary-default)' : 'bg-(--accent-secondary-default)'
+                )}
+              >
+                <span
+                  className={cn(
+                    'absolute top-[2px] size-[16px] rounded-[66.667px] bg-white transition-transform',
+                    autoApproval ? 'left-[16.22px]' : 'left-[2.78px]'
+                  )}
+                />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Field Group */}
-      <div className="flex flex-col gap-2 w-full">
+      <div className={cn('flex flex-col gap-2 w-full', className)}>
         {/* Select Box(es) */}
         {layout === 'single' ? (
           <div className="relative w-full" ref={dropdown1Ref}>
@@ -155,7 +230,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
               </div>
             )}
           </div>
-        ) : (
+        ) : layout === 'double' ? (
           <div className="flex gap-4 w-full">
             <div className="relative flex-1" ref={dropdown1Ref}>
               <button
@@ -248,6 +323,159 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                         'hover:bg-[#EEEEEE] transition-colors',
                         'text-[var(--text-secondary)]',
                         selectedValue2 === option && 'bg-[#EEEEEE]'
+                      )}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          // Triple layout
+          <div className="flex gap-4 w-full">
+            <div className="relative flex-1" ref={dropdown1Ref}>
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={handleToggle1}
+                className={cn(
+                  'w-full h-[60px] px-4 py-4 rounded-xl',
+                  'font-medium text-lg leading-base',
+                  'flex items-center justify-between',
+                  'transition-colors text-left',
+                  disabled 
+                    ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
+                    : error
+                      ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
+                      : isOpen1
+                        ? 'bg-[var(--bg-canvas)] border border-[var(--border-focus)] text-[var(--text-secondary)]'
+                        : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:border-[var(--border-focus)]'
+                )}
+              >
+                <span>{selectedValue1 || placeholder}</span>
+                <div className={cn(
+                  'transition-transform flex-shrink-0',
+                  isOpen1 && !disabled && !error && 'rotate-180'
+                )}>
+                  <DownArrowIcon />
+                </div>
+              </button>
+              
+              {/* Dropdown Menu */}
+              {isOpen1 && !disabled && !error && (
+                <div className="absolute z-10 w-full mt-2 bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
+                  {options1.map((option, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handleSelect1(option)}
+                      className={cn(
+                        'w-full h-[60px] px-[14px] py-[15px] text-left text-lg font-medium',
+                        'hover:bg-[#EEEEEE] transition-colors',
+                        'text-[var(--text-secondary)]',
+                        selectedValue1 === option && 'bg-[#EEEEEE]'
+                      )}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <div className="relative flex-1" ref={dropdown2Ref}>
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={handleToggle2}
+                className={cn(
+                  'w-full h-[60px] px-4 py-4 rounded-xl',
+                  'font-medium text-lg leading-base',
+                  'flex items-center justify-between',
+                  'transition-colors text-left',
+                  disabled 
+                    ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
+                    : error
+                      ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
+                      : isOpen2
+                        ? 'bg-[var(--bg-canvas)] border border-[var(--border-focus)] text-[var(--text-secondary)]'
+                        : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:border-[var(--border-focus)]'
+                )}
+              >
+                <span>{selectedValue2 || placeholder2}</span>
+                <div className={cn(
+                  'transition-transform flex-shrink-0',
+                  isOpen2 && !disabled && !error && 'rotate-180'
+                )}>
+                  <DownArrowIcon />
+                </div>
+              </button>
+              
+              {/* Dropdown Menu */}
+              {isOpen2 && !disabled && !error && (
+                <div className="absolute z-10 w-full mt-2 bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
+                  {options2.map((option, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handleSelect2(option)}
+                      className={cn(
+                        'w-full h-[60px] px-[14px] py-[15px] text-left text-lg font-medium',
+                        'hover:bg-[#EEEEEE] transition-colors',
+                        'text-[var(--text-secondary)]',
+                        selectedValue2 === option && 'bg-[#EEEEEE]'
+                      )}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="relative flex-1" ref={dropdown3Ref}>
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={handleToggle3}
+                className={cn(
+                  'w-full h-[60px] px-4 py-4 rounded-xl',
+                  'font-medium text-lg leading-base',
+                  'flex items-center justify-between',
+                  'transition-colors text-left',
+                  disabled 
+                    ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
+                    : error
+                      ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
+                      : isOpen3
+                        ? 'bg-[var(--bg-canvas)] border border-[var(--border-focus)] text-[var(--text-secondary)]'
+                        : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:border-[var(--border-focus)]'
+                )}
+              >
+                <span>{selectedValue3 || placeholder3}</span>
+                <div className={cn(
+                  'transition-transform flex-shrink-0',
+                  isOpen3 && !disabled && !error && 'rotate-180'
+                )}>
+                  <DownArrowIcon />
+                </div>
+              </button>
+              
+              {/* Dropdown Menu */}
+              {isOpen3 && !disabled && !error && (
+                <div className="absolute z-10 w-full mt-2 bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
+                  {options3.map((option, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handleSelect3(option)}
+                      className={cn(
+                        'w-full h-[60px] px-[14px] py-[15px] text-left text-lg font-medium',
+                        'hover:bg-[#EEEEEE] transition-colors',
+                        'text-[var(--text-secondary)]',
+                        selectedValue3 === option && 'bg-[#EEEEEE]'
                       )}
                     >
                       {option}
