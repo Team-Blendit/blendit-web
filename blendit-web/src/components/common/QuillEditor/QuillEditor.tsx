@@ -21,6 +21,7 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
   disabled = false,
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const quillRef = useRef<any>(null);
   const [textLength, setTextLength] = useState(0);
 
@@ -79,6 +80,7 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
         quillRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // value prop 변경 감지

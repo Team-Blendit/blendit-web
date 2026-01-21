@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## 빌드 및 배포
 
-## Getting Started
-
-First, run the development server:
+### CI/CD 명령어
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm ci --legacy-peer-deps && npm run build && npm run lint && npx tsc --noEmit
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| 명령어 | 설명 |
+|--------|------|
+| `npm ci --legacy-peer-deps` | 의존성 클린 설치 (CI 환경용) |
+| `npm run build` | Next.js 정적 빌드 (out/ 폴더 생성) |
+| `npm run lint` | ESLint 코드 검사 |
+| `npx tsc --noEmit` | TypeScript 타입 검사 |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 정적 배포 (nginx)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+이 프로젝트는 `output: 'export'` 설정으로 정적 HTML을 생성합니다.
 
-## Learn More
+- **빌드 결과물**: `out/` 폴더
+- **Node.js 서버 불필요**: `next start` 필요 없음
+- **nginx 설정 예시**:
 
-To learn more about Next.js, take a look at the following resources:
+```nginx
+server {
+    listen 80;
+    root /path/to/out;
+    index index.html;
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+    location / {
+        try_files $uri $uri.html $uri/ /index.html;
+    }
+}
+```
