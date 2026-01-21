@@ -25,10 +25,10 @@ export default function HomePage() {
     id: i + 1,
     title: i % 2 === 0 ? '디자이너 10년차의 멘토링' : '네카라쿠배 디자이너가 알려주는 실무 팁',
     userName: i % 3 === 0 ? '네카라쿠배의디자이너' : '김개발',
-    job: i % 2 === 0 ? '디자인' : 'Text',
-    career: 'Text',
-    location: 'Text',
-    keywords: ['실무 경험', '멘토링'],
+    userJob: i % 2 === 0 ? '디자인' : '백엔드',
+    userCareer: i % 3 === 0 ? '시니어 (9년이상)' : i % 3 === 1 ? '미들 (4~6년)' : '주니어 (1~3년)',
+    userLocation: '서울 강남구',
+    keywords: ['실무 경험', '멘토링', '사이드 프로젝트'],
     currentNum: i % 5,
     totalNum: 5,
     isRecruiting: i % 2 === 0,
@@ -133,16 +133,17 @@ export default function HomePage() {
             {mockCards.map((card) => (
               <Card
                 key={card.id}
+                variant="main"
                 title={card.title}
                 userName={card.userName}
-                job={card.job}
-                career={card.career}
-                location={card.location}
+                userJob={card.userJob}
+                userCareer={card.userCareer}
+                userLocation={card.userLocation}
                 keywords={card.keywords}
                 currentNum={card.currentNum}
                 totalNum={card.totalNum}
                 isRecruiting={card.isRecruiting}
-                onDetailClick={() => console.log('Detail:', card.id)}
+                onButtonClick={() => console.log('Detail:', card.id)}
               />
             ))}
           </div>
