@@ -35,7 +35,7 @@ jobs:
           cache: "npm"
           cache-dependency-path: blendit-web/package-lock.json
 
-      - name: Install
+      - name: Install dependencies
         working-directory: blendit-web
         run: npm ci --legacy-peer-deps
 
@@ -58,14 +58,34 @@ jobs:
           rm -f frontend-latest.zip
           zip -r frontend-latest.zip out
 
-      - name: Upload zip to NCP Object Storage
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+
+      - name: Upload zip to NCP Object Storage (debug + path-style)
         env:
           AWS_ACCESS_KEY_ID: ${{ env.NCP_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ env.NCP_SECRET_KEY }}
           AWS_DEFAULT_REGION: kr-standard
+          AWS_REGION: kr-standard
+          AWS_S3_ADDRESSING_STYLE: path
+          AWS_EC2_METADATA_DISABLED: "true"
         run: |
-          aws --endpoint-url=${{ env.OS_ENDPOINT }} \
-            s3 cp blendit-web/frontend-latest.zip s3://${{ env.OS_BUCKET }}/${{ env.OS_OBJECT_KEY }}
+          set -euo pipefail
+
+          aws --version
+
+          echo "== list buckets =="
+          aws --region kr-standard --endpoint-url=${{ env.OS_ENDPOINT }} s3api list-buckets || true
+
+          echo "== list objects (bucket) =="
+          aws --region kr-standard --endpoint-url=${{ env.OS_ENDPOINT }} s3api list-objects-v2 \
+            --bucket "${{ env.OS_BUCKET }}" --max-keys 5 || true
+
+          echo "== upload =="
+          aws --region kr-standard --endpoint-url=${{ env.OS_ENDPOINT }} \
+            s3 cp blendit-web/frontend-latest.zip "s3://${{ env.OS_BUCKET }}/${{ env.OS_OBJECT_KEY }}"
 
       - name: Trigger SourceDeploy scenario (FRONTEND)
         shell: bash
@@ -74,7 +94,11 @@ jobs:
 
           METHOD="POST"
           URL="/api/v1/project/${SOURCE_DEPLOY_PROJECT_ID_FE}/stage/${SOURCE_DEPLOY_STAGE_ID_FE}/scenario/${SOURCE_DEPLOY_SCENARIO_ID_FE}/deploy"
-          TIMESTAMP="$(date +%s%3N)"
+          TIMESTAMP="$(python3 - <<'PY'
+import time
+print(int(time.time() * 1000))
+PY
+)"
 
           SIGNATURE="$(printf "%b" "${METHOD} ${URL}\n${TIMESTAMP}\n${NCP_ACCESS_KEY}" \
             | openssl dgst -sha256 -hmac "${NCP_SECRET_KEY}" -binary \
@@ -84,4 +108,5 @@ jobs:
             -H "x-ncp-apigw-timestamp: ${TIMESTAMP}" \
             -H "x-ncp-iam-access-key: ${NCP_ACCESS_KEY}" \
             -H "x-ncp-apigw-signature-v2: ${SIGNATURE}" \
-            -H "Content-Type: application/json"
+            -H "Content-Type: application/json" \
+            -d "{}"
