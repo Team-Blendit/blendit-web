@@ -71,7 +71,7 @@ jobs:
 
           aws --version
 
-      - name: Upload zip to NCP Object Storage (debug + path-style)
+      - name: Delete old object then upload new zip (NCP Object Storage)
         shell: bash
         env:
           AWS_ACCESS_KEY_ID: ${{ env.NCP_ACCESS_KEY }}
@@ -83,14 +83,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          echo "== list buckets =="
-          aws --region kr-standard --endpoint-url=${{ env.OS_ENDPOINT }} s3api list-buckets || true
+          echo "== delete old frontend-latest.zip (ignore if missing) =="
+          aws --region kr-standard --endpoint-url=${{ env.OS_ENDPOINT }} \
+            s3 rm "s3://${{ env.OS_BUCKET }}/${{ env.OS_OBJECT_KEY }}" || true
 
-          echo "== list objects (bucket) =="
-          aws --region kr-standard --endpoint-url=${{ env.OS_ENDPOINT }} s3api list-objects-v2 \
-            --bucket "${{ env.OS_BUCKET }}" --max-keys 5 || true
-
-          echo "== upload =="
+          echo "== upload new frontend-latest.zip =="
           aws --region kr-standard --endpoint-url=${{ env.OS_ENDPOINT }} \
             s3 cp blendit-web/frontend-latest.zip "s3://${{ env.OS_BUCKET }}/${{ env.OS_OBJECT_KEY }}"
 
