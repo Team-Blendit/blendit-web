@@ -71,7 +71,7 @@ jobs:
 
           aws --version
 
-      - name: Delete old object then upload new zip (NCP Object Storage)
+      - name: Delete old object then upload new zip (s3api put-object)
         shell: bash
         env:
           AWS_ACCESS_KEY_ID: ${{ env.NCP_ACCESS_KEY }}
@@ -87,9 +87,12 @@ jobs:
           aws --region kr-standard --endpoint-url=${{ env.OS_ENDPOINT }} \
             s3 rm "s3://${{ env.OS_BUCKET }}/${{ env.OS_OBJECT_KEY }}" || true
 
-          echo "== upload new frontend-latest.zip =="
+          echo "== upload new frontend-latest.zip (put-object) =="
           aws --region kr-standard --endpoint-url=${{ env.OS_ENDPOINT }} \
-            s3 cp blendit-web/frontend-latest.zip "s3://${{ env.OS_BUCKET }}/${{ env.OS_OBJECT_KEY }}"
+            s3api put-object \
+            --bucket "${{ env.OS_BUCKET }}" \
+            --key "${{ env.OS_OBJECT_KEY }}" \
+            --body "blendit-web/frontend-latest.zip"
 
       - name: Trigger SourceDeploy scenario (FRONTEND)
         shell: bash
