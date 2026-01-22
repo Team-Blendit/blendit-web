@@ -80,6 +80,8 @@ jobs:
           AWS_REGION: kr-standard
           AWS_S3_ADDRESSING_STYLE: path
           AWS_EC2_METADATA_DISABLED: "true"
+          # ✅ NCP Object Storage 호환 이슈 대응 (checksum 계산 방식 완화)
+          AWS_REQUEST_CHECKSUM_CALCULATION: WHEN_REQUIRED
         run: |
           set -euo pipefail
 
