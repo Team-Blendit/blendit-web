@@ -59,9 +59,7 @@ jobs:
           zip -r frontend-latest.zip out
 
       - name: Install AWS CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
+        uses: aws-actions/setup-aws-cli@v4
 
       - name: Upload zip to NCP Object Storage (debug + path-style)
         shell: bash
