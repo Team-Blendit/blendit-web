@@ -64,6 +64,7 @@ jobs:
           sudo apt-get install -y awscli
 
       - name: Upload zip to NCP Object Storage (debug + path-style)
+        shell: bash
         env:
           AWS_ACCESS_KEY_ID: ${{ env.NCP_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ env.NCP_SECRET_KEY }}
@@ -94,11 +95,7 @@ jobs:
 
           METHOD="POST"
           URL="/api/v1/project/${SOURCE_DEPLOY_PROJECT_ID_FE}/stage/${SOURCE_DEPLOY_STAGE_ID_FE}/scenario/${SOURCE_DEPLOY_SCENARIO_ID_FE}/deploy"
-          TIMESTAMP="$(python3 - <<'PY'
-import time
-print(int(time.time() * 1000))
-PY
-)"
+          TIMESTAMP="$(python3 -c 'import time; print(int(time.time()*1000))')"
 
           SIGNATURE="$(printf "%b" "${METHOD} ${URL}\n${TIMESTAMP}\n${NCP_ACCESS_KEY}" \
             | openssl dgst -sha256 -hmac "${NCP_SECRET_KEY}" -binary \
