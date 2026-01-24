@@ -15,21 +15,21 @@ export interface BadgeProps {
 
 const colorStyles = {
   blue: {
-    solid: 'bg-(--badge-blue-fill-bg) text-(--badge-blue-fill-text)',
-    outline: 'bg-(--badge-blue-outline-bg) border border-(--badge-blue-outline-text) text-(--badge-blue-outline-text)',
+    solid: 'bg-[var(--badge-blue-fill-bg)] text-[var(--badge-blue-fill-text)]',
+    outline: 'bg-[var(--badge-blue-outline-bg)] border border-[var(--badge-blue-outline-text)] text-[var(--badge-blue-outline-text)]',
   },
   gray: {
-    solid: 'bg-(--badge-gray-bg) text-(--badge-gray-text)',
-    recruit: 'bg-(--badge-gray-bg) text-(--badge-gray-text)',
+    solid: 'bg-[var(--badge-gray-bg)] text-[var(--badge-gray-text)]',
+    recruit: 'bg-[var(--badge-gray-bg)] text-[var(--badge-gray-text)]',
   },
   red: {
-    solid: 'bg-(--badge-red-bg) text-(--badge-red-text)',
+    solid: 'bg-[var(--badge-red-bg)] text-[var(--badge-red-text)]',
   },
   orange: {
-    solid: 'bg-(--badge-orange-bg) text-(--badge-orange-text)',
+    solid: 'bg-[var(--badge-orange-bg)] text-[var(--badge-orange-text)]',
   },
   green: {
-    solid: 'bg-(--badge-green-bg) text-(--badge-green-text)',
+    solid: 'bg-[var(--badge-green-bg)] text-[var(--badge-green-text)]',
   },
 };
 
