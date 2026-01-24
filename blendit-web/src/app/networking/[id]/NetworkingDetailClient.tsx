@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Header } from '@/components/common/Header';
 import { Badge } from '@/components/common/Badge';
 import { Button } from '@/components/common/Button';
 import { PostDescription } from '@/components/common/PostDescription';
 import { UserProfile } from '@/components/common/UserProfile';
 import { BlendingScoreBadge } from '@/components/common/BlendingScoreBadge';
+import { CommentSection } from '@/components/common/CommentSection';
 
 // Back Arrow Icon
 const CaretLeftIcon = () => (
@@ -42,7 +43,10 @@ interface NetworkingDetailClientProps {
 
 export default function NetworkingDetailClient({ id }: NetworkingDetailClientProps) {
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [comment, setComment] = useState('');
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
 
   // Mock data - 실제로는 API에서 가져올 데이터
   // id로 게시물 데이터를 가져올 수 있습니다
@@ -86,11 +90,32 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
     ]
   };
 
-  const handleSubmitComment = () => {
-    if (comment.trim()) {
-      console.log('Comment submitted:', comment);
-      setComment('');
-    }
+  const handleSubmitComment = (content: string) => {
+    console.log('Comment submitted:', content);
+    // TODO: API 호출로 댓글 등록
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollRef.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - scrollRef.current.offsetLeft);
+    setScrollLeft(scrollRef.current.scrollLeft);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX) * 2; // 스크롤 속도 조절
+    scrollRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
   };
 
   return (
@@ -229,8 +254,8 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
             />
 
             {/* Participants Section */}
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col gap-[12px] w-[940px]">
+              <div className="flex items-center gap-[8px]">
                 <h2 className="font-semibold text-[22px] leading-[28px] text-[var(--text-primary)]">
                   참여 인원
                 </h2>
@@ -238,7 +263,15 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
                   {postData.participants.length}
                 </span>
               </div>
-              <div className="flex gap-4 overflow-x-auto">
+              <div
+                ref={scrollRef}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseLeave}
+                className={`flex gap-[16px] overflow-x-auto scrollbar-hide select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
                 {postData.participants.map((participant, idx) => (
                   <div
                     key={idx}
@@ -281,59 +314,10 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
             </div>
 
             {/* Comments Section */}
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2">
-                <h2 className="font-semibold text-[22px] leading-[28px] text-[var(--text-primary)]">
-                  댓글
-                </h2>
-                <span className="font-medium text-[22px] leading-[28px] text-[var(--text-tertiary)]">
-                  {postData.comments.length}
-                </span>
-              </div>
-
-              {/* Comment List */}
-              <div className="flex flex-col gap-1">
-                {postData.comments.map((commentItem, idx) => (
-                  <div key={idx}>
-                    <div className="h-px bg-[#F2F2F3]" />
-                    <div className="rounded-[18px] p-5 flex flex-col gap-2.5">
-                      <div className="flex items-center gap-2 h-[34px]">
-                        <UserProfile size="small" />
-                        <p className="font-medium text-[18px] leading-[24px] text-[var(--text-primary)]">
-                          {commentItem.author}
-                        </p>
-                        <div className="bg-[#EFEFEF] h-[18px] w-px" />
-                        <p className="font-normal text-[18px] leading-[24px] text-[var(--text-tertiary)]">
-                          {commentItem.time}
-                        </p>
-                      </div>
-                      <p className="font-normal text-[18px] leading-[24px] text-[var(--text-primary)]">
-                        {commentItem.content}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Comment Input */}
-              <div className="bg-white border border-[#DBDBDB] rounded-[18px] p-5 min-h-[131px] relative">
-                <textarea
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  placeholder="댓글을 작성해주세요"
-                  className="w-full h-[51px] font-normal text-[18px] leading-[24px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] resize-none outline-none"
-                />
-                <button
-                  onClick={handleSubmitComment}
-                  disabled={!comment.trim()}
-                  className="absolute bottom-[19.5px] right-[19px] bg-[var(--accent-secondary-default)] px-[18px] py-[15px] rounded-[8px] h-[48px] disabled:opacity-50"
-                >
-                  <span className="font-medium text-[18px] leading-[24px] text-[var(--text-secondary)]">
-                    입력
-                  </span>
-                </button>
-              </div>
-            </div>
+            <CommentSection
+              comments={postData.comments}
+              onSubmitComment={handleSubmitComment}
+            />
           </div>
         </div>
       </div>

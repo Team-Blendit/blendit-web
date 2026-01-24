@@ -16,6 +16,7 @@ import SelectChip from '@/components/common/SelectChip';
 import FilterSet from '@/components/common/FilterSet';
 import KeywordChip from '@/components/common/KeywordChip';
 import { useState } from 'react';
+import { Tooltip } from '@/components/common/Tooltip';
 
 // Alarm 아이콘
 const AlarmIcon = () => (
@@ -631,6 +632,14 @@ export default function ComponentTestPage() {
               <KeywordChip label="이것은 좀 더 긴 키워드입니다" selected />
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="mb-8 bg-white p-6 rounded-lg">
+        <div className="space-y-6">
+        <Tooltip content="상호 리뷰를 기반으로 대한 경험의 질을 반영한 지표예요." position="bottom">
+          <span>000000000 블렌딩 ----------------- 지수</span>
+        </Tooltip>
         </div>
       </section>
 

@@ -28,6 +28,10 @@ export interface SelectFieldProps {
   layout?: 'single' | 'double' | 'triple';
   className?: string;
   disabled?: boolean;
+  searchable?: boolean; // single layout용 (또는 모든 필드에 적용)
+  searchable1?: boolean; // double/triple layout 첫 번째 필드용
+  searchable2?: boolean; // double/triple layout 두 번째 필드용
+  searchable3?: boolean; // triple layout 세 번째 필드용
   // Double/Triple layout용 추가 props
   placeholder2?: string;
   placeholder3?: string;
@@ -51,6 +55,10 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   layout = 'single',
   className,
   disabled = false,
+  searchable = false,
+  searchable1,
+  searchable2,
+  searchable3,
   placeholder2 = 'Text',
   placeholder3 = 'Text',
   options1 = ['옵션 1', '옵션 2', '옵션 3'],
@@ -69,6 +77,9 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   const [selectedValue1, setSelectedValue1] = React.useState('');
   const [selectedValue2, setSelectedValue2] = React.useState('');
   const [selectedValue3, setSelectedValue3] = React.useState('');
+  const [searchTerm1, setSearchTerm1] = React.useState('');
+  const [searchTerm2, setSearchTerm2] = React.useState('');
+  const [searchTerm3, setSearchTerm3] = React.useState('');
   const [autoApproval, setAutoApproval] = React.useState(autoApprovalEnabled);
   
   const dropdown1Ref = useRef<HTMLDivElement>(null);
@@ -93,39 +104,24 @@ export const SelectField: React.FC<SelectFieldProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleToggle1 = () => {
-    if (!disabled && !error) {
-      setIsOpen1(prev => !prev);
-    }
-  };
-
-  const handleToggle2 = () => {
-    if (!disabled && !error) {
-      setIsOpen2(prev => !prev);
-    }
-  };
-
   const handleSelect1 = (value: string) => {
     setSelectedValue1(value);
     setIsOpen1(false);
+    setSearchTerm1('');
     onSelect1?.(value);
   };
 
   const handleSelect2 = (value: string) => {
     setSelectedValue2(value);
     setIsOpen2(false);
+    setSearchTerm2('');
     onSelect2?.(value);
-  };
-
-  const handleToggle3 = () => {
-    if (!disabled && !error) {
-      setIsOpen3(prev => !prev);
-    }
   };
 
   const handleSelect3 = (value: string) => {
     setSelectedValue3(value);
     setIsOpen3(false);
+    setSearchTerm3('');
     onSelect3?.(value);
   };
 
@@ -133,6 +129,30 @@ export const SelectField: React.FC<SelectFieldProps> = ({
     const newValue = !autoApproval;
     setAutoApproval(newValue);
     onAutoApprovalChange?.(newValue);
+  };
+
+  const getFilteredOptions1 = () => {
+    const isSearchable = layout === 'single' ? searchable : (searchable1 ?? searchable);
+    if (!isSearchable || !searchTerm1) return options1;
+    return options1.filter(option => 
+      option.toLowerCase().includes(searchTerm1.toLowerCase())
+    );
+  };
+
+  const getFilteredOptions2 = () => {
+    const isSearchable = searchable2 ?? searchable;
+    if (!isSearchable || !searchTerm2) return options2;
+    return options2.filter(option => 
+      option.toLowerCase().includes(searchTerm2.toLowerCase())
+    );
+  };
+
+  const getFilteredOptions3 = () => {
+    const isSearchable = searchable3 ?? searchable;
+    if (!isSearchable || !searchTerm3) return options3;
+    return options3.filter(option => 
+      option.toLowerCase().includes(searchTerm3.toLowerCase())
+    );
   };
 
   return (
@@ -178,41 +198,55 @@ export const SelectField: React.FC<SelectFieldProps> = ({
       )}
 
       {/* Field Group */}
-      <div className={cn('flex flex-col gap-2 w-full', className)}>
+      <div className={cn('flex flex-col gap-[8px] w-full', className)}>
         {/* Select Box(es) */}
         {layout === 'single' ? (
           <div className="relative w-full" ref={dropdown1Ref}>
-            <button
-              type="button"
-              disabled={disabled}
-              onClick={handleToggle1}
-              className={cn(
-                'w-full h-[60px] px-4 py-4 rounded-xl',
-                'font-medium text-lg leading-base',
-                'flex items-center justify-between',
-                'transition-colors text-left',
-                disabled 
-                  ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
-                  : error
-                    ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
-                    : isOpen1
-                      ? 'bg-[var(--bg-canvas)] border border-[var(--border-focus)] text-[var(--text-secondary)]'
-                      : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:border-[var(--border-focus)]'
-              )}
-            >
-              <span>{selectedValue1 || placeholder}</span>
-              <div className={cn(
-                'transition-transform flex-shrink-0',
-                isOpen1 && !disabled && !error && 'rotate-180'
-              )}>
-                <DownArrowIcon />
+            <div className="relative">
+              <input
+                type="text"
+                disabled={disabled}
+                value={searchable && isOpen1 ? searchTerm1 : selectedValue1}
+                onChange={(e) => {
+                  if (searchable) {
+                    setSearchTerm1(e.target.value);
+                    setIsOpen1(true);
+                  }
+                }}
+                onFocus={() => !disabled && !error && setIsOpen1(true)}
+                onClick={() => !disabled && !error && setIsOpen1(true)}
+                placeholder={placeholder}
+                readOnly={!searchable}
+                className={cn(
+                  'w-full h-[60px] px-[16px] py-[16px] rounded-xl',
+                  'font-medium text-lg leading-base',
+                  'transition-colors focus:outline-none',
+                  disabled 
+                    ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
+                    : error
+                      ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
+                      : isOpen1
+                        ? 'bg-[var(--bg-canvas)] border border-[var(--border-focus)] text-[var(--text-secondary)]'
+                        : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:border-[var(--border-focus)]',
+                  !searchable && 'cursor-pointer'
+                )}
+              />
+              <div 
+                className="absolute right-[16px] top-1/2 -translate-y-1/2 pointer-events-none"
+              >
+                <div className={cn(
+                  'transition-transform',
+                  isOpen1 && !disabled && !error && 'rotate-180'
+                )}>
+                  <DownArrowIcon />
+                </div>
               </div>
-            </button>
+            </div>
             
             {/* Dropdown Menu */}
             {isOpen1 && !disabled && !error && (
-              <div className="absolute z-10 w-full mt-2 bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
-                {options1.map((option, index) => (
+              <div className="absolute z-10 w-full mt-[8px] bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
+                {getFilteredOptions1().map((option, index) => (
                   <button
                     key={index}
                     type="button"
@@ -231,39 +265,53 @@ export const SelectField: React.FC<SelectFieldProps> = ({
             )}
           </div>
         ) : layout === 'double' ? (
-          <div className="flex gap-4 w-full">
+          <div className="flex gap-[12px] items-start w-full">
             <div className="relative flex-1" ref={dropdown1Ref}>
-              <button
-                type="button"
-                disabled={disabled}
-                onClick={handleToggle1}
-                className={cn(
-                  'w-full h-[60px] px-4 py-4 rounded-xl',
-                  'font-medium text-lg leading-base',
-                  'flex items-center justify-between',
-                  'transition-colors text-left',
-                  disabled 
-                    ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
-                    : error
-                      ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
-                      : isOpen1
-                        ? 'bg-[var(--bg-canvas)] border border-[var(--border-focus)] text-[var(--text-secondary)]'
-                        : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:border-[var(--border-focus)]'
-                )}
-              >
-                <span>{selectedValue1 || placeholder}</span>
-                <div className={cn(
-                  'transition-transform flex-shrink-0',
-                  isOpen1 && !disabled && !error && 'rotate-180'
-                )}>
-                  <DownArrowIcon />
+              <div className="relative">
+                <input
+                  type="text"
+                  disabled={disabled}
+                  value={(searchable1 ?? searchable) && isOpen1 ? searchTerm1 : selectedValue1}
+                  onChange={(e) => {
+                    if (searchable1 ?? searchable) {
+                      setSearchTerm1(e.target.value);
+                      setIsOpen1(true);
+                    }
+                  }}
+                  onFocus={() => !disabled && !error && setIsOpen1(true)}
+                  onClick={() => !disabled && !error && setIsOpen1(true)}
+                  placeholder={placeholder}
+                  readOnly={!(searchable1 ?? searchable)}
+                  className={cn(
+                    'w-full h-[60px] px-4 py-4 rounded-xl',
+                    'font-medium text-lg leading-base',
+                    'transition-colors focus:outline-none',
+                    disabled 
+                      ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
+                      : error
+                        ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
+                        : isOpen1
+                          ? 'bg-[var(--bg-canvas)] border border-[var(--border-focus)] text-[var(--text-secondary)]'
+                          : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:border-[var(--border-focus)]',
+                    !(searchable1 ?? searchable) && 'cursor-pointer'
+                  )}
+                />
+                <div 
+                  className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
+                >
+                  <div className={cn(
+                    'transition-transform',
+                    isOpen1 && !disabled && !error && 'rotate-180'
+                  )}>
+                    <DownArrowIcon />
+                  </div>
                 </div>
-              </button>
+              </div>
               
               {/* Dropdown Menu */}
               {isOpen1 && !disabled && !error && (
-                <div className="absolute z-10 w-full mt-2 bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
-                  {options1.map((option, index) => (
+                <div className="absolute z-10 w-full mt-[8px] bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
+                  {getFilteredOptions1().map((option, index) => (
                     <button
                       key={index}
                       type="button"
@@ -282,38 +330,52 @@ export const SelectField: React.FC<SelectFieldProps> = ({
               )}
             </div>
             
-            <div className="relative w-[272px]" ref={dropdown2Ref}>
-              <button
-                type="button"
-                disabled={disabled}
-                onClick={handleToggle2}
-                className={cn(
-                  'w-full h-[60px] px-4 py-4 rounded-xl',
-                  'font-medium text-lg leading-base',
-                  'flex items-center justify-between',
-                  'transition-colors text-left',
-                  disabled 
-                    ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
-                    : error
-                      ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
-                      : isOpen2
-                        ? 'bg-[var(--bg-canvas)] border border-[var(--border-focus)] text-[var(--text-secondary)]'
-                        : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:border-[var(--border-focus)]'
-                )}
-              >
-                <span>{selectedValue2 || placeholder2}</span>
-                <div className={cn(
-                  'transition-transform flex-shrink-0',
-                  isOpen2 && !disabled && !error && 'rotate-180'
-                )}>
-                  <DownArrowIcon />
+            <div className="relative flex-1" ref={dropdown2Ref}>
+              <div className="relative">
+                <input
+                  type="text"
+                  disabled={disabled}
+                  value={(searchable2 ?? searchable) && isOpen2 ? searchTerm2 : selectedValue2}
+                  onChange={(e) => {
+                    if (searchable2 ?? searchable) {
+                      setSearchTerm2(e.target.value);
+                      setIsOpen2(true);
+                    }
+                  }}
+                  onFocus={() => !disabled && !error && setIsOpen2(true)}
+                  onClick={() => !disabled && !error && setIsOpen2(true)}
+                  placeholder={placeholder2}
+                  readOnly={!(searchable2 ?? searchable)}
+                  className={cn(
+                    'w-full h-[60px] px-4 py-4 rounded-xl',
+                    'font-medium text-lg leading-base',
+                    'transition-colors focus:outline-none',
+                    disabled 
+                      ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
+                      : error
+                        ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
+                        : isOpen2
+                          ? 'bg-[var(--bg-canvas)] border border-[var(--border-focus)] text-[var(--text-secondary)]'
+                          : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:border-[var(--border-focus)]',
+                    !(searchable2 ?? searchable) && 'cursor-pointer'
+                  )}
+                />
+                <div 
+                  className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
+                >
+                  <div className={cn(
+                    'transition-transform',
+                    isOpen2 && !disabled && !error && 'rotate-180'
+                  )}>
+                    <DownArrowIcon />
+                  </div>
                 </div>
-              </button>
+              </div>
               
               {/* Dropdown Menu */}
               {isOpen2 && !disabled && !error && (
-                <div className="absolute z-10 w-full mt-2 bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
-                  {options2.map((option, index) => (
+                <div className="absolute z-10 w-full mt-[8px] bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
+                  {getFilteredOptions2().map((option, index) => (
                     <button
                       key={index}
                       type="button"
@@ -336,37 +398,51 @@ export const SelectField: React.FC<SelectFieldProps> = ({
           // Triple layout
           <div className="flex gap-4 w-full">
             <div className="relative flex-1" ref={dropdown1Ref}>
-              <button
-                type="button"
-                disabled={disabled}
-                onClick={handleToggle1}
-                className={cn(
-                  'w-full h-[60px] px-4 py-4 rounded-xl',
-                  'font-medium text-lg leading-base',
-                  'flex items-center justify-between',
-                  'transition-colors text-left',
-                  disabled 
-                    ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
-                    : error
-                      ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
-                      : isOpen1
-                        ? 'bg-[var(--bg-canvas)] border border-[var(--border-focus)] text-[var(--text-secondary)]'
-                        : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:border-[var(--border-focus)]'
-                )}
-              >
-                <span>{selectedValue1 || placeholder}</span>
-                <div className={cn(
-                  'transition-transform flex-shrink-0',
-                  isOpen1 && !disabled && !error && 'rotate-180'
-                )}>
-                  <DownArrowIcon />
+              <div className="relative">
+                <input
+                  type="text"
+                  disabled={disabled}
+                  value={(searchable1 ?? searchable) && isOpen1 ? searchTerm1 : selectedValue1}
+                  onChange={(e) => {
+                    if (searchable1 ?? searchable) {
+                      setSearchTerm1(e.target.value);
+                      setIsOpen1(true);
+                    }
+                  }}
+                  onFocus={() => !disabled && !error && setIsOpen1(true)}
+                  onClick={() => !disabled && !error && setIsOpen1(true)}
+                  placeholder={placeholder}
+                  readOnly={!(searchable1 ?? searchable)}
+                  className={cn(
+                    'w-full h-[60px] px-4 py-4 rounded-xl',
+                    'font-medium text-lg leading-base',
+                    'transition-colors focus:outline-none',
+                    disabled 
+                      ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
+                      : error
+                        ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
+                        : isOpen1
+                          ? 'bg-[var(--bg-canvas)] border border-[var(--border-focus)] text-[var(--text-secondary)]'
+                          : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:border-[var(--border-focus)]',
+                    !(searchable1 ?? searchable) && 'cursor-pointer'
+                  )}
+                />
+                <div 
+                  className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
+                >
+                  <div className={cn(
+                    'transition-transform',
+                    isOpen1 && !disabled && !error && 'rotate-180'
+                  )}>
+                    <DownArrowIcon />
+                  </div>
                 </div>
-              </button>
+              </div>
               
               {/* Dropdown Menu */}
               {isOpen1 && !disabled && !error && (
-                <div className="absolute z-10 w-full mt-2 bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
-                  {options1.map((option, index) => (
+                <div className="absolute z-10 w-full mt-[8px] bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
+                  {getFilteredOptions1().map((option, index) => (
                     <button
                       key={index}
                       type="button"
@@ -386,37 +462,51 @@ export const SelectField: React.FC<SelectFieldProps> = ({
             </div>
             
             <div className="relative flex-1" ref={dropdown2Ref}>
-              <button
-                type="button"
-                disabled={disabled}
-                onClick={handleToggle2}
-                className={cn(
-                  'w-full h-[60px] px-4 py-4 rounded-xl',
-                  'font-medium text-lg leading-base',
-                  'flex items-center justify-between',
-                  'transition-colors text-left',
-                  disabled 
-                    ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
-                    : error
-                      ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
-                      : isOpen2
-                        ? 'bg-[var(--bg-canvas)] border border-[var(--border-focus)] text-[var(--text-secondary)]'
-                        : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:border-[var(--border-focus)]'
-                )}
-              >
-                <span>{selectedValue2 || placeholder2}</span>
-                <div className={cn(
-                  'transition-transform flex-shrink-0',
-                  isOpen2 && !disabled && !error && 'rotate-180'
-                )}>
-                  <DownArrowIcon />
+              <div className="relative">
+                <input
+                  type="text"
+                  disabled={disabled}
+                  value={(searchable2 ?? searchable) && isOpen2 ? searchTerm2 : selectedValue2}
+                  onChange={(e) => {
+                    if (searchable2 ?? searchable) {
+                      setSearchTerm2(e.target.value);
+                      setIsOpen2(true);
+                    }
+                  }}
+                  onFocus={() => !disabled && !error && setIsOpen2(true)}
+                  onClick={() => !disabled && !error && setIsOpen2(true)}
+                  placeholder={placeholder2}
+                  readOnly={!(searchable2 ?? searchable)}
+                  className={cn(
+                    'w-full h-[60px] px-4 py-4 rounded-xl',
+                    'font-medium text-lg leading-base',
+                    'transition-colors focus:outline-none',
+                    disabled 
+                      ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
+                      : error
+                        ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
+                        : isOpen2
+                          ? 'bg-[var(--bg-canvas)] border border-[var(--border-focus)] text-[var(--text-secondary)]'
+                          : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:border-[var(--border-focus)]',
+                    !(searchable2 ?? searchable) && 'cursor-pointer'
+                  )}
+                />
+                <div 
+                  className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
+                >
+                  <div className={cn(
+                    'transition-transform',
+                    isOpen2 && !disabled && !error && 'rotate-180'
+                  )}>
+                    <DownArrowIcon />
+                  </div>
                 </div>
-              </button>
+              </div>
               
               {/* Dropdown Menu */}
               {isOpen2 && !disabled && !error && (
-                <div className="absolute z-10 w-full mt-2 bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
-                  {options2.map((option, index) => (
+                <div className="absolute z-10 w-full mt-[8px] bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
+                  {getFilteredOptions2().map((option, index) => (
                     <button
                       key={index}
                       type="button"
@@ -436,37 +526,51 @@ export const SelectField: React.FC<SelectFieldProps> = ({
             </div>
 
             <div className="relative flex-1" ref={dropdown3Ref}>
-              <button
-                type="button"
-                disabled={disabled}
-                onClick={handleToggle3}
-                className={cn(
-                  'w-full h-[60px] px-4 py-4 rounded-xl',
-                  'font-medium text-lg leading-base',
-                  'flex items-center justify-between',
-                  'transition-colors text-left',
-                  disabled 
-                    ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
-                    : error
-                      ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
-                      : isOpen3
-                        ? 'bg-[var(--bg-canvas)] border border-[var(--border-focus)] text-[var(--text-secondary)]'
-                        : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:border-[var(--border-focus)]'
-                )}
-              >
-                <span>{selectedValue3 || placeholder3}</span>
-                <div className={cn(
-                  'transition-transform flex-shrink-0',
-                  isOpen3 && !disabled && !error && 'rotate-180'
-                )}>
-                  <DownArrowIcon />
+              <div className="relative">
+                <input
+                  type="text"
+                  disabled={disabled}
+                  value={(searchable3 ?? searchable) && isOpen3 ? searchTerm3 : selectedValue3}
+                  onChange={(e) => {
+                    if (searchable3 ?? searchable) {
+                      setSearchTerm3(e.target.value);
+                      setIsOpen3(true);
+                    }
+                  }}
+                  onFocus={() => !disabled && !error && setIsOpen3(true)}
+                  onClick={() => !disabled && !error && setIsOpen3(true)}
+                  placeholder={placeholder3}
+                  readOnly={!(searchable3 ?? searchable)}
+                  className={cn(
+                    'w-full h-[60px] px-4 py-4 rounded-xl',
+                    'font-medium text-lg leading-base',
+                    'transition-colors focus:outline-none',
+                    disabled 
+                      ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
+                      : error
+                        ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
+                        : isOpen3
+                          ? 'bg-[var(--bg-canvas)] border border-[var(--border-focus)] text-[var(--text-secondary)]'
+                          : 'bg-[var(--bg-canvas)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:border-[var(--border-focus)]',
+                    !(searchable3 ?? searchable) && 'cursor-pointer'
+                  )}
+                />
+                <div 
+                  className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
+                >
+                  <div className={cn(
+                    'transition-transform',
+                    isOpen3 && !disabled && !error && 'rotate-180'
+                  )}>
+                    <DownArrowIcon />
+                  </div>
                 </div>
-              </button>
+              </div>
               
               {/* Dropdown Menu */}
               {isOpen3 && !disabled && !error && (
-                <div className="absolute z-10 w-full mt-2 bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
-                  {options3.map((option, index) => (
+                <div className="absolute z-10 w-full mt-[8px] bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
+                  {getFilteredOptions3().map((option, index) => (
                     <button
                       key={index}
                       type="button"
@@ -488,13 +592,13 @@ export const SelectField: React.FC<SelectFieldProps> = ({
         )}
 
         {/* Error Message */}
-        {error && (
-          <div className="px-3">
+        <div className="px-[12px] flex items-center min-h-[24px]">
+          {error && (
             <p className="font-normal text-lg text-[var(--text-error)]">
               {error}
             </p>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

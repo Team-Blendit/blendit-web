@@ -39,7 +39,7 @@ export const InputField: React.FC<InputFieldProps> = ({
       </div>
 
       {/* Field Group */}
-      <div className="flex flex-col gap-2 w-full self-stretch">
+      <div className="flex flex-col gap-[8px] w-full self-stretch">
         {/* Input */}
         <input
           type={type}
@@ -61,13 +61,13 @@ export const InputField: React.FC<InputFieldProps> = ({
         />
 
         {/* Error Message */}
-        {error && (
-          <div>
-            <p className="font-normal text-base text-[var(--text-error)] ps-3">
+        <div className="px-[12px] flex items-center min-h-[24px]">
+          {error && (
+            <p className="font-normal text-lg text-[var(--text-error)]">
               {error}
             </p>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
