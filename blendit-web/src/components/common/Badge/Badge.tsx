@@ -16,7 +16,7 @@ export interface BadgeProps {
 const colorStyles = {
   blue: {
     solid: 'bg-[var(--badge-blue-fill-bg)] text-[var(--badge-blue-fill-text)]',
-    outline: 'bg-[var(--badge-blue-outline-bg)] border border-[var(--badge-blue-outline-text)] text-[var(--badge-blue-outline-text)]',
+    outline: 'border border-[var(--badge-blue-outline-text)] text-[var(--badge-blue-outline-text)]',
   },
   gray: {
     solid: 'bg-[var(--badge-gray-bg)] text-[var(--badge-gray-text)]',
@@ -24,6 +24,7 @@ const colorStyles = {
   },
   red: {
     solid: 'bg-[var(--badge-red-bg)] text-[var(--badge-red-text)]',
+    outline: 'border border-[var(--border-error)] text-[var(--border-error)]',
   },
   orange: {
     solid: 'bg-[var(--badge-orange-bg)] text-[var(--badge-orange-text)]',

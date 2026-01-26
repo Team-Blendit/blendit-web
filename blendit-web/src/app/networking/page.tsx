@@ -94,7 +94,7 @@ export default function NetworkingManagementPage() {
           {/* Body */}
           <div className="flex flex-col items-start self-stretch">
             {/* Tab Section */}
-            <div className="flex gap-[20px] items-center self-stretch">
+            <div className="flex gap-[20px] items-center self-stretch border-b border-[var(--border-default)]">
               <Tab
                 label="전체"
                 active={activeTab === '전체'}

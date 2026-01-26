@@ -3,11 +3,9 @@
 import { useState, useRef } from 'react';
 import { Header } from '@/components/common/Header';
 import { Badge } from '@/components/common/Badge';
-import { Button } from '@/components/common/Button';
 import { PostDescription } from '@/components/common/PostDescription';
-import { UserProfile } from '@/components/common/UserProfile';
-import { BlendingScoreBadge } from '@/components/common/BlendingScoreBadge';
 import { CommentSection } from '@/components/common/CommentSection';
+import { Card } from '@/components/common/Card';
 
 // Back Arrow Icon
 const CaretLeftIcon = () => (
@@ -24,15 +22,6 @@ const BookmarkIcon = ({ filled = false }: { filled?: boolean }) => (
       stroke="#999999"
       strokeWidth="2"
       fill={filled ? "#999999" : "none"}
-    />
-  </svg>
-);
-
-// Location Icon
-const LocationIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-    <path d="M10 2C7.24 2 5 4.24 5 7C5 10.5 10 17 10 17C10 17 15 10.5 15 7C15 4.24 12.76 2 10 2ZM10 9C8.9 9 8 8.1 8 7C8 5.9 8.9 5 10 5C11.1 5 12 5.9 12 7C12 8.1 11.1 9 10 9Z"
-      fill="#999999"
     />
   </svg>
 );
@@ -149,100 +138,19 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
         <div className="flex items-start gap-[60px] self-stretch">
           {/* Left: Info Card */}
           <div className="w-[440px] shrink-0">
-            <div className="bg-white border border-[#DBDBDB] rounded-[20px] p-[30px] flex flex-col gap-6">
-              {/* Author Info */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <UserProfile size="small" />
-                  <p className="font-normal text-[18px] leading-[24px] text-[var(--text-primary)]">
-                    {postData.author}
-                  </p>
-                </div>
-              </div>
-              <div className="bg-[#EFEFEF] h-px w-full" />
-              <p className="font-normal text-[18px] leading-[24px] text-[var(--text-tertiary)]">
-                {postData.date}
-              </p>
-
-              {/* Post Details */}
-              <div className="flex flex-col gap-4">
-                {/* 직군 */}
-                <div className="flex items-center gap-5">
-                  <p className="font-normal text-[18px] leading-[24px] text-[var(--text-tertiary)] w-[60px]">
-                    직군
-                  </p>
-                  <Badge color="blue" style="outline" text={postData.jobCategory} />
-                </div>
-
-                {/* 지역 */}
-                <div className="flex items-center gap-5">
-                  <p className="font-normal text-[18px] leading-[24px] text-[var(--text-tertiary)] w-[60px]">
-                    지역
-                  </p>
-                  <p className="font-normal text-[18px] leading-[24px] text-[var(--text-primary)]">
-                    {postData.region}
-                  </p>
-                </div>
-
-                {/* 일정 */}
-                <div className="flex items-center gap-5">
-                  <p className="font-normal text-[18px] leading-[24px] text-[var(--text-tertiary)] w-[60px]">
-                    일정
-                  </p>
-                  <p className="font-normal text-[18px] leading-[24px] text-[var(--text-primary)]">
-                    {postData.schedule}
-                  </p>
-                </div>
-
-                {/* 키워드 */}
-                <div className="flex items-center gap-5">
-                  <p className="font-normal text-[18px] leading-[24px] text-[var(--text-tertiary)] w-[60px]">
-                    키워드
-                  </p>
-                  <div className="flex gap-2">
-                    {postData.keywords.map((keyword, idx) => (
-                      <Badge key={idx} color="blue" style="solid" text={keyword} />
-                    ))}
-                  </div>
-                </div>
-
-                {/* 인원수 */}
-                <div className="flex items-center gap-5">
-                  <p className="font-normal text-[18px] leading-[24px] text-[var(--text-tertiary)] w-[60px]">
-                    인원수
-                  </p>
-                  <p className="font-normal text-[18px] leading-[24px]">
-                    <span className="text-[var(--text-primary)]">{postData.currentMembers}명</span>
-                    <span className="text-[var(--text-tertiary)]"> / {postData.maxMembers}명</span>
-                  </p>
-                </div>
-
-                {/* 오픈채팅 */}
-                <div className="flex items-center gap-5">
-                  <p className="font-normal text-[18px] leading-[24px] text-[var(--text-tertiary)] w-[60px]">
-                    오픈채팅
-                  </p>
-                  <a
-                    href={postData.openChatLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-normal text-[18px] leading-[24px] text-[#006FE5]"
-                  >
-                    {postData.openChatLink}
-                  </a>
-                </div>
-              </div>
-
-              {/* Apply Button */}
-              <Button
-                variant="primary"
-                size="lg"
-                className="w-full"
-                onClick={() => console.log('Apply clicked')}
-              >
-                네트워킹 신청하기
-              </Button>
-            </div>
+            <Card
+              variant="postInfo"
+              userName={postData.author}
+              userJob={postData.jobCategory}
+              postDate={postData.date}
+              meetDate={postData.schedule}
+              meetLocation={postData.region}
+              keywords={postData.keywords}
+              currentNum={postData.currentMembers}
+              totalNum={postData.maxMembers}
+              openChatLink={postData.openChatLink}
+              onButtonClick={() => console.log('Apply clicked')}
+            />
           </div>
 
           {/* Right: Content */}
@@ -273,42 +181,18 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               >
                 {postData.participants.map((participant, idx) => (
-                  <div
+                  <Card
                     key={idx}
-                    className="bg-white border border-[#DBDBDB] rounded-[12px] p-6 flex flex-col gap-4 min-w-[280px]"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <p className="font-semibold text-[22px] leading-[28px] text-[#121212]">
-                          {participant.name}
-                        </p>
-                        <BlendingScoreBadge value={participant.score.toString()} />
-                      </div>
-                      <button>
-                        <BookmarkIcon />
-                      </button>
-                    </div>
-                    <div className="flex gap-4 items-center">
-                      <UserProfile size="medium" />
-                      <div className="flex flex-col gap-1.5">
-                        <Badge color="blue" style="outline" text={participant.job} />
-                        <p className="font-normal text-[18px] leading-[1.5] text-[var(--text-tertiary)]">
-                          {participant.experience}
-                        </p>
-                        <div className="flex items-center gap-1.5">
-                          <LocationIcon />
-                          <p className="font-normal text-[18px] leading-[1.5] text-[var(--text-tertiary)]">
-                            {participant.region}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      {participant.badges.map((badge, badgeIdx) => (
-                        <Badge key={badgeIdx} color="blue" style="solid" text={badge} />
-                      ))}
-                    </div>
-                  </div>
+                    variant="user"
+                    userName={participant.name}
+                    userJob={participant.job}
+                    userCareer={participant.experience}
+                    userLocation={participant.region}
+                    keywords={participant.badges}
+                    showButton={false}
+                    className="w-[273px] shrink-0"
+                    onBookmarkClick={() => console.log('Bookmark clicked:', participant.name)}
+                  />
                 ))}
               </div>
             </div>

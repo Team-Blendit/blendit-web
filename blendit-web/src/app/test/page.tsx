@@ -17,6 +17,7 @@ import FilterSet from '@/components/common/FilterSet';
 import KeywordChip from '@/components/common/KeywordChip';
 import { useState } from 'react';
 import { Tooltip } from '@/components/common/Tooltip';
+import { Card } from '@/components/common/Card';
 
 // Alarm 아이콘
 const AlarmIcon = () => (
@@ -640,6 +641,145 @@ export default function ComponentTestPage() {
         <Tooltip content="상호 리뷰를 기반으로 대한 경험의 질을 반영한 지표예요." position="bottom">
           <span>000000000 블렌딩 ----------------- 지수</span>
         </Tooltip>
+        </div>
+      </section>
+
+      {/* Card - Main */}
+      <section className="mb-8 bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Card - Main</h2>
+        
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-sm font-medium mb-2">모집중 상태</h3>
+            <Card
+              variant="main"
+              title="프론트엔드 개발자 커피챗 모집합니다"
+              userName="김개발"
+              userJob="백엔드"
+              userCareer="3년차"
+              userLocation="서울 강남구"
+              keywords={['React', 'TypeScript', 'Next.js']}
+              isRecruiting={true}
+              currentNum={2}
+              totalNum={5}
+              onButtonClick={() => console.log('신청하기 클릭')}
+              onBookmarkClick={() => console.log('북마크 클릭')}
+            />
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">모집 마감 상태</h3>
+            <Card
+              variant="main"
+              title="백엔드 개발자와 함께 성장하실 분!"
+              userName="박백엔드"
+              userJob="프론트엔드"
+              userCareer="5년차"
+              userLocation="서울 서초구"
+              keywords={['Spring', 'Java', 'AWS']}
+              isRecruiting={false}
+              currentNum={5}
+              totalNum={5}
+              onButtonClick={() => console.log('신청하기 클릭')}
+              onBookmarkClick={() => console.log('북마크 클릭')}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Card - MyProfile */}
+      <section className="mb-8 bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Card - MyProfile</h2>
+        
+        <div className="space-y-6">
+          <Card
+            variant="myProfile"
+            userName="김개발"
+            userJob="백엔드"
+            userCareer="3년차"
+            userLocation="서울 강남구"
+            userCompany="토스"
+            keywords={['성장', '커리어', '네트워킹']}
+            skills={['React', 'TypeScript', 'Next.js', 'Node.js']}
+            onButtonClick={() => console.log('프로필 편집 클릭')}
+          />
+        </div>
+      </section>
+
+      {/* Card - UserProfile */}
+      <section className="mb-8 bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Card - UserProfile</h2>
+        
+        <div className="space-y-6">
+          <Card
+            variant="userProfile"
+            userName="이디자이너"
+            userJob="디자이너"
+            userCareer="4년차"
+            userLocation="서울 마포구"
+            userCompany="네이버"
+            keywords={['UX/UI', '디자인시스템', '사용자조사']}
+            skills={['Figma', 'Sketch', 'Protopie', 'Adobe XD']}
+            onButtonClick={() => console.log('커피챗 신청하기 클릭')}
+            onBookmarkClick={() => console.log('북마크 클릭')}
+          />
+        </div>
+      </section>
+
+      {/* Card - PostInfo */}
+      <section className="mb-8 bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Card - PostInfo</h2>
+        
+        <div className="space-y-6">
+          <Card
+            variant="postInfo"
+            userName="김개발"
+            userJob="백엔드"
+            postDate="2026.01.20"
+            meetDate="2026. 02. 15"
+            meetLocation="서울 강남구"
+            keywords={['React', 'TypeScript', 'Next.js']}
+            currentNum={3}
+            totalNum={5}
+            openChatLink="https://open.kakao.com/example"
+            onButtonClick={() => console.log('커피챗 신청하기 클릭')}
+          />
+        </div>
+      </section>
+
+      {/* Card - User */}
+      <section className="mb-8 bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Card - User</h2>
+        
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-sm font-medium mb-2">버튼 있는 상태</h3>
+            <Card
+              variant="user"
+              userName="박매니저"
+              userJob="프로덕트 매니저"
+              userCareer="2년차"
+              userLocation="서울 성동구"
+              keywords={['프로덕트', '애자일', '데이터분석']}
+              showButton={true}
+              onButtonClick={() => console.log('네트워킹 신청하기 클릭')}
+              onBookmarkClick={() => console.log('북마크 클릭')}
+            />
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">버튼 없는 상태</h3>
+            <Card
+              variant="user"
+              userName="최마케터"
+              userJob="그로스 마케터"
+              userCareer="6년차"
+              userLocation="서울 용산구"
+              keywords={['퍼포먼스', 'GA4', 'SEO']}
+              showButton={false}
+              onBookmarkClick={() => console.log('북마크 클릭')}
+            />
+          </div>
         </div>
       </section>
 
