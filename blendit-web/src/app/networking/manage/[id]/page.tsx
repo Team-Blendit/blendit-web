@@ -1,4 +1,4 @@
-import { Header } from '@/components/common/Header';
+import { Header } from '@/components/layout/Header';
 import { NetworkingManageClient } from './NetworkingManageClient';
 
 // Mock data interfaces

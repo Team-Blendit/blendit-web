@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Header } from '@/components/common/Header';
+import { Header } from '@/components/layout/Header';
 import { SearchBar } from '@/components/common/SearchBar';
 import FilterSet from '@/components/common/FilterSet';
 import Tab from '@/components/common/Tab';

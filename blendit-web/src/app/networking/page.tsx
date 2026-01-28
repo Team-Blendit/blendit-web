@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Header } from '@/components/common/Header';
+import { Header } from '@/components/layout/Header';
 import Tab from '@/components/common/Tab';
 import { NetworkingListItem } from '@/components/common/NetworkingListItem';
 import Pagination from '@/components/common/Pagination';

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { UserProfile } from '@/components/common/UserProfile';
+import { UserProfile } from '@/components/layout/UserProfile';
 import { Button } from '@/components/common/Button';
 import { cn } from '@/lib/utils';
 

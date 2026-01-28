@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/common/Button';
 import { LoginModal } from '@/components/common/LoginModal';
 import { OnboardingModal, OnboardingData } from '@/components/common/OnboardingModal';
-import { UserProfile } from '@/components/common/UserProfile';
-import { UserDropdown } from '@/components/common/UserDropdown';
+import { UserProfile } from '@/components/layout/UserProfile';
+import { UserDropdown } from '@/components/layout/UserDropdown';
 import { useAuthStore } from '@/stores/authStore';
 
 export const Header: React.FC = () => {

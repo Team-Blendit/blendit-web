@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Header } from '@/components/common/Header';
+import { Header } from '@/components/layout/Header';
 import { Badge } from '@/components/common/Badge';
 import { PostDescription } from '@/components/common/PostDescription';
 import { CommentSection } from '@/components/common/CommentSection';

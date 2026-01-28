@@ -5,7 +5,7 @@ import { SelectField } from '@/components/common/SelectField';
 import { InputField } from '@/components/common/InputField';
 import { QuillEditor } from '@/components/common/QuillEditor';
 import { Button } from '@/components/common/Button';
-import { Header } from '@/components/common/Header';
+import { Header } from '@/components/layout/Header';
 
 // Back Arrow Icon
 const CaretLeftIcon = () => (

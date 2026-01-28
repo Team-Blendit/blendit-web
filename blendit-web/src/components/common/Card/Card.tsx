@@ -3,7 +3,7 @@
 import React from 'react';
 import { Badge } from '@/components/common/Badge';
 import { Button } from '@/components/common/Button';
-import { UserProfile } from '@/components/common/UserProfile';
+import { UserProfile } from '@/components/layout/UserProfile';
 import { cn } from '@/lib/utils';
 
 // Bookmark Icon (unfilled)
