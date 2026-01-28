@@ -4,7 +4,14 @@ import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 
-export default function KakaoCallbackPage() {
+type Provider = 'kakao' | 'google';
+
+const PROVIDER_CONFIG: Record<Provider, { endpoint: string; name: string }> = {
+  kakao: { endpoint: '/auth/oidc/kakao', name: '카카오' },
+  google: { endpoint: '/auth/oidc/google', name: '구글' },
+};
+
+export default function AuthCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useAuthStore();
@@ -12,9 +19,12 @@ export default function KakaoCallbackPage() {
   useEffect(() => {
     const code = searchParams.get('code');
     const error = searchParams.get('error');
+    const state = searchParams.get('state');
+    const provider = (state || 'kakao') as Provider;
+    const config = PROVIDER_CONFIG[provider] || PROVIDER_CONFIG.kakao;
 
     if (error) {
-      console.error('카카오 로그인 에러:', error);
+      console.error(`${config.name} 로그인 에러:`, error);
       router.replace('/');
       return;
     }
@@ -25,12 +35,11 @@ export default function KakaoCallbackPage() {
       return;
     }
 
-    // 백엔드로 인가 코드 전송
-    const handleKakaoCallback = async () => {
+    const handleOAuthCallback = async () => {
       try {
-        console.log('카카오 로그인 요청:', { code });
-        
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/oidc/kakao`, {
+        console.log(`${config.name} 로그인 요청:`, { code, provider });
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${config.endpoint}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -56,21 +65,20 @@ export default function KakaoCallbackPage() {
             nickname: data.user.nickname,
             profileImage: data.user.profileImage,
             email: data.user.email,
-            isNewUser: !data.user.isOnboardingComplete, // 온보딩 완료 여부로 신규 사용자 판단
+            isNewUser: !data.user.isOnboardingComplete,
           },
           data.accessToken,
           data.refreshToken
         );
 
-        // 메인 페이지로 이동
         router.replace('/');
       } catch (error) {
-        console.error('카카오 로그인 처리 중 에러:', error);
+        console.error(`${config.name} 로그인 처리 중 에러:`, error);
         router.replace('/');
       }
     };
 
-    handleKakaoCallback();
+    handleOAuthCallback();
   }, [searchParams, login, router]);
 
   return (

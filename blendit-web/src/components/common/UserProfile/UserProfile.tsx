@@ -34,6 +34,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
           src={imageUrl}
           alt={nickname || '프로필 이미지'}
           className="size-full object-cover"
+          referrerPolicy="no-referrer"
         />
       ) : (
         <svg className="size-full" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">

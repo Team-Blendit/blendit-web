@@ -19,17 +19,21 @@ export const Header: React.FC = () => {
   // 카카오 로그인 핸들러
   const handleKakaoLogin = () => {
     const KAKAO_CLIENT_ID = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
-    const REDIRECT_URI = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI;
+    const REDIRECT_URI = process.env.NEXT_PUBLIC_REDIRECT_URI;
 
-    const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+    const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&state=kakao`;
 
-    // 카카오 로그인 페이지로 이동
     window.location.href = KAKAO_AUTH_URL;
   };
 
+  // 구글 로그인 핸들러
   const handleGoogleLogin = () => {
-    console.log('구글 로그인 준비 중');
-    // TODO: 구글 로그인 구현
+    const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const REDIRECT_URI = process.env.NEXT_PUBLIC_REDIRECT_URI;
+
+    const GOOGLE_AUTH_URL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=openid%20email%20profile&state=google`;
+
+    window.location.href = GOOGLE_AUTH_URL;
   };
 
   const handleNaverLogin = () => {
