@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useAuthStore } from '@/stores/authStore';
+import { apiClient } from '@/lib/api';
 
 interface UserDropdownProps {
   isOpen: boolean;
@@ -17,12 +18,7 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose }) =
     try {
       // 백엔드 로그아웃 API 호출
       if (refreshToken) {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout?refreshToken=${refreshToken}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+        await apiClient.post(`/auth/logout?refreshToken=${refreshToken}`);
       }
       console.log('로그아웃 성공');
     } catch (error) {

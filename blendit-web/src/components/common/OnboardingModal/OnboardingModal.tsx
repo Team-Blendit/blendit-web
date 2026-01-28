@@ -7,6 +7,7 @@ import { FlowModalHeader } from '@/components/common/FlowModalHeader';
 import { InputField } from '@/components/common/InputField';
 import KeywordChip from '@/components/common/KeywordChip';
 import { useAuthStore } from '@/stores/authStore';
+import { apiClient } from '@/lib/api';
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -50,27 +51,24 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const [keywordList, setKeywordList] = useState<KeywordItem[]>([]);
   const [emailError, setEmailError] = useState<string>('');
   const [nicknameError, setNicknameError] = useState<string>('');
-  const { user, accessToken } = useAuthStore();
+  const { user } = useAuthStore();
 
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-      
+
       // 키워드 목록 불러오기
       const fetchKeywords = async () => {
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/keyword`);
-          if (response.ok) {
-            const result = await response.json();
-            if (result.result === 'SUCCESS' && result.data) {
-              setKeywordList(result.data);
-            }
+          const response = await apiClient.get('/keyword');
+          if (response.data.result === 'SUCCESS' && response.data.data) {
+            setKeywordList(response.data.data);
           }
         } catch (error) {
           console.error('키워드 목록 불러오기 실패:', error);
         }
       };
-      
+
       fetchKeywords();
     } else {
       document.body.style.overflow = 'unset';
@@ -147,26 +145,20 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
       setEmailError('이메일 형식이 올바르지 않아요.');
       return false;
     }
-    
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/user/onboarding/email-duplicate-check?email=${encodeURIComponent(email)}`
+      const response = await apiClient.get(
+        `/user/onboarding/email-duplicate-check?email=${encodeURIComponent(email)}`
       );
-      
-      if (response.ok) {
-        const result = await response.json();
-        if (result.result === 'SUCCESS') {
-          setEmailError('');
-          return true;
-        } else if (result.result === 'FAILED') {
-          setEmailError(result.error?.message || '');
-          return false;
-        }
+
+      if (response.data.result === 'SUCCESS') {
+        setEmailError('');
+        return true;
+      } else if (response.data.result === 'FAILED') {
+        setEmailError(response.data.error?.message || '');
+        return false;
       }
-      
-      const errorData = await response.json().catch(() => ({}));
-      setEmailError(errorData.error?.message || '이메일 중복 검사에 실패했습니다.');
+
       return false;
     } catch (error) {
       console.error('이메일 중복 검사 에러:', error);
@@ -182,25 +174,20 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
       setNicknameError(validation.error);
       return false;
     }
-    
+
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/user/onboarding/nickname-duplicate-check?nickname=${encodeURIComponent(nickname)}`
+      const response = await apiClient.get(
+        `/user/onboarding/nickname-duplicate-check?nickname=${encodeURIComponent(nickname)}`
       );
-      
-      if (response.ok) {
-        const result = await response.json();
-        if (result.result === 'SUCCESS') {
-          setNicknameError('');
-          return true;
-        } else if (result.result === 'FAILED') {
-          setNicknameError(result.error?.message || '');
-          return false;
-        }
+
+      if (response.data.result === 'SUCCESS') {
+        setNicknameError('');
+        return true;
+      } else if (response.data.result === 'FAILED') {
+        setNicknameError(response.data.error?.message || '');
+        return false;
       }
-      
-      const errorData = await response.json().catch(() => ({}));
-      setNicknameError(errorData.error?.message || '닉네임 중복 검사에 실패했습니다.');
+
       return false;
     } catch (error) {
       console.error('닉네임 중복 검사 에러:', error);
@@ -210,11 +197,11 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   const handleSubmitOnboarding = async () => {
-    if (isSubmitting || !user || !accessToken) return;
+    if (isSubmitting || !user) return;
 
     setIsSubmitting(true);
     try {
-      console.log('온보딩 제출 데이터:', {
+      await apiClient.post(`/user/onboarding?currentUser=${user.id}`, {
         position: mapPositionToApi(formData.jobCategory),
         experience: mapExperienceToApi(formData.experience),
         email: formData.email,
@@ -224,36 +211,6 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
         nickname: formData.nickname,
       });
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/user/onboarding?currentUser=${user.id}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            position: mapPositionToApi(formData.jobCategory),
-            experience: mapExperienceToApi(formData.experience),
-            email: formData.email,
-            province: formData.location1,
-            district: formData.location2,
-            keywordUuidList: formData.keywords,
-            nickname: formData.nickname,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('온보딩 제출 실패:', errorData);
-        throw new Error('온보딩 제출 실패');
-      }
-
-      const data = await response.json();
-      console.log('온보딩 제출 성공:', data);
-      
-      // 완료 콜백 호출
       onComplete(formData);
     } catch (error) {
       console.error('온보딩 처리 중 에러:', error);

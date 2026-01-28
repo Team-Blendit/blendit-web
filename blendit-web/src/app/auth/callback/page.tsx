@@ -3,6 +3,7 @@
 import { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
+import { apiClient } from '@/lib/api';
 
 type Provider = 'kakao' | 'google';
 
@@ -39,24 +40,11 @@ function AuthCallbackContent() {
       try {
         console.log(`${config.name} 로그인 요청:`, { code, provider });
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${config.endpoint}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ code }),
-        });
+        const response = await apiClient.post(config.endpoint, { code });
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          console.error('백엔드 응답 에러:', response.status, errorData);
-          throw new Error(`로그인 처리 실패: ${response.status}`);
-        }
+        console.log('로그인 성공:', response.data);
 
-        const response_data = await response.json();
-        console.log('로그인 성공:', response_data);
-
-        const { data } = response_data;
+        const { data } = response.data;
 
         // Zustand store에 사용자 정보 저장
         login(
