@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { apiClient } from '@/lib/api';
 
@@ -11,6 +12,7 @@ interface UserDropdownProps {
 
 export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose }) => {
   const { logout, refreshToken } = useAuthStore();
+  const router = useRouter();
 
   if (!isOpen) return null;
 
@@ -31,9 +33,12 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose }) =
   };
 
   const handleItemClick = (action: string) => {
-    console.log(`${action} 클릭`);
     onClose();
-    // TODO: 각 메뉴 항목에 대한 액션 구현
+    
+    if (action === '네트워킹 관리') {
+      router.push('/manage');
+    }
+    // TODO: 다른 메뉴 항목에 대한 액션 구현
   };
 
   return (
