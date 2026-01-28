@@ -1,43 +1,55 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/common/Button';
 import { LoginModal } from '@/components/common/LoginModal';
 import { OnboardingModal, OnboardingData } from '@/components/common/OnboardingModal';
 import { UserProfile } from '@/components/common/UserProfile';
 import { UserDropdown } from '@/components/common/UserDropdown';
+import { useAuthStore } from '@/stores/authStore';
 
 export const Header: React.FC = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isOnboardingModalOpen, setIsOnboardingModalOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const handleSocialLogin = () => {
-    console.log('소셜 로그인 시도');
-    // 로그인 모달 닫고 온보딩 모달 열기
-    setIsLoginModalOpen(false);
-    setIsOnboardingModalOpen(true);
-  };
+  // Zustand store에서 인증 상태 가져오기
+  const { isAuthenticated, user, setNewUserComplete } = useAuthStore();
 
+  // 카카오 로그인 핸들러
   const handleKakaoLogin = () => {
-    handleSocialLogin();
+    const KAKAO_CLIENT_ID = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
+    const REDIRECT_URI = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI;
+
+    const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+
+    // 카카오 로그인 페이지로 이동
+    window.location.href = KAKAO_AUTH_URL;
   };
 
   const handleGoogleLogin = () => {
-    handleSocialLogin();
+    console.log('구글 로그인 준비 중');
+    // TODO: 구글 로그인 구현
   };
 
   const handleNaverLogin = () => {
-    handleSocialLogin();
+    console.log('네이버 로그인 준비 중');
+    // TODO: 네이버 로그인 구현
   };
 
   const handleOnboardingComplete = (data: OnboardingData) => {
     console.log('온보딩 완료:', data);
     setIsOnboardingModalOpen(false);
-    setIsLoggedIn(true);
-    // TODO: 온보딩 데이터 저장 및 메인 페이지로 이동
+    setNewUserComplete();
+    // TODO: 온보딩 데이터를 백엔드로 전송
   };
+
+  // 신규 회원인 경우 온보딩 모달 자동 표시
+  useEffect(() => {
+    if (isAuthenticated && user?.isNewUser) {
+      setIsOnboardingModalOpen(true);
+    }
+  }, [isAuthenticated, user?.isNewUser]);
 
   return (
     <>
@@ -49,22 +61,27 @@ export const Header: React.FC = () => {
           </div>
 
           {/* Right Section - Login Button or User Menu */}
-          {isLoggedIn ? (
+          {isAuthenticated ? (
             <div className="flex gap-[4px] items-center relative">
               {/* User Profile */}
-              <UserProfile size='small' className='w-[52px] h-[52px]'/>
+              <UserProfile
+                size="small"
+                className="w-[52px] h-[52px]"
+                imageUrl={user?.profileImage}
+                nickname={user?.nickname}
+              />
               {/* Dropdown Arrow */}
-              <button 
+              <button
                 className="w-[20px] h-[20px]"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M14 7L9.97 13L6 7H14Z" fill="#999999"/>
+                  <path d="M14 7L9.97 13L6 7H14Z" fill="#999999" />
                 </svg>
               </button>
-              
+
               {/* User Dropdown */}
-              <UserDropdown 
+              <UserDropdown
                 isOpen={isDropdownOpen}
                 onClose={() => setIsDropdownOpen(false)}
               />

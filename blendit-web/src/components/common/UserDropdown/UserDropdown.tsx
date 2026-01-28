@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useAuthStore } from '@/stores/authStore';
 
 interface UserDropdownProps {
   isOpen: boolean;
@@ -8,7 +9,30 @@ interface UserDropdownProps {
 }
 
 export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose }) => {
+  const { logout, refreshToken } = useAuthStore();
+
   if (!isOpen) return null;
+
+  const handleLogout = async () => {
+    try {
+      // 백엔드 로그아웃 API 호출
+      if (refreshToken) {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout?refreshToken=${refreshToken}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+      }
+      console.log('로그아웃 성공');
+    } catch (error) {
+      console.error('로그아웃 API 호출 실패:', error);
+    } finally {
+      // API 호출 실패해도 로컬 상태는 초기화
+      logout();
+      onClose();
+    }
+  };
 
   const handleItemClick = (action: string) => {
     console.log(`${action} 클릭`);
@@ -46,7 +70,7 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose }) =
           </button>
           
           <button
-            onClick={() => handleItemClick('로그아웃')}
+            onClick={handleLogout}
             className="flex items-center justify-center px-[8px] py-[12px] w-full whitespace-nowrap hover:bg-[var(--accent-secondary-hover)] rounded-lg transition-colors"
           >
             <span className="font-semibold text-[22px] leading-[28px] text-[var(--text-tertiary)]">

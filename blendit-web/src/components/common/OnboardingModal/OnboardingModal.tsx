@@ -6,6 +6,7 @@ import { SelectField } from '@/components/common/SelectField';
 import { FlowModalHeader } from '@/components/common/FlowModalHeader';
 import { InputField } from '@/components/common/InputField';
 import KeywordChip from '@/components/common/KeywordChip';
+import { useAuthStore } from '@/stores/authStore';
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -24,6 +25,11 @@ export interface OnboardingData {
   nickname: string;
 }
 
+interface KeywordItem {
+  uuid: string;
+  name: string;
+}
+
 export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   isOpen,
   onClose,
@@ -37,13 +43,35 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     location1: '',
     location2: '',
     interests: [],
-    keywords: [],
+    keywords: [], 
     nickname: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [keywordList, setKeywordList] = useState<KeywordItem[]>([]);
+  const [emailError, setEmailError] = useState<string>('');
+  const [nicknameError, setNicknameError] = useState<string>('');
+  const { user, accessToken } = useAuthStore();
 
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      
+      // 키워드 목록 불러오기
+      const fetchKeywords = async () => {
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/keyword`);
+          if (response.ok) {
+            const result = await response.json();
+            if (result.result === 'SUCCESS' && result.data) {
+              setKeywordList(result.data);
+            }
+          }
+        } catch (error) {
+          console.error('키워드 목록 불러오기 실패:', error);
+        }
+      };
+      
+      fetchKeywords();
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -55,11 +83,158 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleNext = () => {
+  // 한글 → API enum 매핑 함수들
+  const mapPositionToApi = (position: string): string => {
+    const mapping: { [key: string]: string } = {
+      '프론트엔드': 'FRONTEND',
+      '백엔드': 'BACKEND',
+      'PM': 'PM',
+      '마케팅': 'MARKETING',
+      '디자인': 'DESIGN',
+      '데이터': 'DATA',
+      'AI': 'AI',
+      '보안': 'SECURITY',
+    };
+    return mapping[position] || 'ALL';
+  };
+
+  const mapExperienceToApi = (experience: string): string => {
+    const mapping: { [key: string]: string } = {
+      '신입': 'NEWBIE',
+      '주니어 (1~3년)': 'JUNIOR',
+      '미들 (3~6년)': 'MIDDLE',
+      '시니어 (7년 이상)': 'SENIOR',
+    };
+    return mapping[experience] || 'NEWBIE';
+  };
+
+  const checkEmailDuplicate = async (email: string): Promise<boolean> => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user/onboarding/email-duplicate-check?email=${encodeURIComponent(email)}`
+      );
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.result === 'SUCCESS') {
+          setEmailError('');
+          return true;
+        } else if (result.result === 'FAILED') {
+          setEmailError(result.error?.message || '');
+          return false;
+        }
+      }
+      
+      const errorData = await response.json().catch(() => ({}));
+      setEmailError(errorData.error?.message || '이메일 중복 검사에 실패했습니다.');
+      return false;
+    } catch (error) {
+      console.error('이메일 중복 검사 에러:', error);
+      setEmailError('이메일 중복 검사에 실패했습니다.');
+      return false;
+    }
+  };
+
+  const checkNicknameDuplicate = async (nickname: string): Promise<boolean> => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user/onboarding/nickname-duplicate-check?nickname=${encodeURIComponent(nickname)}`
+      );
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.result === 'SUCCESS') {
+          setNicknameError('');
+          return true;
+        } else if (result.result === 'FAILED') {
+          setNicknameError(result.error?.message || '');
+          return false;
+        }
+      }
+      
+      const errorData = await response.json().catch(() => ({}));
+      setNicknameError(errorData.error?.message || '닉네임 중복 검사에 실패했습니다.');
+      return false;
+    } catch (error) {
+      console.error('닉네임 중복 검사 에러:', error);
+      setNicknameError('닉네임 중복 검사에 실패했습니다.');
+      return false;
+    }
+  };
+
+  const handleSubmitOnboarding = async () => {
+    if (isSubmitting || !user || !accessToken) return;
+
+    setIsSubmitting(true);
+    try {
+      console.log('온보딩 제출 데이터:', {
+        position: mapPositionToApi(formData.jobCategory),
+        experience: mapExperienceToApi(formData.experience),
+        email: formData.email,
+        province: formData.location1,
+        district: formData.location2,
+        keywordUuidList: formData.keywords,
+        nickname: formData.nickname,
+      });
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user/onboarding?currentUser=${user.id}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            position: mapPositionToApi(formData.jobCategory),
+            experience: mapExperienceToApi(formData.experience),
+            email: formData.email,
+            province: formData.location1,
+            district: formData.location2,
+            keywordUuidList: formData.keywords,
+            nickname: formData.nickname,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('온보딩 제출 실패:', errorData);
+        throw new Error('온보딩 제출 실패');
+      }
+
+      const data = await response.json();
+      console.log('온보딩 제출 성공:', data);
+      
+      // 완료 콜백 호출
+      onComplete(formData);
+    } catch (error) {
+      console.error('온보딩 처리 중 에러:', error);
+      alert('온보딩 정보 저장에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleNext = async () => {
+    if (step === 2) {
+      const isEmailAvailable = await checkEmailDuplicate(formData.email);
+      if (!isEmailAvailable) {
+        return; // 중복이면 다음 단계로 넘어가지 않음
+      }
+    }
+    
+    if (step === 4) {
+      const isNicknameAvailable = await checkNicknameDuplicate(formData.nickname);
+      if (!isNicknameAvailable) {
+        return; // 중복이면 다음 단계로 넘어가지 않음
+      }
+    }
+
     if (step < 5) {
       setStep(step + 1);
     } else {
-      onComplete(formData);
+      handleSubmitOnboarding();
     }
   };
 
@@ -69,16 +244,16 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     }
   };
 
-  const handleKeywordToggle = (keyword: string) => {
+  const handleKeywordToggle = (keywordUuid: string) => {
     setFormData(prev => {
-      const isSelected = prev.keywords.includes(keyword);
+      const isSelected = prev.keywords.includes(keywordUuid);
       if (isSelected) {
-        return { ...prev, keywords: prev.keywords.filter(k => k !== keyword) };
+        return { ...prev, keywords: prev.keywords.filter(k => k !== keywordUuid) };
       } else {
         if (prev.keywords.length >= 3) {
           return prev;
         }
-        return { ...prev, keywords: [...prev.keywords, keyword] };
+        return { ...prev, keywords: [...prev.keywords, keywordUuid] };
       }
     });
   };
@@ -150,7 +325,11 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           label="이메일" 
           required 
           placeholder="example@domain.com" 
-          onChange={(value: string) => setFormData({ ...formData, email: value })}
+          error={emailError}
+          onChange={(value: string) => {
+            setFormData({ ...formData, email: value });
+            if (emailError) setEmailError(''); // 입력 시 에러 메시지 초기화
+          }}
         />
 
         <SelectField
@@ -171,12 +350,6 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   const renderStep3 = () => {
-    const keywordOptions = [
-      '실무', '멘토링', '스터디', '사이드프로젝트',
-      '트렌드', '포트폴리오', '자소서', '면접',
-      '커리어', '이직', '협업',
-    ];
-
     return (
       <>
       <div className="flex flex-col gap-[16px] items-start">
@@ -191,12 +364,12 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           </div>
 
           <div className="flex flex-wrap items-start gap-y-[16px] gap-x-[8px] self-stretch">
-            {keywordOptions.map((keyword) => (
+            {keywordList.map((keyword) => (
               <KeywordChip
-                key={keyword}
-                label={keyword}
-                selected={formData.keywords.includes(keyword)}
-                onClick={() => handleKeywordToggle(keyword)}
+                key={keyword.uuid}
+                label={keyword.name}
+                selected={formData.keywords.includes(keyword.uuid)}
+                onClick={() => handleKeywordToggle(keyword.uuid)}
               />
             ))}
           </div>
@@ -221,7 +394,11 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
         label="닉네임"
         required
         placeholder="닉네임을 입력해주세요"
-        onChange={(value: string) => setFormData({ ...formData, nickname: value })}
+        error={nicknameError}
+        onChange={(value: string) => {
+          setFormData({ ...formData, nickname: value });
+          if (nicknameError) setNicknameError(''); // 입력 시 에러 메시지 초기화
+        }}
       />
       </>
     )
@@ -251,21 +428,23 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
             <Button
               variant="secondary"
               size="lg"
-              onClick={() => onComplete(formData)}
+              onClick={() => handleSubmitOnboarding()}
+              disabled={isSubmitting}
               className="flex-1"
             >
-              건너뛰기
+              {isSubmitting ? '제출 중...' : '건너뛰기'}
             </Button>
             <Button
               variant="primary"
               size="lg"
               onClick={() => {
-              // TODO: 프로필 완성 페이지로 이동
-              onComplete(formData);
+                // TODO: 프로필 완성 페이지로 이동
+                handleSubmitOnboarding();
               }}
+              disabled={isSubmitting}
               className="flex-1"
             >
-              프로필 완성하기
+              {isSubmitting ? '제출 중...' : '프로필 완성하기'}
             </Button>
           </div>
         </div>
@@ -277,7 +456,6 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{ background: 'rgba(30, 30, 30, 0.30)' }}
-      onClick={onClose}
     >
       <div
         className={`bg-white w-[640px] rounded-[28px] px-[36px] pt-[28px] pb-[36px] flex flex-col items-start 

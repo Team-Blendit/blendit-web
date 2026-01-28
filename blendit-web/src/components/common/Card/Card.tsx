@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 // Bookmark Icon (unfilled)
 const BookmarkIcon = () => (
   <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M8.0625 26.1931V5.27383C8.0625 4.94246 8.33113 4.67383 8.6625 4.67383H23.3352C23.6666 4.67383 23.9352 4.94246 23.9352 5.27383V26.183C23.9352 26.6666 23.3924 26.9515 22.9944 26.6768L16.3992 22.1249C16.1954 21.9842 15.9261 21.9832 15.7212 22.1224L8.9997 26.6894C8.60134 26.9601 8.0625 26.6747 8.0625 26.1931Z" stroke="#999999" stroke-width="1.5"/>
+    <path d="M8.0625 26.1931V5.27383C8.0625 4.94246 8.33113 4.67383 8.6625 4.67383H23.3352C23.6666 4.67383 23.9352 4.94246 23.9352 5.27383V26.183C23.9352 26.6666 23.3924 26.9515 22.9944 26.6768L16.3992 22.1249C16.1954 21.9842 15.9261 21.9832 15.7212 22.1224L8.9997 26.6894C8.60134 26.9601 8.0625 26.6747 8.0625 26.1931Z" stroke="#999999" strokeWidth="1.5"/>
   </svg>
 );
 
@@ -340,8 +340,8 @@ export const Card: React.FC<CardProps> = ({
           </div>
 
           {/* Title */}
-          <div className='flex justify-center items-center gap-[8px] self-stretch'>
-            <p className="text-[22px] leading-[28px] text-[#121212] line-clamp-2 w-full">
+          <div className='flex justify-center items-start gap-[8px] self-stretch h-[68px]'>
+            <p className="text-[22px] leading-[34px] text-[#121212] line-clamp-2 w-full">
               {title}
             </p>
           </div>
