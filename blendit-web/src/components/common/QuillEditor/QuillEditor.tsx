@@ -37,7 +37,7 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
         [{ header: [1, 2, false] }],
         ['bold', 'italic', 'underline', 'strike'],
         [{ list: 'ordered' }, { list: 'bullet' }],
-        ['link', 'image'],
+        ['link'],
         ['clean'],
       ];
 
