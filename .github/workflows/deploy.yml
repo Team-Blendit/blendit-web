@@ -39,6 +39,14 @@ jobs:
         working-directory: blendit-web
         run: npm ci --legacy-peer-deps
 
+      - name: Create .env file
+        working-directory: blendit-web
+        run: |
+          echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" >> .env
+          echo "NEXT_PUBLIC_KAKAO_CLIENT_ID=${{ secrets.NEXT_PUBLIC_KAKAO_CLIENT_ID }}" >> .env
+          echo "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}" >> .env
+          echo "NEXT_PUBLIC_REDIRECT_URI=${{ secrets.NEXT_PUBLIC_REDIRECT_URI }}" >> .env
+
       - name: Build (Next export -> out)
         working-directory: blendit-web
         run: npm run build
