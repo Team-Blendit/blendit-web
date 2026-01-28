@@ -108,7 +108,47 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     return mapping[experience] || 'NEWBIE';
   };
 
+  const validateEmailFormat = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validateNicknameFormat = (nickname: string): { isValid: boolean; error: string } => {
+    const trimmed = nickname.trim();
+    
+    // 1. 최소 글자 수 체크
+    if (trimmed.length === 0) {
+      return { isValid: false, error: '닉네임은 1자 이상 입력해주세요.' };
+    }
+    
+    // 2. 최대 글자 수 체크
+    if (trimmed.length > 10) {
+      return { isValid: false, error: '닉네임은 최대 10자까지 입력할 수 있어요.' };
+    }
+    
+    // 3. 자음이나 모음만 있는지 체크 (한글 자음: ㄱ-ㅎ, 모음: ㅏ-ㅣ)
+    const onlyConsonantOrVowel = /^[ㄱ-ㅎㅏ-ㅣ\s]+$/.test(trimmed);
+    if (onlyConsonantOrVowel) {
+      return { isValid: false, error: '자음이나 모음만으로는 닉네임을 만들 수 없어요.' };
+    }
+    
+    // 4. 유효한 문자(한글, 영문, 숫자)가 하나라도 있는지 체크
+    const hasValidChar = /[가-힣a-zA-Z0-9]/.test(trimmed);
+    if (!hasValidChar) {
+      return { isValid: false, error: '공백이나 특수문자만 입력된 닉네임은 사용할 수 없어요.' };
+    }
+    
+    return { isValid: true, error: '' };
+  };
+
   const checkEmailDuplicate = async (email: string): Promise<boolean> => {
+    // 이메일 형식 검증
+    if (!validateEmailFormat(email)) {
+      setEmailError('이메일 형식이 올바르지 않아요.');
+      return false;
+    }
+    
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/user/onboarding/email-duplicate-check?email=${encodeURIComponent(email)}`
@@ -136,6 +176,13 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   const checkNicknameDuplicate = async (nickname: string): Promise<boolean> => {
+    // 닉네임 형식 검증
+    const validation = validateNicknameFormat(nickname);
+    if (!validation.isValid) {
+      setNicknameError(validation.error);
+      return false;
+    }
+    
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/user/onboarding/nickname-duplicate-check?nickname=${encodeURIComponent(nickname)}`
@@ -296,6 +343,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           label="직군"
           required
           placeholder="직군"
+          value={formData.jobCategory}
           options1={['프론트엔드', '백엔드', 'PM', '마케팅', '디자인', '데이터', 'AI', '보안']}
           onSelect1={(value: string) => setFormData({ ...formData, jobCategory: value })}
         />
@@ -304,6 +352,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           label="경력"
           required
           placeholder="경력"
+          value={formData.experience}
           options1={['신입', '주니어 (1~3년)', '미들 (3~6년)', '시니어 (7년 이상)']}
           onSelect1={(value: string) => setFormData({ ...formData, experience: value })}
         />
@@ -325,6 +374,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           label="이메일" 
           required 
           placeholder="example@domain.com" 
+          value={formData.email}
           error={emailError}
           onChange={(value: string) => {
             setFormData({ ...formData, email: value });
@@ -338,9 +388,11 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           required
           searchable2
           placeholder="시/도"
+          value={formData.location1}
           options1={['서울특별시']}
           onSelect1={(value: string) => setFormData({ ...formData, location1: value })}
           placeholder2='시/구'
+          value2={formData.location2}
           options2={['강남구', '강동구', '강북구', '강서구', '관악구', '광진구', '구로구', '금천구', '노원구', '도봉구', '동대문구', '동작구', '마포구', '서대문구', '서초구', '성동구', '성북구', '송파구', '양천구', '영등포구', '용산구', '은평구', '종로구', '중구', '중랑구']}
           onSelect2={(value: string) => setFormData({ ...formData, location2: value })}
         />
@@ -394,6 +446,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
         label="닉네임"
         required
         placeholder="닉네임을 입력해주세요"
+        value={formData.nickname}
         error={nicknameError}
         onChange={(value: string) => {
           setFormData({ ...formData, nickname: value });
@@ -468,7 +521,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           showStepIndicator={step !== 5}
           showBackButton={step == 1 ? false : true}
           onBack={handleBack}
-          onClose={onClose}
+          onClose={step !== 5 ? onClose : undefined}
         />
 
         {/* Content */}

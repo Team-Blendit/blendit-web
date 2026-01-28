@@ -32,6 +32,10 @@ export interface SelectFieldProps {
   searchable1?: boolean; // double/triple layout 첫 번째 필드용
   searchable2?: boolean; // double/triple layout 두 번째 필드용
   searchable3?: boolean; // triple layout 세 번째 필드용
+  // 선택된 값 props
+  value?: string;
+  value2?: string;
+  value3?: string;
   // Double/Triple layout용 추가 props
   placeholder2?: string;
   placeholder3?: string;
@@ -59,6 +63,9 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   searchable1,
   searchable2,
   searchable3,
+  value,
+  value2,
+  value3,
   placeholder2 = 'Text',
   placeholder3 = 'Text',
   options1 = ['옵션 1', '옵션 2', '옵션 3'],
@@ -74,9 +81,9 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   const [isOpen1, setIsOpen1] = React.useState(false);
   const [isOpen2, setIsOpen2] = React.useState(false);
   const [isOpen3, setIsOpen3] = React.useState(false);
-  const [selectedValue1, setSelectedValue1] = React.useState('');
-  const [selectedValue2, setSelectedValue2] = React.useState('');
-  const [selectedValue3, setSelectedValue3] = React.useState('');
+  const [selectedValue1, setSelectedValue1] = React.useState(value || '');
+  const [selectedValue2, setSelectedValue2] = React.useState(value2 || '');
+  const [selectedValue3, setSelectedValue3] = React.useState(value3 || '');
   const [searchTerm1, setSearchTerm1] = React.useState('');
   const [searchTerm2, setSearchTerm2] = React.useState('');
   const [searchTerm3, setSearchTerm3] = React.useState('');

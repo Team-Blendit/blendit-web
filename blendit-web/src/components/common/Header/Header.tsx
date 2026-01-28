@@ -36,10 +36,10 @@ export const Header: React.FC = () => {
     window.location.href = GOOGLE_AUTH_URL;
   };
 
-  const handleNaverLogin = () => {
-    console.log('네이버 로그인 준비 중');
-    // TODO: 네이버 로그인 구현
-  };
+  // const handleNaverLogin = () => {
+  //   console.log('네이버 로그인 준비 중');
+  //   // TODO: 네이버 로그인 구현
+  // };
 
   const handleOnboardingComplete = (data: OnboardingData) => {
     console.log('온보딩 완료:', data);
@@ -108,7 +108,7 @@ export const Header: React.FC = () => {
         onClose={() => setIsLoginModalOpen(false)}
         onKakaoLogin={handleKakaoLogin}
         onGoogleLogin={handleGoogleLogin}
-        onNaverLogin={handleNaverLogin}
+        // onNaverLogin={handleNaverLogin}
       />
 
       {/* Onboarding Modal */}

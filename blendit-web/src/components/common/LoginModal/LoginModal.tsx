@@ -15,7 +15,7 @@ export interface LoginModalProps {
   onClose: () => void;
   onKakaoLogin?: () => void;
   onGoogleLogin?: () => void;
-  onNaverLogin?: () => void;
+  // onNaverLogin?: () => void;
 }
 
 export const LoginModal: React.FC<LoginModalProps> = ({
@@ -23,7 +23,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   onClose,
   onKakaoLogin,
   onGoogleLogin,
-  onNaverLogin,
+  // onNaverLogin,
 }) => {
   useEffect(() => {
     if (isOpen) {
@@ -81,7 +81,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             <div className="flex flex-col items-start gap-[24px] self-stretch">
                 <SocialLoginButton provider="kakao" onClick={onKakaoLogin} />
                 <SocialLoginButton provider="google" onClick={onGoogleLogin} />
-                <SocialLoginButton provider="naver" onClick={onNaverLogin} />
+                {/* <SocialLoginButton provider="naver" onClick={onNaverLogin} /> */}
             </div>
           </div>
         </div>

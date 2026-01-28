@@ -8,7 +8,7 @@ interface FlowModalHeaderProps {
   showStepIndicator?: boolean;
   showBackButton?: boolean;
   onBack?: () => void;
-  onClose: () => void;
+  onClose?: () => void;
   className?: string;
 }
 
@@ -52,12 +52,16 @@ export const FlowModalHeader: React.FC<FlowModalHeaderProps> = ({
       )}
 
       {/* Close Button */}
-      <button
-        onClick={onClose}
-        className="w-[24px] h-[24px] flex items-center justify-center rounded transition-colors"
-      >
-        <XIcon />
-      </button>
+      {onClose ? (
+        <button
+          onClick={onClose}
+          className="w-[24px] h-[24px] flex items-center justify-center rounded transition-colors"
+        >
+          <XIcon />
+        </button>
+      ) : (
+        <div className="w-[24px] h-[24px]" /> // Spacer
+      )}
     </div>
   );
 };
