@@ -32,19 +32,24 @@ export interface SelectFieldProps {
   searchable1?: boolean; // double/triple layout 첫 번째 필드용
   searchable2?: boolean; // double/triple layout 두 번째 필드용
   searchable3?: boolean; // triple layout 세 번째 필드용
+  // 다중 선택 옵션
+  multiple?: boolean; // single layout용
+  multiple1?: boolean; // double/triple layout 첫 번째 필드용
+  multiple2?: boolean; // double/triple layout 두 번째 필드용
+  multiple3?: boolean; // triple layout 세 번째 필드용
   // 선택된 값 props
-  value?: string;
-  value2?: string;
-  value3?: string;
+  value?: string | string[];
+  value2?: string | string[];
+  value3?: string | string[];
   // Double/Triple layout용 추가 props
   placeholder2?: string;
   placeholder3?: string;
   options1?: string[];
   options2?: string[];
   options3?: string[];
-  onSelect1?: (value: string) => void;
-  onSelect2?: (value: string) => void;
-  onSelect3?: (value: string) => void;
+  onSelect1?: (value: string | string[]) => void;
+  onSelect2?: (value: string | string[]) => void;
+  onSelect3?: (value: string | string[]) => void;
   // 자동승인 토글 관련 props
   showAutoApproval?: boolean;
   autoApprovalEnabled?: boolean;
@@ -63,6 +68,10 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   searchable1,
   searchable2,
   searchable3,
+  multiple = false,
+  multiple1,
+  multiple2,
+  multiple3,
   value,
   value2,
   value3,
@@ -81,9 +90,26 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   const [isOpen1, setIsOpen1] = React.useState(false);
   const [isOpen2, setIsOpen2] = React.useState(false);
   const [isOpen3, setIsOpen3] = React.useState(false);
-  const [selectedValue1, setSelectedValue1] = React.useState(value || '');
-  const [selectedValue2, setSelectedValue2] = React.useState(value2 || '');
-  const [selectedValue3, setSelectedValue3] = React.useState(value3 || '');
+
+  // 다중 선택 여부 확인
+  const isMultiple1 = layout === 'single' ? multiple : (multiple1 ?? multiple);
+  const isMultiple2 = multiple2 ?? multiple;
+  const isMultiple3 = multiple3 ?? multiple;
+
+  // 초기값 설정 (다중 선택일 경우 배열로)
+  const getInitialValue = (val: string | string[] | undefined, isMulti: boolean): string | string[] => {
+    if (isMulti) {
+      if (Array.isArray(val)) return val;
+      if (val) return [val];
+      return [];
+    }
+    if (Array.isArray(val)) return val[0] || '';
+    return val || '';
+  };
+
+  const [selectedValue1, setSelectedValue1] = React.useState<string | string[]>(getInitialValue(value, isMultiple1));
+  const [selectedValue2, setSelectedValue2] = React.useState<string | string[]>(getInitialValue(value2, isMultiple2));
+  const [selectedValue3, setSelectedValue3] = React.useState<string | string[]>(getInitialValue(value3, isMultiple3));
   const [searchTerm1, setSearchTerm1] = React.useState('');
   const [searchTerm2, setSearchTerm2] = React.useState('');
   const [searchTerm3, setSearchTerm3] = React.useState('');
@@ -111,25 +137,64 @@ export const SelectField: React.FC<SelectFieldProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleSelect1 = (value: string) => {
-    setSelectedValue1(value);
-    setIsOpen1(false);
-    setSearchTerm1('');
-    onSelect1?.(value);
+  const handleSelect1 = (val: string) => {
+    if (isMultiple1) {
+      const currentValues = Array.isArray(selectedValue1) ? selectedValue1 : [];
+      const newValues = currentValues.includes(val)
+        ? currentValues.filter(v => v !== val)
+        : [...currentValues, val];
+      setSelectedValue1(newValues);
+      onSelect1?.(newValues);
+    } else {
+      setSelectedValue1(val);
+      setIsOpen1(false);
+      setSearchTerm1('');
+      onSelect1?.(val);
+    }
   };
 
-  const handleSelect2 = (value: string) => {
-    setSelectedValue2(value);
-    setIsOpen2(false);
-    setSearchTerm2('');
-    onSelect2?.(value);
+  const handleSelect2 = (val: string) => {
+    if (isMultiple2) {
+      const currentValues = Array.isArray(selectedValue2) ? selectedValue2 : [];
+      const newValues = currentValues.includes(val)
+        ? currentValues.filter(v => v !== val)
+        : [...currentValues, val];
+      setSelectedValue2(newValues);
+      onSelect2?.(newValues);
+    } else {
+      setSelectedValue2(val);
+      setIsOpen2(false);
+      setSearchTerm2('');
+      onSelect2?.(val);
+    }
   };
 
-  const handleSelect3 = (value: string) => {
-    setSelectedValue3(value);
-    setIsOpen3(false);
-    setSearchTerm3('');
-    onSelect3?.(value);
+  const handleSelect3 = (val: string) => {
+    if (isMultiple3) {
+      const currentValues = Array.isArray(selectedValue3) ? selectedValue3 : [];
+      const newValues = currentValues.includes(val)
+        ? currentValues.filter(v => v !== val)
+        : [...currentValues, val];
+      setSelectedValue3(newValues);
+      onSelect3?.(newValues);
+    } else {
+      setSelectedValue3(val);
+      setIsOpen3(false);
+      setSearchTerm3('');
+      onSelect3?.(val);
+    }
+  };
+
+  // 표시할 값 포맷팅 (다중 선택시 쉼표로 구분)
+  const getDisplayValue = (val: string | string[]): string => {
+    if (Array.isArray(val)) return val.join(', ');
+    return val;
+  };
+
+  // 선택 여부 확인
+  const isSelected = (val: string | string[], option: string): boolean => {
+    if (Array.isArray(val)) return val.includes(option);
+    return val === option;
   };
 
   const handleToggleAutoApproval = () => {
@@ -213,22 +278,22 @@ export const SelectField: React.FC<SelectFieldProps> = ({
               <input
                 type="text"
                 disabled={disabled}
-                value={searchable && isOpen1 ? searchTerm1 : selectedValue1}
+                value={searchable && isOpen1 ? searchTerm1 : getDisplayValue(selectedValue1)}
                 onChange={(e) => {
                   if (searchable) {
                     setSearchTerm1(e.target.value);
                     setIsOpen1(true);
                   }
                 }}
-                onFocus={() => !disabled && !error && setIsOpen1(true)}
-                onClick={() => !disabled && !error && setIsOpen1(true)}
+                onFocus={() => !disabled && setIsOpen1(true)}
+                onClick={() => !disabled && setIsOpen1(true)}
                 placeholder={placeholder}
                 readOnly={!searchable}
                 className={cn(
                   'w-full h-[60px] px-[16px] py-[16px] rounded-xl',
                   'font-medium text-lg leading-base',
                   'transition-colors focus:outline-none',
-                  disabled 
+                  disabled
                     ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
                     : error
                       ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
@@ -243,7 +308,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
               >
                 <div className={cn(
                   'transition-transform',
-                  isOpen1 && !disabled && !error && 'rotate-180'
+                  isOpen1 && !disabled && 'rotate-180'
                 )}>
                   <DownArrowIcon />
                 </div>
@@ -251,7 +316,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
             </div>
             
             {/* Dropdown Menu */}
-            {isOpen1 && !disabled && !error && (
+            {isOpen1 && !disabled && (
               <div className="absolute z-10 w-full mt-[8px] bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
                 {getFilteredOptions1().map((option, index) => (
                   <button
@@ -262,9 +327,18 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                       'w-full h-[60px] px-[14px] py-[15px] text-left text-lg font-medium',
                       'hover:bg-[#EEEEEE] transition-colors',
                       'text-[var(--text-secondary)]',
-                      selectedValue1 === option && 'bg-[#EEEEEE]'
+                      isSelected(selectedValue1, option) && 'bg-[#EEEEEE]'
                     )}
                   >
+                    {isMultiple1 && (
+                      <span className="inline-block w-[20px] h-[20px] mr-[8px] border border-[var(--border-default)] rounded align-middle">
+                        {isSelected(selectedValue1, option) && (
+                          <svg className="w-full h-full text-[var(--accent-primary-default)]" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                      </span>
+                    )}
                     {option}
                   </button>
                 ))}
@@ -278,22 +352,22 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                 <input
                   type="text"
                   disabled={disabled}
-                  value={(searchable1 ?? searchable) && isOpen1 ? searchTerm1 : selectedValue1}
+                  value={(searchable1 ?? searchable) && isOpen1 ? searchTerm1 : getDisplayValue(selectedValue1)}
                   onChange={(e) => {
                     if (searchable1 ?? searchable) {
                       setSearchTerm1(e.target.value);
                       setIsOpen1(true);
                     }
                   }}
-                  onFocus={() => !disabled && !error && setIsOpen1(true)}
-                  onClick={() => !disabled && !error && setIsOpen1(true)}
+                  onFocus={() => !disabled && setIsOpen1(true)}
+                  onClick={() => !disabled && setIsOpen1(true)}
                   placeholder={placeholder}
                   readOnly={!(searchable1 ?? searchable)}
                   className={cn(
                     'w-full h-[60px] px-4 py-4 rounded-xl',
                     'font-medium text-lg leading-base',
                     'transition-colors focus:outline-none',
-                    disabled 
+                    disabled
                       ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
                       : error
                         ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
@@ -303,20 +377,20 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                     !(searchable1 ?? searchable) && 'cursor-pointer'
                   )}
                 />
-                <div 
+                <div
                   className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
                 >
                   <div className={cn(
                     'transition-transform',
-                    isOpen1 && !disabled && !error && 'rotate-180'
+                    isOpen1 && !disabled && 'rotate-180'
                   )}>
                     <DownArrowIcon />
                   </div>
                 </div>
               </div>
-              
+
               {/* Dropdown Menu */}
-              {isOpen1 && !disabled && !error && (
+              {isOpen1 && !disabled && (
                 <div className="absolute z-10 w-full mt-[8px] bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
                   {getFilteredOptions1().map((option, index) => (
                     <button
@@ -327,37 +401,46 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                         'w-full h-[60px] px-[14px] py-[15px] text-left text-lg font-medium',
                         'hover:bg-[#EEEEEE] transition-colors',
                         'text-[var(--text-secondary)]',
-                        selectedValue1 === option && 'bg-[#EEEEEE]'
+                        isSelected(selectedValue1, option) && 'bg-[#EEEEEE]'
                       )}
                     >
+                      {isMultiple1 && (
+                        <span className="inline-block w-[20px] h-[20px] mr-[8px] border border-[var(--border-default)] rounded align-middle">
+                          {isSelected(selectedValue1, option) && (
+                            <svg className="w-full h-full text-[var(--accent-primary-default)]" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </span>
+                      )}
                       {option}
                     </button>
                   ))}
                 </div>
               )}
             </div>
-            
+
             <div className="relative flex-1" ref={dropdown2Ref}>
               <div className="relative">
                 <input
                   type="text"
                   disabled={disabled}
-                  value={(searchable2 ?? searchable) && isOpen2 ? searchTerm2 : selectedValue2}
+                  value={(searchable2 ?? searchable) && isOpen2 ? searchTerm2 : getDisplayValue(selectedValue2)}
                   onChange={(e) => {
                     if (searchable2 ?? searchable) {
                       setSearchTerm2(e.target.value);
                       setIsOpen2(true);
                     }
                   }}
-                  onFocus={() => !disabled && !error && setIsOpen2(true)}
-                  onClick={() => !disabled && !error && setIsOpen2(true)}
+                  onFocus={() => !disabled && setIsOpen2(true)}
+                  onClick={() => !disabled && setIsOpen2(true)}
                   placeholder={placeholder2}
                   readOnly={!(searchable2 ?? searchable)}
                   className={cn(
                     'w-full h-[60px] px-4 py-4 rounded-xl',
                     'font-medium text-lg leading-base',
                     'transition-colors focus:outline-none',
-                    disabled 
+                    disabled
                       ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
                       : error
                         ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
@@ -372,7 +455,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                 >
                   <div className={cn(
                     'transition-transform',
-                    isOpen2 && !disabled && !error && 'rotate-180'
+                    isOpen2 && !disabled && 'rotate-180'
                   )}>
                     <DownArrowIcon />
                   </div>
@@ -380,7 +463,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
               </div>
               
               {/* Dropdown Menu */}
-              {isOpen2 && !disabled && !error && (
+              {isOpen2 && !disabled && (
                 <div className="absolute z-10 w-full mt-[8px] bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
                   {getFilteredOptions2().map((option, index) => (
                     <button
@@ -391,9 +474,18 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                         'w-full h-[60px] px-[14px] py-[15px] text-left text-lg font-medium',
                         'hover:bg-[#EEEEEE] transition-colors',
                         'text-[var(--text-secondary)]',
-                        selectedValue2 === option && 'bg-[#EEEEEE]'
+                        isSelected(selectedValue2, option) && 'bg-[#EEEEEE]'
                       )}
                     >
+                      {isMultiple2 && (
+                        <span className="inline-block w-[20px] h-[20px] mr-[8px] border border-[var(--border-default)] rounded align-middle">
+                          {isSelected(selectedValue2, option) && (
+                            <svg className="w-full h-full text-[var(--accent-primary-default)]" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </span>
+                      )}
                       {option}
                     </button>
                   ))}
@@ -409,22 +501,22 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                 <input
                   type="text"
                   disabled={disabled}
-                  value={(searchable1 ?? searchable) && isOpen1 ? searchTerm1 : selectedValue1}
+                  value={(searchable1 ?? searchable) && isOpen1 ? searchTerm1 : getDisplayValue(selectedValue1)}
                   onChange={(e) => {
                     if (searchable1 ?? searchable) {
                       setSearchTerm1(e.target.value);
                       setIsOpen1(true);
                     }
                   }}
-                  onFocus={() => !disabled && !error && setIsOpen1(true)}
-                  onClick={() => !disabled && !error && setIsOpen1(true)}
+                  onFocus={() => !disabled && setIsOpen1(true)}
+                  onClick={() => !disabled && setIsOpen1(true)}
                   placeholder={placeholder}
                   readOnly={!(searchable1 ?? searchable)}
                   className={cn(
                     'w-full h-[60px] px-4 py-4 rounded-xl',
                     'font-medium text-lg leading-base',
                     'transition-colors focus:outline-none',
-                    disabled 
+                    disabled
                       ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
                       : error
                         ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
@@ -434,20 +526,20 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                     !(searchable1 ?? searchable) && 'cursor-pointer'
                   )}
                 />
-                <div 
+                <div
                   className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
                 >
                   <div className={cn(
                     'transition-transform',
-                    isOpen1 && !disabled && !error && 'rotate-180'
+                    isOpen1 && !disabled && 'rotate-180'
                   )}>
                     <DownArrowIcon />
                   </div>
                 </div>
               </div>
-              
+
               {/* Dropdown Menu */}
-              {isOpen1 && !disabled && !error && (
+              {isOpen1 && !disabled && (
                 <div className="absolute z-10 w-full mt-[8px] bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
                   {getFilteredOptions1().map((option, index) => (
                     <button
@@ -458,9 +550,18 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                         'w-full h-[60px] px-[14px] py-[15px] text-left text-lg font-medium',
                         'hover:bg-[#EEEEEE] transition-colors',
                         'text-[var(--text-secondary)]',
-                        selectedValue1 === option && 'bg-[#EEEEEE]'
+                        isSelected(selectedValue1, option) && 'bg-[#EEEEEE]'
                       )}
                     >
+                      {isMultiple1 && (
+                        <span className="inline-block w-[20px] h-[20px] mr-[8px] border border-[var(--border-default)] rounded align-middle">
+                          {isSelected(selectedValue1, option) && (
+                            <svg className="w-full h-full text-[var(--accent-primary-default)]" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </span>
+                      )}
                       {option}
                     </button>
                   ))}
@@ -473,22 +574,22 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                 <input
                   type="text"
                   disabled={disabled}
-                  value={(searchable2 ?? searchable) && isOpen2 ? searchTerm2 : selectedValue2}
+                  value={(searchable2 ?? searchable) && isOpen2 ? searchTerm2 : getDisplayValue(selectedValue2)}
                   onChange={(e) => {
                     if (searchable2 ?? searchable) {
                       setSearchTerm2(e.target.value);
                       setIsOpen2(true);
                     }
                   }}
-                  onFocus={() => !disabled && !error && setIsOpen2(true)}
-                  onClick={() => !disabled && !error && setIsOpen2(true)}
+                  onFocus={() => !disabled && setIsOpen2(true)}
+                  onClick={() => !disabled && setIsOpen2(true)}
                   placeholder={placeholder2}
                   readOnly={!(searchable2 ?? searchable)}
                   className={cn(
                     'w-full h-[60px] px-4 py-4 rounded-xl',
                     'font-medium text-lg leading-base',
                     'transition-colors focus:outline-none',
-                    disabled 
+                    disabled
                       ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
                       : error
                         ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
@@ -498,20 +599,20 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                     !(searchable2 ?? searchable) && 'cursor-pointer'
                   )}
                 />
-                <div 
+                <div
                   className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
                 >
                   <div className={cn(
                     'transition-transform',
-                    isOpen2 && !disabled && !error && 'rotate-180'
+                    isOpen2 && !disabled && 'rotate-180'
                   )}>
                     <DownArrowIcon />
                   </div>
                 </div>
               </div>
-              
+
               {/* Dropdown Menu */}
-              {isOpen2 && !disabled && !error && (
+              {isOpen2 && !disabled && (
                 <div className="absolute z-10 w-full mt-[8px] bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
                   {getFilteredOptions2().map((option, index) => (
                     <button
@@ -522,9 +623,18 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                         'w-full h-[60px] px-[14px] py-[15px] text-left text-lg font-medium',
                         'hover:bg-[#EEEEEE] transition-colors',
                         'text-[var(--text-secondary)]',
-                        selectedValue2 === option && 'bg-[#EEEEEE]'
+                        isSelected(selectedValue2, option) && 'bg-[#EEEEEE]'
                       )}
                     >
+                      {isMultiple2 && (
+                        <span className="inline-block w-[20px] h-[20px] mr-[8px] border border-[var(--border-default)] rounded align-middle">
+                          {isSelected(selectedValue2, option) && (
+                            <svg className="w-full h-full text-[var(--accent-primary-default)]" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </span>
+                      )}
                       {option}
                     </button>
                   ))}
@@ -537,22 +647,22 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                 <input
                   type="text"
                   disabled={disabled}
-                  value={(searchable3 ?? searchable) && isOpen3 ? searchTerm3 : selectedValue3}
+                  value={(searchable3 ?? searchable) && isOpen3 ? searchTerm3 : getDisplayValue(selectedValue3)}
                   onChange={(e) => {
                     if (searchable3 ?? searchable) {
                       setSearchTerm3(e.target.value);
                       setIsOpen3(true);
                     }
                   }}
-                  onFocus={() => !disabled && !error && setIsOpen3(true)}
-                  onClick={() => !disabled && !error && setIsOpen3(true)}
+                  onFocus={() => !disabled && setIsOpen3(true)}
+                  onClick={() => !disabled && setIsOpen3(true)}
                   placeholder={placeholder3}
                   readOnly={!(searchable3 ?? searchable)}
                   className={cn(
                     'w-full h-[60px] px-4 py-4 rounded-xl',
                     'font-medium text-lg leading-base',
                     'transition-colors focus:outline-none',
-                    disabled 
+                    disabled
                       ? 'bg-[var(--accent-secondary-disabled)] border border-[var(--border-default)] text-[var(--text-disabled)] cursor-not-allowed'
                       : error
                         ? 'bg-[var(--bg-canvas)] border border-[var(--border-error)] text-[var(--text-tertiary)]'
@@ -562,20 +672,20 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                     !(searchable3 ?? searchable) && 'cursor-pointer'
                   )}
                 />
-                <div 
+                <div
                   className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
                 >
                   <div className={cn(
                     'transition-transform',
-                    isOpen3 && !disabled && !error && 'rotate-180'
+                    isOpen3 && !disabled && 'rotate-180'
                   )}>
                     <DownArrowIcon />
                   </div>
                 </div>
               </div>
-              
+
               {/* Dropdown Menu */}
-              {isOpen3 && !disabled && !error && (
+              {isOpen3 && !disabled && (
                 <div className="absolute z-10 w-full mt-[8px] bg-white border border-[var(--border-default)] rounded-xl shadow-lg max-h-[240px] overflow-y-auto">
                   {getFilteredOptions3().map((option, index) => (
                     <button
@@ -586,9 +696,18 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                         'w-full h-[60px] px-[14px] py-[15px] text-left text-lg font-medium',
                         'hover:bg-[#EEEEEE] transition-colors',
                         'text-[var(--text-secondary)]',
-                        selectedValue3 === option && 'bg-[#EEEEEE]'
+                        isSelected(selectedValue3, option) && 'bg-[#EEEEEE]'
                       )}
                     >
+                      {isMultiple3 && (
+                        <span className="inline-block w-[20px] h-[20px] mr-[8px] border border-[var(--border-default)] rounded align-middle">
+                          {isSelected(selectedValue3, option) && (
+                            <svg className="w-full h-full text-[var(--accent-primary-default)]" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </span>
+                      )}
                       {option}
                     </button>
                   ))}

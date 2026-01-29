@@ -67,7 +67,7 @@ export default function NetworkingCreatePage() {
               required
               placeholder="직군을 선택해주세요"
               options1={['프론트엔드', '백엔드', 'PM', '디자인', '마케팅']}
-              onSelect1={(value: string) => setFormData({ ...formData, jobCategory: value })}
+              onSelect1={(value) => setFormData({ ...formData, jobCategory: Array.isArray(value) ? value[0] : value })}
             />
 
             {/* 지역 */}
@@ -76,7 +76,7 @@ export default function NetworkingCreatePage() {
               required
               placeholder="지역을 선택해주세요"
               options1={['서울', '경기', '인천', '부산', '대구', '광주', '대전']}
-              onSelect1={(value: string) => setFormData({ ...formData, region: value })}
+              onSelect1={(value) => setFormData({ ...formData, region: Array.isArray(value) ? value[0] : value })}
             />
 
             {/* 인원 with 자동승인 toggle */}
@@ -85,7 +85,7 @@ export default function NetworkingCreatePage() {
               required
               placeholder="인원을 선택해주세요"
               options1={['2명', '3명', '4명', '5명', '6명', '7명', '8명']}
-              onSelect1={(value: string) => setFormData({ ...formData, participants: value })}
+              onSelect1={(value) => setFormData({ ...formData, participants: Array.isArray(value) ? value[0] : value })}
               showAutoApproval={true}
               autoApprovalEnabled={formData.autoApproval}
               onAutoApprovalChange={(enabled) => setFormData({ ...formData, autoApproval: enabled })}
@@ -100,7 +100,7 @@ export default function NetworkingCreatePage() {
               required
               placeholder="키워드를 선택해주세요"
               options1={['React', 'Vue', 'Angular', 'Next.js', 'Nuxt.js']}
-              onSelect1={(value: string) => setFormData({ ...formData, keyword: value })}
+              onSelect1={(value) => setFormData({ ...formData, keyword: Array.isArray(value) ? value[0] : value })}
             />
 
             {/* 일정 */}
@@ -114,9 +114,9 @@ export default function NetworkingCreatePage() {
               options1={['2024', '2025', '2026']}
               options2={Array.from({ length: 12 }, (_, i) => `${i + 1}월`)}
               options3={Array.from({ length: 31 }, (_, i) => `${i + 1}일`)}
-              onSelect1={(value: string) => setFormData({ ...formData, year: value })}
-              onSelect2={(value: string) => setFormData({ ...formData, month: value })}
-              onSelect3={(value: string) => setFormData({ ...formData, day: value })}
+              onSelect1={(value) => setFormData({ ...formData, year: Array.isArray(value) ? value[0] : value })}
+              onSelect2={(value) => setFormData({ ...formData, month: Array.isArray(value) ? value[0] : value })}
+              onSelect3={(value) => setFormData({ ...formData, day: Array.isArray(value) ? value[0] : value })}
             />
 
             {/* 오픈채팅 */}

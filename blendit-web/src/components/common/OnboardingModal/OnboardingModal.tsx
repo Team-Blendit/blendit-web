@@ -100,7 +100,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     const mapping: { [key: string]: string } = {
       '신입': 'NEWBIE',
       '주니어 (1~3년)': 'JUNIOR',
-      '미들 (3~6년)': 'MIDDLE',
+      '미들 (4~6년)': 'MIDDLE',
       '시니어 (7년 이상)': 'SENIOR',
     };
     return mapping[experience] || 'NEWBIE';
@@ -304,7 +304,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           placeholder="직군"
           value={formData.jobCategory}
           options1={['프론트엔드', '백엔드', 'PM', '마케팅', '디자인', '데이터', 'AI', '보안']}
-          onSelect1={(value: string) => setFormData({ ...formData, jobCategory: value })}
+          onSelect1={(value) => setFormData({ ...formData, jobCategory: Array.isArray(value) ? value[0] : value })}
         />
 
         <SelectField
@@ -313,7 +313,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           placeholder="경력"
           value={formData.experience}
           options1={['신입', '주니어 (1~3년)', '미들 (3~6년)', '시니어 (7년 이상)']}
-          onSelect1={(value: string) => setFormData({ ...formData, experience: value })}
+          onSelect1={(value) => setFormData({ ...formData, experience: Array.isArray(value) ? value[0] : value })}
         />
       </div>
     </>
@@ -349,11 +349,11 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           placeholder="시/도"
           value={formData.location1}
           options1={['서울특별시']}
-          onSelect1={(value: string) => setFormData({ ...formData, location1: value })}
+          onSelect1={(value) => setFormData({ ...formData, location1: Array.isArray(value) ? value[0] : value })}
           placeholder2='시/구'
           value2={formData.location2}
           options2={['강남구', '강동구', '강북구', '강서구', '관악구', '광진구', '구로구', '금천구', '노원구', '도봉구', '동대문구', '동작구', '마포구', '서대문구', '서초구', '성동구', '성북구', '송파구', '양천구', '영등포구', '용산구', '은평구', '종로구', '중구', '중랑구']}
-          onSelect2={(value: string) => setFormData({ ...formData, location2: value })}
+          onSelect2={(value) => setFormData({ ...formData, location2: Array.isArray(value) ? value[0] : value })}
         />
       </div>
     </>

@@ -28,6 +28,8 @@ const processQueue = (error: AxiosError | null, token: string | null = null) => 
 
 // Request 인터셉터: 토큰 자동 첨부
 apiClient.interceptors.request.use((config) => {
+  if (typeof window === 'undefined') return config;
+
   const authStorage = localStorage.getItem('auth-storage');
   if (authStorage) {
     const { state } = JSON.parse(authStorage);

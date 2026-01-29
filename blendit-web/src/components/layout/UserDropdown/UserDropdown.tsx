@@ -38,7 +38,9 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose }) =
     if (action === '네트워킹 관리') {
       router.push('/manage');
     }
-    // TODO: 다른 메뉴 항목에 대한 액션 구현
+    if (action === '마이페이지') {
+      router.push('/mypage');
+    }
   };
 
   return (

@@ -43,7 +43,7 @@ const PencilSimpleIcon = () => (
 
 export interface CardProps {
   variant: 'postInfo' | 'userProfile' | 'myProfile' | 'main' | 'user';
-  
+
   // Common props
   userName?: string;
   userJob?: string;
@@ -52,6 +52,7 @@ export interface CardProps {
   userCompany?: string;
   keywords?: string[];
   skills?: string[];
+  profileImage?: string;
   
   // PostInfoCard specific
   postDate?: string;
@@ -80,21 +81,22 @@ export interface CardProps {
 
 export const Card: React.FC<CardProps> = ({
   variant,
-  userName = '김개발',
-  userJob = '백엔드',
-  userCareer = '3년차',
-  userLocation = '서울 강남구',
-  userCompany = '토스',
-  keywords = ['Badge', 'Badge', 'Badge'],
-  skills = ['Badge', 'Badge', 'Badge', 'Badge'],
-  postDate = '0000.00.00',
-  meetDate = '0000. 00. 00',
-  meetLocation = '서울 강남구',
-  currentNum = 0,
-  totalNum = 5,
-  openChatLink = 'http://',
-  title = 'Text',
-  isRecruiting = true,
+  userName,
+  userJob,
+  userCareer,
+  userLocation,
+  userCompany,
+  keywords = [],
+  skills = [],
+  profileImage,
+  postDate,
+  meetDate,
+  meetLocation,
+  currentNum,
+  totalNum,
+  openChatLink,
+  title,
+  isRecruiting,
   showButton = true,
   buttonText,
   buttonIcon,
@@ -130,7 +132,7 @@ export const Card: React.FC<CardProps> = ({
       {(isUserProfileCard || isMyProfileCard) && (
         <>
           <div className="flex gap-[28px] items-center self-stretch">
-            <UserProfile size="large" />
+            <UserProfile size="large" imageUrl={profileImage} nickname={userName} />
             <div className="flex-1 flex flex-col items-center gap-[16px]">
               {/* Name and Score */}
               <div className={cn(
@@ -208,7 +210,11 @@ export const Card: React.FC<CardProps> = ({
                     <Badge key={index} color="blue" style="solid" text={skill} />
                   ))}
                 </div>
-              ) : null}
+              ) : (
+                <p className="text-[18px] leading-[24px] text-[var(--text-disabled)]">
+                  아직 등록된 스킬이 없어요
+                </p>
+              )}
             </div>
           </div>
         </>
@@ -216,15 +222,17 @@ export const Card: React.FC<CardProps> = ({
 
       {/* MyProfileCard: 프로필 편집 button */}
       {isMyProfileCard && (
-        <button
+        <Button
           onClick={onButtonClick}
-          className="bg-[var(--accent-secondary-default)] flex gap-[10px] h-[48px] items-center justify-center px-[18px] py-[15px] rounded-[8px] w-full"
+          className="w-full"
+          variant='secondary'
+          size='sm'
         >
           {buttonIcon || <PencilSimpleIcon />}
           <span className="text-[18px] font-medium leading-[24px] text-[var(--text-secondary)]">
             {buttonText || '프로필 편집'}
           </span>
-        </button>
+        </Button>
       )}
 
       {/* PostInfoCard: Post meta information */}
