@@ -265,7 +265,9 @@ export default function ProfileEdit() {
 
   const handleIntroductionChange = (value: string) => {
     setFormData(prev => ({ ...prev, introduction: value }));
-    if (value.length > 500) {
+    if (!value.trim()) {
+      setErrors(prev => ({ ...prev, introduction: '프로필 완성을 위해 소개를 입력해주세요' }));
+    } else if (value.length > 500) {
       setErrors(prev => ({ ...prev, introduction: '소개글은 최대 500자까지 입력할 수 있어요' }));
     } else {
       setErrors(prev => ({ ...prev, introduction: '' }));
@@ -352,6 +354,17 @@ export default function ProfileEdit() {
       newErrors.email = '';
     }
 
+    // Introduction validation
+    if (!formData.introduction.trim()) {
+      newErrors.introduction = '프로필 완성을 위해 소개를 입력해주세요';
+      hasError = true;
+    } else if (formData.introduction.length > 500) {
+      newErrors.introduction = '소개글은 최대 500자까지 입력할 수 있어요';
+      hasError = true;
+    } else {
+      newErrors.introduction = '';
+    }
+
     // Keywords validation
     if (formData.keywords.length === 0) {
       newErrors.keywords = '키워드는 최소 1개 이상 선택해주세요.';
@@ -361,14 +374,6 @@ export default function ProfileEdit() {
       hasError = true;
     } else {
       newErrors.keywords = '';
-    }
-
-    // Introduction validation
-    if (formData.introduction.length > 500) {
-      newErrors.introduction = '소개글은 최대 500자까지 입력할 수 있어요';
-      hasError = true;
-    } else {
-      newErrors.introduction = '';
     }
 
     setErrors(newErrors);
@@ -419,7 +424,7 @@ export default function ProfileEdit() {
 
       const updateData = {
         nickname: formData.nickname,
-        description: formData.introduction || undefined,
+        description: formData.introduction,
         experience: experienceMap[formData.experience],
         position: positionMap[formData.job],
         province: formData.location1,
@@ -524,10 +529,11 @@ export default function ProfileEdit() {
                 {/* Introduction */}
                 <div className="flex flex-col gap-[8px]">
                   <div className="flex flex-col gap-[12px]">
-                    <div className="flex items-center gap-[8px]">
-                      <h3 className="text-[22px] font-semibold leading-[28px] text-[var(--text-secondary)]">
+                    <div className="flex items-start gap-[2px]">
+                      <h3 className="text-[22px] font-semibold text-[var(--text-secondary)]">
                         소개
                       </h3>
+                      <div className="w-[6px] h-[6px] rounded-full bg-[var(--border-error)]" aria-label="required" />
                     </div>
                     <textarea
                       value={formData.introduction}
