@@ -79,7 +79,6 @@ export default function HomePage() {
           {/* Filter Section */}
           <section className="flex gap-4 items-start justify-between">
             <FilterSet
-            // 수정 필요
               filters={[
                 {
                   type: 'dropdown',
@@ -102,25 +101,27 @@ export default function HomePage() {
                   value: filterValues.region,
                   onChange: (value) => setFilterValues(prev => ({ ...prev, region: value as string })),
                 },
-                {
-                  type: 'dropdown',
-                  label: '인원수',
-                  options: ['1-2명', '3-5명', '6-10명', '10명 이상'],
-                  value: filterValues.people,
-                  onChange: (value) => setFilterValues(prev => ({ ...prev, people: value as string })),
-                },
-                {
-                  type: 'select',
-                  label: '모집중',
-                  selected: filterValues.recruiting,
-                  onChange: (selected) => {
-                    if (selected as boolean) {
-                      setFilterValues(prev => ({ ...prev, recruiting: true }));
-                    } else {
-                      setFilterValues(prev => ({ ...prev, recruiting: false }));
+                ...(activeTab === 'networking' ? [
+                  {
+                    type: 'dropdown' as const,
+                    label: '인원수',
+                    options: ['1-2명', '3-5명', '6-10명', '10명 이상'],
+                    value: filterValues.people,
+                    onChange: (value: string | boolean) => setFilterValues(prev => ({ ...prev, people: value as string })),
+                  },
+                  {
+                    type: 'select' as const,
+                    label: '모집중',
+                    selected: filterValues.recruiting,
+                    onChange: (selected: string | boolean) => {
+                      if (selected as boolean) {
+                        setFilterValues(prev => ({ ...prev, recruiting: true }));
+                      } else {
+                        setFilterValues(prev => ({ ...prev, recruiting: false }));
+                      }
                     }
                   }
-                },
+                ] : []),
                 {
                   type: 'select',
                   label: '북마크',
