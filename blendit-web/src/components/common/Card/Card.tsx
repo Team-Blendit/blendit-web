@@ -112,7 +112,7 @@ export const Card: React.FC<CardProps> = ({
   // Base classes
   const baseClasses = 'border border-[var(--border-default)] flex flex-col items-start overflow-hidden transition-all duration-300';
   const profileClasses = 'bg-[var(--bg-canvas)] gap-[24px] p-[30px] rounded-[20px] w-[440px]';
-  const mainCardClasses = 'bg-[var(--bg-canvas)] gap-[16px] p-[24px] rounded-[20px] w-[342px] cursor-pointer hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)] hover:-translate-y-0.3';
+  const mainCardClasses = 'bg-[var(--bg-canvas)] gap-[16px] p-[24px] rounded-[20px] w-[342px] cursor-pointer';
   const userCardClasses = 'bg-white gap-[16px] p-[24px] rounded-[12px] w-[342px] shrink-0 cursor-pointer';
 
   return (

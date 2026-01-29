@@ -22,8 +22,8 @@ export default function HomePage() {
     bookmarked: false,
   });
 
-  // Mock data for cards
-  const mockCards = Array.from({ length: 16 }, (_, i) => ({
+  // Mock data for networking cards
+  const mockNetworkingCards = Array.from({ length: 16 }, (_, i) => ({
     id: i + 1,
     title: i % 2 === 0 ? '디자이너 10년차의 멘토링' : '네카라쿠배 디자이너가 알려주는 실무 팁',
     userName: i % 3 === 0 ? '네카라쿠배의디자이너' : '김개발',
@@ -34,6 +34,16 @@ export default function HomePage() {
     currentNum: i % 5,
     totalNum: 5,
     isRecruiting: i % 2 === 0,
+  }));
+
+  // Mock data for user cards
+  const mockUserCards = Array.from({ length: 16 }, (_, i) => ({
+    id: i + 1,
+    userName: i % 3 === 0 ? '네카라쿠배의디자이너' : '김개발',
+    userJob: i % 2 === 0 ? '디자인' : '백엔드',
+    userCareer: i % 3 === 0 ? '시니어 (9년이상)' : i % 3 === 1 ? '미들 (4~6년)' : '주니어 (1~3년)',
+    userLocation: '서울 강남구',
+    keywords: ['실무 경험', '멘토링', '사이드 프로젝트'],
   }));
 
   return (
@@ -54,7 +64,7 @@ export default function HomePage() {
           <section>
             <div className="flex gap-2">
               <Tab
-                label="전체 네트워킹"
+                label="전체 블렌딩"
                 active={activeTab === 'networking'}
                 onClick={() => setActiveTab('networking')}
               />
@@ -132,23 +142,42 @@ export default function HomePage() {
         {/* Card Grid */}
         <section className="flex flex-col gap-[16px] items-stretch">
           <div className="grid grid-cols-4 gap-x-[24px] gap-y-[30px]">
-            {mockCards.map((card) => (
-              <Card
-                key={card.id}
-                variant="main"
-                title={card.title}
-                userName={card.userName}
-                userJob={card.userJob}
-                userCareer={card.userCareer}
-                userLocation={card.userLocation}
-                keywords={card.keywords}
-                currentNum={card.currentNum}
-                totalNum={card.totalNum}
-                isRecruiting={card.isRecruiting}
-                onClick={() => router.push(`/${card.id}`)}
-                onButtonClick={() => console.log('Detail:', card.id)}
-              />
-            ))}
+            {activeTab === 'networking' ? (
+              mockNetworkingCards.map((card) => (
+                <Card
+                  key={card.id}
+                  variant="main"
+                  title={card.title}
+                  userName={card.userName}
+                  userJob={card.userJob}
+                  userCareer={card.userCareer}
+                  userLocation={card.userLocation}
+                  keywords={card.keywords}
+                  currentNum={card.currentNum}
+                  totalNum={card.totalNum}
+                  isRecruiting={card.isRecruiting}
+                  onClick={() => router.push(`/${card.id}`)}
+                  onButtonClick={() => console.log('Detail:', card.id)}
+                  className='hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)] hover:-translate-y-0.3'
+                />
+              ))
+            ) : (
+              mockUserCards.map((card) => (
+                <Card
+                  key={card.id}
+                  variant="user"
+                  userName={card.userName}
+                  userJob={card.userJob}
+                  userCareer={card.userCareer}
+                  userLocation={card.userLocation}
+                  keywords={card.keywords}
+                  onClick={() => router.push(`/user/${card.id}`)}
+                  onButtonClick={() => console.log('User Detail:', card.id)}
+                  showButton={false}
+                  className='hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)] hover:-translate-y-0.3'
+                />
+              ))
+            )}
           </div>
         </section>
 
