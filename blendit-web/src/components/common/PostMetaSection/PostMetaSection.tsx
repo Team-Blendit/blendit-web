@@ -46,7 +46,7 @@ export const PostMetaSection: React.FC<PostMetaSectionProps> = ({
       </div>
 
       {/* Right Column */}
-      <div className="flex flex-col gap-[12px] items-start">
+      <div className="flex flex-col gap-[12px] items-start w-[339px]">
         {/* Keywords */}
         <div className="flex gap-[36px] items-center">
           <span className="text-[18px] leading-[24px] text-[var(--text-secondary)]">키워드</span>

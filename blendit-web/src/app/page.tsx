@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { SearchBar } from '@/components/common/SearchBar';
 import FilterSet from '@/components/common/FilterSet';
@@ -9,6 +10,7 @@ import { Card } from '@/components/common/Card';
 import Pagination from '@/components/common/Pagination';
 
 export default function HomePage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('networking');
   const [currentPage, setCurrentPage] = useState(1);
   const [filterValues, setFilterValues] = useState({
@@ -143,6 +145,7 @@ export default function HomePage() {
                 currentNum={card.currentNum}
                 totalNum={card.totalNum}
                 isRecruiting={card.isRecruiting}
+                onClick={() => router.push(`/${card.id}`)}
                 onButtonClick={() => console.log('Detail:', card.id)}
               />
             ))}

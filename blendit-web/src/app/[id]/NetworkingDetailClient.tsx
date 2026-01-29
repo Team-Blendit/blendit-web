@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { Badge } from '@/components/common/Badge';
 import { PostDescription } from '@/components/common/PostDescription';
 import { CommentSection } from '@/components/common/CommentSection';
 import { Card } from '@/components/common/Card';
+import ApplyModal from '@/components/common/ApplyModal';
 
 // Back Arrow Icon
 const CaretLeftIcon = () => (
@@ -31,7 +33,9 @@ interface NetworkingDetailClientProps {
 }
 
 export default function NetworkingDetailClient({ id }: NetworkingDetailClientProps) {
+  const router = useRouter();
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -84,6 +88,11 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
     // TODO: API 호출로 댓글 등록
   };
 
+  const handleApply = (message: string) => {
+    console.log('Apply message:', message);
+    // TODO: API 호출로 신청하기
+  };
+
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!scrollRef.current) return;
     setIsDragging(true);
@@ -116,7 +125,10 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
         {/* Top Section */}
         <div className="flex items-center justify-between self-stretch">
           <div className="flex items-center gap-[24px] flex-1">
-            <button className="flex p-[4px] items-center gap-[8px]">
+            <button 
+              onClick={() => router.back()}
+              className="flex p-[4px] items-center gap-[8px]"
+            >
               <CaretLeftIcon />
             </button>
             <div className="flex items-center gap-2.5">
@@ -149,7 +161,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
               currentNum={postData.currentMembers}
               totalNum={postData.maxMembers}
               openChatLink={postData.openChatLink}
-              onButtonClick={() => console.log('Apply clicked')}
+              onButtonClick={() => setIsModalOpen(true)}
             />
           </div>
 
@@ -205,6 +217,22 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
           </div>
         </div>
       </div>
+
+      {/* Apply Modal */}
+      <ApplyModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        postData={{
+          jobCategory: postData.jobCategory,
+          region: postData.region,
+          schedule: postData.schedule,
+          keywords: postData.keywords,
+          currentMembers: postData.currentMembers,
+          maxMembers: postData.maxMembers,
+          openChatLink: postData.openChatLink,
+        }}
+        onSubmit={handleApply}
+      />
     </div>
   );
 }

@@ -7,7 +7,8 @@ import { Button } from '@/components/common/Button';
 
 interface NetworkingListItemProps {
   title: string;
-  status?: '승인' | '대기' | '거절';
+  status?: string;
+  statusColor?: 'green' | 'gray' | 'red';
   job: string;
   keywords: string[];
   location: string;
@@ -16,14 +17,16 @@ interface NetworkingListItemProps {
   chatLink: string;
   hasNewNotification?: boolean;
   isBookmarked?: boolean;
-  showButton?: boolean;
+  buttonText?: string;
+  buttonDisabled?: boolean;
   onMoreClick?: () => void;
-  onApplyClick?: () => void;
+  onButtonClick?: () => void;
 }
 
 export const NetworkingListItem: React.FC<NetworkingListItemProps> = ({
   title,
   status,
+  statusColor = 'gray',
   job,
   keywords,
   location,
@@ -32,9 +35,10 @@ export const NetworkingListItem: React.FC<NetworkingListItemProps> = ({
   chatLink,
   hasNewNotification = false,
   isBookmarked = false,
-  showButton = true,
+  buttonText,
+  buttonDisabled = false,
   onMoreClick,
-  onApplyClick,
+  onButtonClick,
 }) => {
   return (
     <div className="bg-white border-b border-[var(--border-default)] p-[30px] relative">
@@ -60,7 +64,7 @@ export const NetworkingListItem: React.FC<NetworkingListItemProps> = ({
                 </svg>
               </div>
             ) : status ? (
-              <Badge color='gray' style='solid' text={status} className='min-w-[66px]'/>
+              <Badge color={statusColor} style='solid' text={status} className='min-w-[66px]'/>
             ) : null}
           </div>
           
@@ -86,15 +90,17 @@ export const NetworkingListItem: React.FC<NetworkingListItemProps> = ({
           />
 
           <div className="flex flex-col items-end justify-end gap-[8px] flex-1">
-            {/* Apply Button */}
-            {showButton && (
-                <Button 
-                onClick={onApplyClick}
+            {/* Button */}
+            {buttonText && (
+              <Button 
+                onClick={onButtonClick}
                 variant='secondary'
                 size='sm'
-                className='w-[140px]'>
-                    신청하기
-                </Button>
+                disabled={buttonDisabled}
+                className='w-[140px]'
+              >
+                {buttonText}
+              </Button>
             )}
           </div>
         </div>

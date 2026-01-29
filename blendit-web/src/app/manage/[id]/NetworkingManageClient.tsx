@@ -5,6 +5,7 @@ import { Badge } from '@/components/common/Badge';
 import { PostDescription } from '@/components/common/PostDescription';
 import { CommentSection } from '@/components/common/CommentSection';
 import { Card } from '@/components/common/Card';
+import { useRouter } from 'next/navigation';
 
 // Back Arrow Icon
 const CaretLeftIcon = () => (
@@ -94,6 +95,7 @@ export function NetworkingManageClient({
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+  const router = useRouter();
 
   const handleSubmitComment = (content: string) => {
     console.log('댓글 입력:', content);
@@ -123,12 +125,16 @@ export function NetworkingManageClient({
     setIsDragging(false);
   };
 
+  const handleBack = () => {
+    router.back();
+  };
+
   return (
     <>
       {/* Top Section - Title */}
       <div className="flex items-center justify-between self-stretch">
         <div className="flex items-center gap-[24px] flex-1">
-          <button className="flex p-[4px] items-center gap-[8px]">
+          <button onClick={handleBack} className="flex p-[4px] items-center gap-[8px]">
             <CaretLeftIcon />
           </button>
           <div className="flex items-center gap-2.5">
