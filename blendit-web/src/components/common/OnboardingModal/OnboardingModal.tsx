@@ -160,9 +160,10 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
       }
 
       return false;
-    } catch (error) {
+    } catch (error: any) {
       console.error('이메일 중복 검사 에러:', error);
-      setEmailError('이메일 중복 검사에 실패했습니다.');
+      const errorMessage = error?.response?.data?.error?.message || '이메일 중복 검사에 실패했습니다.';
+      setEmailError(errorMessage);
       return false;
     }
   };
@@ -189,9 +190,10 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
       }
 
       return false;
-    } catch (error) {
+    } catch (error: any) {
       console.error('닉네임 중복 검사 에러:', error);
-      setNicknameError('닉네임 중복 검사에 실패했습니다.');
+      const errorMessage = error?.response?.data?.error?.message || '닉네임 중복 검사에 실패했습니다.';
+      setNicknameError(errorMessage);
       return false;
     }
   };
