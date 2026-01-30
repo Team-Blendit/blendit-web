@@ -108,6 +108,7 @@ export default function MyPage() {
       setIsLoadingUsers(true);
       try {
         const data = await profileAPI.getBookmarkedUsers(currentPage - 1, usersPerPage);
+        console.log('📋 Bookmarked users response:', JSON.stringify(data, null, 2));
         setBookmarkedUsers(data.content);
         setTotalUserPages(data.totalPages);
       } catch (error) {
@@ -508,7 +509,8 @@ export default function MyPage() {
                         userJob={positionLabels[user.position]}
                         userCareer={experienceLabels[user.experience]}
                         userLocation={user.province + ' ' + user.district}
-                        keywords={user.keywordList}
+                        keywords={user.keywords}
+                        profileImage={user.profileImageUrl}
                         showButton={false}
                         isBookmarked={true}
                         onClick={() => router.push(`/user/${user.userUuid}`)}

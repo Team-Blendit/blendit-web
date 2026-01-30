@@ -50,7 +50,8 @@ export interface BookmarkedUser {
   experience: Experience;
   province: string;
   district: string;
-  keywordList: string[];
+  keywords: string[];
+  profileImageUrl: string;
 }
 
 export interface PageableRequest {
