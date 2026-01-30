@@ -87,6 +87,8 @@ export interface CardProps {
   onClick?: () => void;
   onButtonClick?: () => void;
   onBookmarkClick?: (e?: React.MouseEvent) => void;
+  onApproveClick?: () => void;
+  onRejectClick?: () => void;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -117,6 +119,8 @@ export const Card: React.FC<CardProps> = ({
   onClick,
   onButtonClick,
   onBookmarkClick,
+  onApproveClick,
+  onRejectClick,
 }) => {
   const isMainCard = variant === 'main';
   const isMyProfileCard = variant === 'myProfile';
@@ -465,7 +469,10 @@ export const Card: React.FC<CardProps> = ({
                 variant="primary"
                 size="sm"
                 className="w-full"
-                onClick={onButtonClick}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onApproveClick?.();
+                }}
               >
                 수락
               </Button>
@@ -473,7 +480,10 @@ export const Card: React.FC<CardProps> = ({
                 variant="secondary"
                 size="sm"
                 className="w-full"
-                onClick={onButtonClick}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRejectClick?.();
+                }}
               >
                 거절
               </Button>

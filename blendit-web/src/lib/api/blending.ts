@@ -33,4 +33,18 @@ export const blendingAPI = {
       message,
     });
   },
+
+  // 블렌딩 참여 승인
+  approveParticipation: async (blendingUuid: string, participantUuid: string): Promise<void> => {
+    await apiClient.patch<ApiResponse<void>>(
+      `/blending/${blendingUuid}/participation/${participantUuid}/approve`
+    );
+  },
+
+  // 블렌딩 참여 거부
+  rejectParticipation: async (blendingUuid: string, participantUuid: string): Promise<void> => {
+    await apiClient.patch<ApiResponse<void>>(
+      `/blending/${blendingUuid}/participation/${participantUuid}/reject`
+    );
+  },
 };

@@ -146,6 +146,32 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
     // TODO: API call to post comment
   };
 
+  // 참여 승인 핸들러
+  const handleApproveParticipant = async (participantUuid: string) => {
+    try {
+      await blendingAPI.approveParticipation(id, participantUuid);
+      // 승인 후 데이터 새로고침
+      const data = await blendingAPI.getBlendingDetail(id);
+      setBlendingData(data);
+    } catch (err) {
+      console.error('참여 승인 실패:', err);
+      alert('참여 승인에 실패했습니다.');
+    }
+  };
+
+  // 참여 거부 핸들러
+  const handleRejectParticipant = async (participantUuid: string) => {
+    try {
+      await blendingAPI.rejectParticipation(id, participantUuid);
+      // 거부 후 데이터 새로고침
+      const data = await blendingAPI.getBlendingDetail(id);
+      setBlendingData(data);
+    } catch (err) {
+      console.error('참여 거부 실패:', err);
+      alert('참여 거부에 실패했습니다.');
+    }
+  };
+
   const handleMouseDown = (e: React.MouseEvent, ref: React.RefObject<HTMLDivElement | null>) => {
     if (!ref.current) return;
     setIsDragging(true);
@@ -288,6 +314,8 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
                       showButton={true}
                       className="shrink-0"
                       onBookmarkClick={() => console.log('Bookmark clicked:', participant.nickname)}
+                      onApproveClick={() => handleApproveParticipant(participant.uuid)}
+                      onRejectClick={() => handleRejectParticipant(participant.uuid)}
                     />
                   ))
                 )}
