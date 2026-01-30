@@ -81,13 +81,15 @@ export const Header: React.FC = () => {
           {/* Right Section - Login Button or User Menu */}
           {isAuthenticated ? (
             <div className="flex gap-[20px] items-center relative">
-              <Button
-                variant='primary'
-                size='sm'
-                className='rounded-full'
-              >
-                블렌딩 생성
-              </Button>
+              <Link href="/blending/new">
+                <Button
+                  variant='primary'
+                  size='sm'
+                  className='rounded-full'
+                >
+                  블렌딩 생성
+                </Button>
+              </Link>
 
               {/* Notification Bell - TODO: 호버 효과 제거 */}
               <button className="flex items-center justify-center rounded-full hover:bg-[var(--color-gray-100)]">
