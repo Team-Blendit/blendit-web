@@ -81,7 +81,8 @@ export interface CardProps {
   // Button props
   buttonText?: string;
   buttonIcon?: React.ReactNode;
-  
+  buttonDisabled?: boolean;
+
   className?: string;
   onClick?: () => void;
   onButtonClick?: () => void;
@@ -111,6 +112,7 @@ export const Card: React.FC<CardProps> = ({
   hideBookmark = false,
   buttonText,
   buttonIcon,
+  buttonDisabled,
   className,
   onClick,
   onButtonClick,
@@ -328,6 +330,7 @@ export const Card: React.FC<CardProps> = ({
             size="md"
             className="w-full"
             onClick={onButtonClick}
+            disabled={buttonDisabled}
           >
             {buttonIcon && <span className="flex items-center">{buttonIcon}</span>}
             {buttonText || '블렌딩 신청하기'}

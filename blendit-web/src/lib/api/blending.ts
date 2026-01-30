@@ -26,4 +26,11 @@ export const blendingAPI = {
   updateBlending: async (blendingUuid: string, data: UpdateBlendingRequest): Promise<void> => {
     await apiClient.patch<ApiResponse<void>>(`/blending/${blendingUuid}`, data);
   },
+
+  // 블렌딩 참여 신청
+  applyBlending: async (blendingUuid: string, message: string): Promise<void> => {
+    await apiClient.post<ApiResponse<void>>(`/blending/${blendingUuid}/participation`, {
+      message,
+    });
+  },
 };

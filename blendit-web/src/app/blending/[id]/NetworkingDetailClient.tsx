@@ -121,6 +121,14 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
     p => p.joinStatus === 'APPROVED' || p.blendingUserGrade === 'HOST'
   ) || [];
 
+  // 현재 사용자가 이미 신청했는지 확인
+  console.log('user?.id:', user?.id);
+  console.log('blendingParticipant uuids:', blendingData?.blendingParticipant.map(p => p.uuid));
+  const hasApplied = blendingData?.blendingParticipant.some(
+    p => p.uuid === user?.id
+  ) || false;
+  console.log('hasApplied:', hasApplied);
+
   // 날짜 포맷팅
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -138,9 +146,17 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
     // TODO: API 호출로 댓글 등록
   };
 
-  const handleApply = (message: string) => {
-    console.log('Apply message:', message);
-    // TODO: API 호출로 신청하기
+  const handleApply = async (message: string) => {
+    try {
+      await blendingAPI.applyBlending(id, message);
+      setIsModalOpen(false);
+      // 신청 완료 후 데이터 새로고침
+      const data = await blendingAPI.getBlendingDetail(id);
+      setBlendingData(data);
+    } catch (err) {
+      console.error('블렌딩 참여 신청 실패:', err);
+      alert('참여 신청에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -237,6 +253,8 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
               openChatLink={blendingData.openChattingUrl}
               onButtonClick={() => setIsModalOpen(true)}
               profileImage={host?.profileImageUrl}
+              buttonText={hasApplied ? '신청 완료' : '블렌딩 신청하기'}
+              buttonDisabled={hasApplied}
             />
           </div>
 
