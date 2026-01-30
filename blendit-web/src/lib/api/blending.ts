@@ -1,7 +1,7 @@
 // src/lib/api/blending.ts
 
 import { apiClient } from '@/lib/api';
-import { CreateBlendingRequest, BlendingDetail } from '@/lib/types/blending';
+import { CreateBlendingRequest, UpdateBlendingRequest, BlendingDetail } from '@/lib/types/blending';
 
 interface ApiResponse<T> {
   result: string;
@@ -20,5 +20,10 @@ export const blendingAPI = {
       `/blending/${blendingUuid}`
     );
     return response.data.data;
+  },
+
+  // 블렌딩 수정
+  updateBlending: async (blendingUuid: string, data: UpdateBlendingRequest): Promise<void> => {
+    await apiClient.patch<ApiResponse<void>>(`/blending/${blendingUuid}`, data);
   },
 };

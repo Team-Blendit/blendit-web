@@ -125,7 +125,7 @@ export default function ManageListClient() {
   };
 
   const handleDetailView = (id: number) => {
-    router.push(`/manage/${id}`);
+    router.push(`/blending/manage/${id}`);
   };
 
   const handleCancelApplication = (id: number) => {

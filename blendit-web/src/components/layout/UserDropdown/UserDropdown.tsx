@@ -36,7 +36,7 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose }) =
     onClose();
     
     if (action === '네트워킹 관리') {
-      router.push('/manage');
+      router.push('/blending/manage');
     }
     if (action === '마이페이지') {
       router.push('/mypage');

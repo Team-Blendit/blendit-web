@@ -14,6 +14,18 @@ export interface CreateBlendingRequest {
   keywordUuidList: string[];
 }
 
+export interface UpdateBlendingRequest {
+  title: string;
+  content: string;
+  position: Position;
+  keywordUuidList: string[];
+  capacity: number;
+  region: string;
+  openChattingUrl?: string;
+  schedule: string;
+  autoApproval: boolean;
+}
+
 export type BlendingUserGrade = 'HOST' | 'MEMBER';
 export type JoinStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 export type BlendingStatus = 'RECRUITING' | 'CLOSED' | 'COMPLETED' | 'CANCELLED';

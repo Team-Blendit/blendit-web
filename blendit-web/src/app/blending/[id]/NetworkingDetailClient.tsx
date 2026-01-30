@@ -11,6 +11,7 @@ import ApplyModal from '@/components/common/ApplyModal';
 import { blendingAPI } from '@/lib/api/blending';
 import { BlendingDetail, BlendingStatus } from '@/lib/types/blending';
 import { Position, Experience } from '@/lib/types/profile';
+import { useAuthStore } from '@/stores/authStore';
 
 // Back Arrow Icon
 const CaretLeftIcon = () => (
@@ -66,6 +67,7 @@ const statusLabels: Record<BlendingStatus, string> = {
 
 export default function NetworkingDetailClient({ id }: NetworkingDetailClientProps) {
   const router = useRouter();
+  const user = useAuthStore((state) => state.user);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -83,6 +85,21 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
       try {
         setIsLoading(true);
         const data = await blendingAPI.getBlendingDetail(id);
+
+        // 로그인한 사용자가 HOST인지 확인 (blendingParticipant에서 체크)
+        if (user) {
+          const currentUserParticipant = data.blendingParticipant.find(
+            p => p.uuid === user.id
+          );
+          const isCurrentUserHost = currentUserParticipant?.blendingUserGrade === 'HOST';
+
+          // 호스트인 경우 관리 페이지로 리다이렉트
+          if (isCurrentUserHost) {
+            router.replace(`/blending/manage/${id}`);
+            return;
+          }
+        }
+
         setBlendingData(data);
         setIsBookmarked(data.isBookmarked);
       } catch (err) {
@@ -94,7 +111,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
     };
 
     fetchBlendingDetail();
-  }, [id]);
+  }, [id, router, user]);
 
   // 호스트 정보 추출
   const host = blendingData?.blendingParticipant.find(p => p.blendingUserGrade === 'HOST');
