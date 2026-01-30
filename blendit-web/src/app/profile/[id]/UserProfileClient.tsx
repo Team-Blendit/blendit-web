@@ -104,7 +104,7 @@ export default function UserProfileClient({ id }: UserProfileClientProps) {
     <div className="min-h-screen flex flex-col">
       <Header />
 
-      <main className="max-w-[1440px] mx-auto w-full px-[30px] flex flex-col mt-[56px]">
+      <main className="max-w-[1440px] mx-auto w-full flex flex-col mt-[56px]">
         
         <div className='flex justify-start items-center gap-[24px]'>
           <button

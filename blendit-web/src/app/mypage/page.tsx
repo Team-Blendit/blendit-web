@@ -283,7 +283,7 @@ export default function MyPage() {
       <Header />
 
       {/* Main Content */}
-      <main className="max-w-[1440px] mx-auto w-full px-[30px] py-[32px] flex flex-col">
+      <main className="max-w-[1440px] mx-auto w-full py-[32px] flex flex-col">
         {/* Page Title & Tabs */}
         <div className="flex flex-col gap-[20px]">
           <h1 className="text-[28px] font-bold leading-[34px] text-[#0a0a0a]">
