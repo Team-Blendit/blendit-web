@@ -13,6 +13,13 @@ const BookmarkIcon = () => (
   </svg>
 );
 
+// Bookmark Icon (filled)
+const BookmarkFilledIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8.0625 26.1931V5.27383C8.0625 4.94246 8.33113 4.67383 8.6625 4.67383H23.3352C23.6666 4.67383 23.9352 4.94246 23.9352 5.27383V26.183C23.9352 26.6666 23.3924 26.9515 22.9944 26.6768L16.3992 22.1249C16.1954 21.9842 15.9261 21.9832 15.7212 22.1224L8.9997 26.6894C8.60134 26.9601 8.0625 26.6747 8.0625 26.1931Z" fill="#999999" stroke="#999999" strokeWidth="1.5"/>
+  </svg>
+);
+
 // Map Pin Icon
 const MapPinIcon: React.FC<{ className?: string; size?: number }> = ({ className, size = 24 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
@@ -68,6 +75,7 @@ export interface CardProps {
   
   // UserCard specific
   showButton?: boolean;
+  isBookmarked?: boolean;
   
   // Button props
   buttonText?: string;
@@ -76,7 +84,7 @@ export interface CardProps {
   className?: string;
   onClick?: () => void;
   onButtonClick?: () => void;
-  onBookmarkClick?: () => void;
+  onBookmarkClick?: (e?: React.MouseEvent) => void;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -98,6 +106,7 @@ export const Card: React.FC<CardProps> = ({
   title,
   isRecruiting,
   showButton = true,
+  isBookmarked = false,
   buttonText,
   buttonIcon,
   className,
@@ -242,7 +251,7 @@ export const Card: React.FC<CardProps> = ({
           <div className="flex items-center justify-between self-stretch">
             <div className="flex h-[34px] gap-[12px] items-center">
               <div className="flex gap-[8px] justify-center items-center">
-                <UserProfile size="small" />
+                <UserProfile size="small" imageUrl={profileImage} nickname={userName} />
                 <p className="text-[18px] leading-[24px] text-[var(--text-primary)]">
                   {userName}
                 </p>
@@ -361,7 +370,7 @@ export const Card: React.FC<CardProps> = ({
           <div className="flex flex-col items-start gap-[4px] self-stretch">
             {/* User Info */}
             <div className="flex gap-[8px] items-center">
-              <UserProfile size="small" />
+              <UserProfile size="small" imageUrl={profileImage} nickname={userName} />
               <p className="text-[18px] leading-[24px] text-[var(--text-tertiary)] truncate">
                 {userName}
               </p>
@@ -395,7 +404,7 @@ export const Card: React.FC<CardProps> = ({
       {isUserCard && (
         <>
           {/* User Section */}
-          <div className="flex flex-col gap-[20px] self-stretch">
+          <div className="flex flex-col gap-[20px] w-full">
             {/* Header */}
             <div className="flex items-center justify-between w-full">
               <div className="flex gap-[12px] items-center">
@@ -404,14 +413,17 @@ export const Card: React.FC<CardProps> = ({
                 </h3>
                 {/* <BlendingScoreBadge value={blendingScore} /> */}
               </div>
-              <button onClick={onBookmarkClick} className="shrink-0">
-                <BookmarkIcon />
+              <button onClick={(e) => {
+                e.stopPropagation();
+                onBookmarkClick?.(e);
+              }} className="shrink-0">
+                {isBookmarked ? <BookmarkFilledIcon /> : <BookmarkIcon />}
               </button>
             </div>
 
             {/* Body */}
             <div className="flex gap-[16px] items-center">
-              <UserProfile size="medium" />
+              <UserProfile size="medium" imageUrl={profileImage} nickname={userName} />
               <div className="flex-1 flex flex-col justify-center items-start gap-[8px]">
                 {/* Job Badge */}
                 <Badge color="blue" style="outline" text={userJob} />
@@ -434,7 +446,7 @@ export const Card: React.FC<CardProps> = ({
             {/* Badge Group */}
             <div className="flex gap-[8px] items-center">
               {keywords.map((keyword, index) => (
-                <Badge key={index} color="blue" style="solid" text={keyword} />
+                <Badge key={index} color="blue" style="solid" text={keyword} className='shrink-0' />
               ))}
             </div>
           </div>

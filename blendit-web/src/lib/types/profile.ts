@@ -42,3 +42,48 @@ export interface UpdateProfileRequest {
   skills: SkillItem[];
   links: ProfileLink[];
 }
+
+export interface BookmarkedUser {
+  userUuid: string;
+  nickname: string;
+  position: Position;
+  experience: Experience;
+  province: string;
+  district: string;
+  keywordList: string[];
+}
+
+export interface PageableRequest {
+  page: number;
+  size: number;
+  sort?: string[];
+}
+
+export interface PageableResponse<T> {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+  numberOfElements: number;
+}
+
+export interface UserSearchRequest {
+  position?: Position;
+  keywordUuidList: string[];
+  districtList: string[];
+  isBookmarked: boolean;
+}
+
+export interface SearchedUser {
+  userUuid: string;
+  nickname: string;
+  position: Position;
+  experience: Experience;
+  province: string;
+  district: string;
+  keywordList: string[];
+  isBookmarked: boolean;
+}

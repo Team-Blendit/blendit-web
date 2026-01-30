@@ -68,7 +68,7 @@ export const PostMetaSection: React.FC<PostMetaSectionProps> = ({
         </div>
         {/* Link */}
         <div className="flex gap-[20px] items-center self-stretch text-[18px] leading-[24px]">
-          <span className="text-[var(--text-secondary)]">오픈채팅</span>
+          <span className="text-[var(--text-secondary)] whitespace-nowrap">오픈채팅</span>
           <a href={chatLink} className="text-(--color-blue-500)">
             {chatLink}
           </a>

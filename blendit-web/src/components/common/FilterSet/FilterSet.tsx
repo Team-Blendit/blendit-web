@@ -5,12 +5,13 @@ import SelectChip from '@/components/common/SelectChip';
 import { cn } from '@/lib/utils';
 
 type FilterItem = {
-  type: 'dropdown' | 'select';
+  type: 'dropdown' | 'select' | 'reset';
   label: string;
   options?: string[];
   value?: string;
   selected?: boolean;
   onChange?: (value: string | boolean) => void;
+  onClick?: () => void;
 };
 
 type FilterSetProps = {
@@ -46,6 +47,16 @@ export default function FilterSet({ filters, className }: FilterSetProps) {
                 }
               }}
             />
+          );
+        } else if (filter.type === 'reset') {
+          return (
+            <button
+              key={index}
+              onClick={filter.onClick}
+              className="px-[16px] py-[10px] text-[16px] font-medium leading-[22px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
+            >
+              {filter.label}
+            </button>
           );
         }
         return null;
