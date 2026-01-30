@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { SearchBar } from '@/components/common/SearchBar';
 import FilterSet from '@/components/common/FilterSet';
@@ -11,6 +11,7 @@ import Pagination from '@/components/common/Pagination';
 import { profileAPI } from '@/lib/api/profile';
 import { SearchedUser, Position, Experience } from '@/lib/types/profile';
 import { apiClient } from '@/lib/api';
+import { useAuthStore } from '@/stores/authStore';
 
 interface KeywordItem {
   uuid: string;
@@ -57,8 +58,13 @@ const seoulDistricts = [
 ];
 
 export default function HomePage() {
+  const { user } = useAuthStore();
+  const loggedInUserId = user?.id;
+
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState('networking');
+  const searchParams = useSearchParams();
+  const tabFromUrl = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tabFromUrl === 'user' ? 'user' : 'blending');
   const [currentPage, setCurrentPage] = useState(1);
   const [filterValues, setFilterValues] = useState({
     job: '' as Position | '',
@@ -141,8 +147,8 @@ export default function HomePage() {
     fetchUsers();
   }, [activeTab, currentPage, filterValues.job, filterValues.keyword, filterValues.region, filterValues.bookmarked, usersPerPage]);
 
-  // Mock data for networking cards
-  const mockNetworkingCards = Array.from({ length: 16 }, (_, i) => ({
+  // Mock data for blending cards
+  const mockBlendingCards = Array.from({ length: 16 }, (_, i) => ({
     id: i + 1,
     title: i % 2 === 0 ? '디자이너 10년차의 멘토링' : '네카라쿠배 디자이너가 알려주는 실무 팁',
     userName: i % 3 === 0 ? '네카라쿠배의디자이너' : '김개발',
@@ -174,13 +180,19 @@ export default function HomePage() {
             <div className="flex gap-2">
               <Tab
                 label="전체 블렌딩"
-                active={activeTab === 'networking'}
-                onClick={() => setActiveTab('networking')}
+                active={activeTab === 'blending'}
+                onClick={() => {
+                  setActiveTab('blending');
+                  router.replace('/', { scroll: false });
+                }}
               />
               <Tab
                 label="전체 유저"
                 active={activeTab === 'user'}
-                onClick={() => setActiveTab('user')}
+                onClick={() => {
+                  setActiveTab('user');
+                  router.replace('/?tab=user', { scroll: false });
+                }}
               />
             </div>
           </section>
@@ -216,7 +228,7 @@ export default function HomePage() {
                   value: filterValues.region,
                   onChange: (value) => setFilterValues(prev => ({ ...prev, region: value as string })),
                 },
-                ...(activeTab === 'networking' ? [
+                ...(activeTab === 'blending' ? [
                   {
                     type: 'dropdown' as const,
                     label: '인원수',
@@ -263,8 +275,8 @@ export default function HomePage() {
         {/* Card Grid */}
         <section className="flex flex-col gap-[16px] items-stretch w-full">
           <div className="grid grid-cols-4 gap-x-[24px] gap-y-[30px] w-full min-w-[1440px]">
-            {activeTab === 'networking' ? (
-              mockNetworkingCards.map((card) => (
+            {activeTab === 'blending' ? (
+              mockBlendingCards.map((card) => (
                 <Card
                   key={card.id}
                   variant="main"
@@ -299,10 +311,12 @@ export default function HomePage() {
                   userJob={positionLabels[user.position]}
                   userCareer={experienceLabels[user.experience]}
                   userLocation={`${user.province} ${user.district}`}
+                  profileImage={user.profileImageUrl}
                   keywords={user.keywordList}
                   isBookmarked={user.isBookmarked}
-                  onClick={() => router.push(`/user/${user.userUuid}`)}
+                  onClick={() => router.push(`/profile/${user.userUuid}`)}
                   showButton={false}
+                  hideBookmark={(user.userUuid===loggedInUserId)}
                   onBookmarkClick={async (e) => {
                     e?.stopPropagation();
                     try {

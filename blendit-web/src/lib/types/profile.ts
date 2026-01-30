@@ -86,4 +86,21 @@ export interface SearchedUser {
   district: string;
   keywordList: string[];
   isBookmarked: boolean;
+  profileImageUrl: string;
+}
+
+export interface OtherUserProfile {
+  nickname: string;
+  profileImage: string;
+  position: Position;
+  experience: Experience;
+  affiliation: string;
+  province: string;
+  district: string;
+  email: string;
+  description: string;
+  keywordList: string[];
+  skills: string[];
+  links: ProfileLink[];
+  isBookmarked: boolean;
 }

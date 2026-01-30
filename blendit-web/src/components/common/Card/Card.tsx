@@ -76,7 +76,8 @@ export interface CardProps {
   // UserCard specific
   showButton?: boolean;
   isBookmarked?: boolean;
-  
+  hideBookmark?: boolean;
+
   // Button props
   buttonText?: string;
   buttonIcon?: React.ReactNode;
@@ -107,6 +108,7 @@ export const Card: React.FC<CardProps> = ({
   isRecruiting,
   showButton = true,
   isBookmarked = false,
+  hideBookmark = false,
   buttonText,
   buttonIcon,
   className,
@@ -153,9 +155,9 @@ export const Card: React.FC<CardProps> = ({
                     {userName}
                   </h3>
                 </div>
-                {isUserProfileCard && (
+                {isUserProfileCard && !hideBookmark && (
                   <button onClick={onBookmarkClick} className="shrink-0">
-                    <BookmarkIcon />
+                    {isBookmarked ? <BookmarkFilledIcon /> : <BookmarkIcon />}
                   </button>
                 )}
               </div>
@@ -413,12 +415,14 @@ export const Card: React.FC<CardProps> = ({
                 </h3>
                 {/* <BlendingScoreBadge value={blendingScore} /> */}
               </div>
-              <button onClick={(e) => {
-                e.stopPropagation();
-                onBookmarkClick?.(e);
-              }} className="shrink-0">
-                {isBookmarked ? <BookmarkFilledIcon /> : <BookmarkIcon />}
-              </button>
+              { !hideBookmark && (
+                <button onClick={(e) => {
+                  e.stopPropagation();
+                  onBookmarkClick?.(e);
+                }} className="shrink-0">
+                  {isBookmarked ? <BookmarkFilledIcon /> : <BookmarkIcon />}
+                </button>
+              )}
             </div>
 
             {/* Body */}

@@ -1,6 +1,6 @@
 // src/lib/api/profile.ts
 import { apiClient } from '@/lib/api';
-import { UserProfile, UpdateProfileRequest, BookmarkedUser, PageableResponse, UserSearchRequest, SearchedUser } from '@/lib/types/profile';
+import { UserProfile, UpdateProfileRequest, BookmarkedUser, PageableResponse, UserSearchRequest, SearchedUser, OtherUserProfile } from '@/lib/types/profile';
 
 interface ApiResponse<T> {
   result: string;
@@ -60,5 +60,11 @@ export const profileAPI = {
   // 유저 북마크 삭제
   removeBookmark: async (userUuid: string): Promise<void> => {
     await apiClient.delete<ApiResponse<void>>(`/user/bookmark/${userUuid}`);
+  },
+
+  // 다른 유저 프로필 조회
+  getUserProfile: async (userUuid: string): Promise<OtherUserProfile> => {
+    const response = await apiClient.get<ApiResponse<OtherUserProfile>>(`/user/profile/${userUuid}`);
+    return response.data.data;
   },
 };
