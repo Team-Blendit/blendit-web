@@ -8,6 +8,7 @@ import { InputField } from '@/components/common/InputField';
 import KeywordChip from '@/components/common/KeywordChip';
 import { useAuthStore } from '@/stores/authStore';
 import { apiClient } from '@/lib/api';
+import { useRouter } from 'next/navigation';
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -52,7 +53,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const [emailError, setEmailError] = useState<string>('');
   const [nicknameError, setNicknameError] = useState<string>('');
   const { user } = useAuthStore();
-
+  const router = useRouter();
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -198,8 +199,8 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     }
   };
 
-  const handleSubmitOnboarding = async () => {
-    if (isSubmitting || !user) return;
+  const handleSubmitOnboarding = async (): Promise<boolean> => {
+    if (isSubmitting || !user) return false;
 
     setIsSubmitting(true);
     try {
@@ -214,9 +215,11 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
       });
 
       onComplete(formData);
+      return true;
     } catch (error) {
       console.error('온보딩 처리 중 에러:', error);
       alert('온보딩 정보 저장에 실패했습니다. 다시 시도해주세요.');
+      return false;
     } finally {
       setIsSubmitting(false);
     }
@@ -440,7 +443,12 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
             <Button
               variant="secondary"
               size="lg"
-              onClick={() => handleSubmitOnboarding()}
+              onClick={async () => {
+                const success = await handleSubmitOnboarding();
+                if (success) {
+                  onClose();
+                }
+              }}
               disabled={isSubmitting}
               className="flex-1"
             >
@@ -449,9 +457,11 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
             <Button
               variant="primary"
               size="lg"
-              onClick={() => {
-                // TODO: 프로필 완성 페이지로 이동
-                handleSubmitOnboarding();
+              onClick={async () => {
+                const success = await handleSubmitOnboarding();
+                if (success) {
+                  router.push('/mypage');
+                }
               }}
               disabled={isSubmitting}
               className="flex-1"
