@@ -1,6 +1,6 @@
 // src/lib/types/blending.ts
 
-import { Position } from './profile';
+import { Position, Experience } from './profile';
 
 export interface CreateBlendingRequest {
   title: string;
@@ -12,4 +12,42 @@ export interface CreateBlendingRequest {
   schedule: string; // ISO 8601 형식: "2026-01-30T18:18:44.923Z"
   autoApproval: boolean;
   keywordUuidList: string[];
+}
+
+export type BlendingUserGrade = 'HOST' | 'MEMBER';
+export type JoinStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+export type BlendingStatus = 'RECRUITING' | 'CLOSED' | 'COMPLETED' | 'CANCELLED';
+
+export interface BlendingParticipant {
+  uuid: string;
+  nickname: string;
+  position: Position;
+  experience: Experience;
+  province: string;
+  district: string;
+  keywords: string[];
+  blendingUserGrade: BlendingUserGrade;
+  joinStatus: JoinStatus;
+  profileImageUrl?: string;
+}
+
+export interface BlendingDetail {
+  id: number;
+  uuid: string;
+  blendingParticipant: BlendingParticipant[];
+  title: string;
+  content: string;
+  position: Position;
+  keywords: string[];
+  capacity: number;
+  region: string;
+  status: BlendingStatus;
+  openChattingUrl?: string;
+  schedule: string;
+  autoApproval: boolean;
+  bookmarkCount: number;
+  createdDate: string;
+  lastModifiedDate: string;
+  isBookmarked: boolean;
+  isHost: boolean;
 }

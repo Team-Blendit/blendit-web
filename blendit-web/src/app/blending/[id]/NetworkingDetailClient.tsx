@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { Badge } from '@/components/common/Badge';
@@ -8,6 +8,9 @@ import { PostDescription } from '@/components/common/PostDescription';
 import { CommentSection } from '@/components/common/CommentSection';
 import { Card } from '@/components/common/Card';
 import ApplyModal from '@/components/common/ApplyModal';
+import { blendingAPI } from '@/lib/api/blending';
+import { BlendingDetail, BlendingStatus } from '@/lib/types/blending';
+import { Position, Experience } from '@/lib/types/profile';
 
 // Back Arrow Icon
 const CaretLeftIcon = () => (
@@ -32,6 +35,35 @@ interface NetworkingDetailClientProps {
   id: string;
 }
 
+// Position을 한글로 변환
+const positionLabels: Record<Position, string> = {
+  ALL: '전체',
+  FRONTEND: '프론트엔드',
+  BACKEND: '백엔드',
+  DESIGN: '디자인',
+  PM: 'PM',
+  AI: 'AI',
+  DATA: '데이터',
+  SECURITY: '보안',
+  MARKETING: '마케팅',
+};
+
+// Experience를 한글로 변환
+const experienceLabels: Record<Experience, string> = {
+  NEWBIE: '신입',
+  JUNIOR: '주니어 (1~3년)',
+  MIDDLE: '미들 (4~6년)',
+  SENIOR: '시니어 (7년+)',
+};
+
+// Status를 한글로 변환
+const statusLabels: Record<BlendingStatus, string> = {
+  RECRUITING: '모집중',
+  CLOSED: '마감',
+  COMPLETED: '완료',
+  CANCELLED: '취소',
+};
+
 export default function NetworkingDetailClient({ id }: NetworkingDetailClientProps) {
   const router = useRouter();
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -41,47 +73,48 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
 
-  // Mock data - 실제로는 API에서 가져올 데이터
-  // id로 게시물 데이터를 가져올 수 있습니다
-  console.log('Post ID:', id);
-  const postData = {
-    title: '네카라쿠배 디자이너가 알려주는 실무 팁 40가지 분해를 해보기 미션 주마다 이뤄집니다!!',
-    status: '모집중',
-    author: '네카라쿠배당토디자이너임',
-    date: '2026.01.20',
-    jobCategory: '디자인',
-    region: '서울 강남구',
-    schedule: '2026.02.03',
-    keywords: ['실무', '멘토링', '이직'],
-    currentMembers: 4,
-    maxMembers: 5,
-    openChatLink: 'http://openchat.com',
-    description: `AI 기반 사주·타로 서비스 풀리의 초기 멤버로서 함께할 [디자이너] 를 찾고 있습니다. 런칭 ※2주 만에 빠른 수익화※가 진행중이며, 지금은 작지만 빠른 실행력으로 글로벌 확장을 준비 중인 팀입니다. 아시아, 미국 시장을 타깃으로 미국 법인 설립과 본격적인 글로벌 진출을 앞두고 있습니다.
+  const [blendingData, setBlendingData] = useState<BlendingDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-💜이런 분을 찾고 있어요 (디자이너(UI/UX))
-• Figma로 실제 서비스 UXUI 디자인이 가능하신 분, 또는
-• 브랜딩을 적용/응용한 화면 디자인이 가능하신 분, 또는
-• 마케팅 아이디어를 컨텐츠로 시각화하고 발행 가능하신 분
+  // API에서 블렌딩 상세 데이터 조회
+  useEffect(() => {
+    const fetchBlendingDetail = async () => {
+      try {
+        setIsLoading(true);
+        const data = await blendingAPI.getBlendingDetail(id);
+        setBlendingData(data);
+        setIsBookmarked(data.isBookmarked);
+      } catch (err) {
+        console.error('블렌딩 상세 조회 실패:', err);
+        setError('블렌딩 정보를 불러오는데 실패했습니다.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-가파르게 성장 중인 팀에서 "실제 시장에 적용되는 디자인 실무"를 경험해보고 싶으신 분 환영합니다🤗
+    fetchBlendingDetail();
+  }, [id]);
 
-👥 팀 구성: Google 출신 1인 / 실리콘밸리 본사 Amazon 출신 1인 / 서울대 출신 1인
+  // 호스트 정보 추출
+  const host = blendingData?.blendingParticipant.find(p => p.blendingUserGrade === 'HOST');
 
-🌎 글로벌 시장을 전제로, 🚀 속도감 있게 실행합니다.
+  // 참여 승인된 인원
+  const approvedParticipants = blendingData?.blendingParticipant.filter(
+    p => p.joinStatus === 'APPROVED' || p.blendingUserGrade === 'HOST'
+  ) || [];
 
-가벼운 커피챗도 환영합니다!! 관심 있으신 분들은 편하게 연락 주세요 :)
-성지유 010-0000-0000`,
-    participants: [
-      { name: '김개발', score: 78.5, job: '디자인', experience: '미들 (4~6년)', region: '활동 지역', badges: ['Badge', 'Badge', 'Badge'] },
-      { name: '김개발', score: 78.5, job: '디자인', experience: '미들 (4~6년)', region: '활동 지역', badges: ['Badge', 'Badge', 'Badge'] },
-      { name: '김개발', score: 78.5, job: '디자인', experience: '미들 (4~6년)', region: '활동 지역', badges: ['Badge', 'Badge', 'Badge'] },
-      { name: '김개발', score: 78.5, job: '디자인', experience: '미들 (4~6년)', region: '활동 지역', badges: ['Badge', 'Badge', 'Badge'] },
-    ],
-    comments: [
-      { author: '블린', time: '5분 전', content: '스터디 정보 부탁드립니다. 어떤 스택 사용하시나요 ?' },
-      { author: '트렌드디자인', time: '1시간 전', content: '신청합니다 ! 좋은 시간 보냈으면 좋겠어요.' },
-    ]
+  // 날짜 포맷팅
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
   };
+
+  // Mock 댓글 데이터 (댓글 API가 없으므로 유지)
+  const comments = [
+    { author: '블린', time: '5분 전', content: '스터디 정보 부탁드립니다. 어떤 스택 사용하시나요 ?' },
+    { author: '트렌드디자인', time: '1시간 전', content: '신청합니다 ! 좋은 시간 보냈으면 좋겠어요.' },
+  ];
 
   const handleSubmitComment = (content: string) => {
     console.log('Comment submitted:', content);
@@ -116,6 +149,30 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
     setIsDragging(false);
   };
 
+  // 로딩 상태
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col gap-[30px] px-auto pb-[94px]">
+        <Header />
+        <div className="max-w-[1440px] mx-auto flex items-center justify-center h-[400px]">
+          <p className="text-[var(--text-secondary)]">로딩 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 에러 상태
+  if (error || !blendingData) {
+    return (
+      <div className="min-h-screen flex flex-col gap-[30px] px-auto pb-[94px]">
+        <Header />
+        <div className="max-w-[1440px] mx-auto flex items-center justify-center h-[400px]">
+          <p className="text-[var(--text-secondary)]">{error || '데이터를 불러올 수 없습니다.'}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col gap-[30px] px-auto pb-[94px]">
       {/* Header */}
@@ -125,7 +182,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
         {/* Top Section */}
         <div className="flex items-center justify-between self-stretch">
           <div className="flex items-center gap-[24px] flex-1">
-            <button 
+            <button
               onClick={() => router.back()}
               className="flex p-[4px] items-center gap-[8px]"
             >
@@ -133,9 +190,9 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
             </button>
             <div className="flex items-center gap-2.5">
               <h1 className="font-bold text-[28px] leading-[34px] text-[var(--text-primary)]">
-                {postData.title}
+                {blendingData.title}
               </h1>
-              <Badge color="red" style="solid" text={postData.status} />
+              <Badge color={blendingData.status === 'RECRUITING' ? 'red' : 'gray'} style="solid" text={statusLabels[blendingData.status]} />
             </div>
           </div>
           <button
@@ -152,16 +209,17 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
           <div className="w-[440px] shrink-0">
             <Card
               variant="postInfo"
-              userName={postData.author}
-              userJob={postData.jobCategory}
-              postDate={postData.date}
-              meetDate={postData.schedule}
-              meetLocation={postData.region}
-              keywords={postData.keywords}
-              currentNum={postData.currentMembers}
-              totalNum={postData.maxMembers}
-              openChatLink={postData.openChatLink}
+              userName={host?.nickname || ''}
+              userJob={host?.position ? positionLabels[host.position] : ''}
+              postDate={formatDate(blendingData.createdDate)}
+              meetDate={formatDate(blendingData.schedule)}
+              meetLocation={blendingData.region}
+              keywords={blendingData.keywords}
+              currentNum={approvedParticipants.length}
+              totalNum={blendingData.capacity}
+              openChatLink={blendingData.openChattingUrl}
               onButtonClick={() => setIsModalOpen(true)}
+              profileImage={host?.profileImageUrl}
             />
           </div>
 
@@ -170,7 +228,8 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
             {/* Description Section */}
             <PostDescription
               title="소개"
-              content={postData.description}
+              content={blendingData.content}
+              isHtml
             />
 
             {/* Participants Section */}
@@ -180,7 +239,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
                   참여 인원
                 </h2>
                 <span className="font-medium text-[22px] leading-[28px] text-[var(--text-tertiary)]">
-                  {postData.participants.length}
+                  {approvedParticipants.length}
                 </span>
               </div>
               <div
@@ -192,18 +251,18 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
                 className={`flex gap-[16px] overflow-x-auto scrollbar-hide select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               >
-                {postData.participants.map((participant, idx) => (
+                {approvedParticipants.map((participant, idx) => (
                   <Card
                     key={idx}
                     variant="user"
-                    userName={participant.name}
-                    userJob={participant.job}
-                    userCareer={participant.experience}
-                    userLocation={participant.region}
-                    keywords={participant.badges}
+                    userName={participant.nickname}
+                    userJob={positionLabels[participant.position]}
+                    userCareer={experienceLabels[participant.experience]}
+                    userLocation={`${participant.province} ${participant.district}`}
+                    keywords={participant.keywords}
                     showButton={false}
-                    className="w-[273px] shrink-0"
-                    onBookmarkClick={() => console.log('Bookmark clicked:', participant.name)}
+                    className="shrink-0"
+                    onBookmarkClick={() => console.log('Bookmark clicked:', participant.nickname)}
                   />
                 ))}
               </div>
@@ -211,7 +270,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
 
             {/* Comments Section */}
             <CommentSection
-              comments={postData.comments}
+              comments={comments}
               onSubmitComment={handleSubmitComment}
             />
           </div>
@@ -223,13 +282,13 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         postData={{
-          jobCategory: postData.jobCategory,
-          region: postData.region,
-          schedule: postData.schedule,
-          keywords: postData.keywords,
-          currentMembers: postData.currentMembers,
-          maxMembers: postData.maxMembers,
-          openChatLink: postData.openChatLink,
+          jobCategory: positionLabels[blendingData.position],
+          region: blendingData.region,
+          schedule: formatDate(blendingData.schedule),
+          keywords: blendingData.keywords,
+          currentMembers: approvedParticipants.length,
+          maxMembers: blendingData.capacity,
+          openChatLink: blendingData.openChattingUrl || '',
         }}
         onSubmit={handleApply}
       />
