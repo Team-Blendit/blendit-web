@@ -52,6 +52,12 @@ export default function NetworkingCreatePage() {
     content: '',
     autoApproval: false,
   });
+  const [errors, setErrors] = useState({
+    keywords: '',
+    title: '',
+    content: '',
+    openChatLink: '',
+  });
 
   const handleSubmit = async () => {
     if (isSubmitting) return;
@@ -182,6 +188,7 @@ export default function NetworkingCreatePage() {
               label="인원"
               required
               placeholder="인원을 선택해주세요"
+              value={formData.participants}
               options1={['2명', '3명', '4명', '5명', '6명', '7명', '8명', '9명', '10명']}
               onSelect1={(value) => setFormData(prev => ({ ...prev, participants: Array.isArray(value) ? value[0] : value }))}
               showAutoApproval={true}
@@ -206,14 +213,34 @@ export default function NetworkingCreatePage() {
                   const uuids = value
                     .map(name => keywordList.find(k => k.name === name)?.uuid)
                     .filter((uuid): uuid is string => !!uuid);
-                  setFormData(prev => ({ ...prev, keywords: uuids }));
+                  
+                  setFormData(prev => {
+                    // 이전보다 개수가 줄어드는 경우(해제)는 항상 허용
+                    const isDeselecting = uuids.length < prev.keywords.length;
+
+                    if (uuids.length > 3 && !isDeselecting) {
+                      setErrors(prevErrors => ({ ...prevErrors, keywords: '최대 3개까지 선택할 수 있어요' }));
+                      return prev;
+                    }
+                    setErrors(prevErrors => ({ ...prevErrors, keywords: uuids.length > 3 ? '최대 3개까지 선택할 수 있어요' : '' }));
+                    return { ...prev, keywords: uuids };
+                  });
                 } else {
                   const selected = keywordList.find(k => k.name === value);
                   if (selected) {
-                    setFormData(prev => ({ ...prev, keywords: [selected.uuid] }));
+                    setFormData(prev => {
+                      const newKeywords = [selected.uuid];
+                      if (newKeywords.length > 3) {
+                        setErrors(prevErrors => ({ ...prevErrors, keywords: '최대 3개까지 선택할 수 있어요' }));
+                        return prev;
+                      }
+                      setErrors(prevErrors => ({ ...prevErrors, keywords: '' }));
+                      return { ...prev, keywords: newKeywords };
+                    });
                   }
                 }
               }}
+              error={errors.keywords}
             />
 
             {/* 일정 */}
@@ -238,7 +265,22 @@ export default function NetworkingCreatePage() {
               placeholder="내용을 입력해주세요"
               value={formData.openChatLink}
               required={false}
-              onChange={(value: string) => setFormData(prev => ({ ...prev, openChatLink: value }))}
+              onChange={(value: string) => {
+                setFormData(prev => ({ ...prev, openChatLink: value }));
+                // 빈 값이면 에러 초기화
+                if (!value) {
+                  setErrors(prev => ({ ...prev, openChatLink: '' }));
+                  return;
+                }
+                // URL 형식 검증
+                const urlRegex = /^https?:\/\/.+\..+/;
+                if (!urlRegex.test(value)) {
+                  setErrors(prev => ({ ...prev, openChatLink: '올바른 링크 형식을 입력해주세요' }));
+                } else {
+                  setErrors(prev => ({ ...prev, openChatLink: '' }));
+                }
+              }}
+              error={errors.openChatLink}
             />
           </div>
         </div>
@@ -251,7 +293,15 @@ export default function NetworkingCreatePage() {
                 required
                 placeholder="글 제목을 입력해주세요"
                 value={formData.title}
-                onChange={(value: string) => setFormData(prev => ({ ...prev, title: value }))}
+                onChange={(value: string) => {
+                  if (value.length > 50) {
+                    setErrors(prev => ({ ...prev, title: '제목은 최대 50자까지 입력할 수 있어요' }));
+                  } else {
+                    setErrors(prev => ({ ...prev, title: '' }));
+                  }
+                  setFormData(prev => ({ ...prev, title: value }));
+                }}
+                error={errors.title}
             />
             </div>
 
@@ -259,10 +309,24 @@ export default function NetworkingCreatePage() {
             <div className="flex flex-col w-full self-stretch">
             <QuillEditor
                 value={formData.content}
-                onChange={(value: string) => setFormData(prev => ({ ...prev, content: value }))}
+                onChange={(value: string) => {
+                  // HTML 태그를 제외한 순수 텍스트 길이 계산
+                  const textContent = value.replace(/<[^>]*>/g, '').trim();
+                  if (textContent.length > 1000) {
+                    setErrors(prev => ({ ...prev, content: '본문은 최대 1000자까지 입력할 수 있어요' }));
+                  } else {
+                    setErrors(prev => ({ ...prev, content: '' }));
+                  }
+                  setFormData(prev => ({ ...prev, content: value }));
+                }}
                 placeholder="내용을 입력해주세요"
                 maxLength={1000}
             />
+            {errors.content && (
+              <p className="mt-[8px] px-[12px] text-[18px] leading-[24px] text-[var(--text-error)]">
+                {errors.content}
+              </p>
+            )}
             </div>
         </div>
 

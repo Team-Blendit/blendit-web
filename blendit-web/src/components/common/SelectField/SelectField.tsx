@@ -114,10 +114,23 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   const [searchTerm2, setSearchTerm2] = React.useState('');
   const [searchTerm3, setSearchTerm3] = React.useState('');
   const [autoApproval, setAutoApproval] = React.useState(autoApprovalEnabled);
-  
+
   const dropdown1Ref = useRef<HTMLDivElement>(null);
   const dropdown2Ref = useRef<HTMLDivElement>(null);
   const dropdown3Ref = useRef<HTMLDivElement>(null);
+
+  // 외부 value prop 변경 시 내부 상태 동기화
+  useEffect(() => {
+    setSelectedValue1(getInitialValue(value, isMultiple1));
+  }, [value, isMultiple1]);
+
+  useEffect(() => {
+    setSelectedValue2(getInitialValue(value2, isMultiple2));
+  }, [value2, isMultiple2]);
+
+  useEffect(() => {
+    setSelectedValue3(getInitialValue(value3, isMultiple3));
+  }, [value3, isMultiple3]);
 
   // 외부 클릭 감지
   useEffect(() => {
@@ -233,7 +246,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
       {label && (
         <div className="flex items-center justify-between self-stretch w-full">
           <div className="flex items-start gap-[2px]">
-            <label className="font-semibold text-xl text-[var(--text-secondary)]">
+            <label className="font-semibold text-[22px] text-[var(--text-secondary)]">
               {label}
             </label>
             {required && (
@@ -244,7 +257,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
           {showAutoApproval && (
             <div className="flex w-[126px] justify-between items-center">
               <div className="flex items-center gap-[4px]">
-                <span className="font-semibold text-[18px] leading-[28px] text-(--text-disabled)">
+                <span className="font-semibold text-[18px] leading-[28px] text-[var(--text-disabled)]">
                   자동승인
                 </span>
                 <InfoIcon />
