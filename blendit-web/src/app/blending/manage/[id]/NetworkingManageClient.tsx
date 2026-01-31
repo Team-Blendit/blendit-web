@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Badge } from '@/components/common/Badge';
 import { PostDescription } from '@/components/common/PostDescription';
-import { CommentSection } from '@/components/common/CommentSection';
+// import { CommentSection } from '@/components/common/CommentSection';
 import { Card } from '@/components/common/Card';
 import { Header } from '@/components/layout/Header';
 import { useRouter } from 'next/navigation';
@@ -129,16 +129,16 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
     return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
   };
 
-  // Mock 댓글 데이터 (댓글 API가 없으므로 유지)
-  const comments = [
-    { author: '블린', time: '5분 전', content: '스터디 정보 부탁드립니다. 어떤 스택 사용하시나요 ?' },
-    { author: '트렌드디자인', time: '1시간 전', content: '신청합니다 ! 좋은 시간 보냈으면 좋겠어요.' },
-  ];
+  // // Mock 댓글 데이터 (댓글 API가 없으므로 유지)
+  // const comments = [
+  //   { author: '블린', time: '5분 전', content: '스터디 정보 부탁드립니다. 어떤 스택 사용하시나요 ?' },
+  //   { author: '트렌드디자인', time: '1시간 전', content: '신청합니다 ! 좋은 시간 보냈으면 좋겠어요.' },
+  // ];
 
-  const handleSubmitComment = (content: string) => {
-    console.log('댓글 입력:', content);
-    // TODO: API call to post comment
-  };
+  // const handleSubmitComment = (content: string) => {
+  //   console.log('댓글 입력:', content);
+  //   // TODO: API call to post comment
+  // };
 
   // 참여 승인 핸들러
   const handleApproveParticipant = async (participantUuid: string) => {
@@ -353,10 +353,10 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
             </div>
 
             {/* Comments Section */}
-            <CommentSection
+            {/* <CommentSection
               comments={comments}
               onSubmitComment={handleSubmitComment}
-            />
+            /> */}
           </div>
         </div>
       </div>

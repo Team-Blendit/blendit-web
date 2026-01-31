@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { Badge } from '@/components/common/Badge';
 import { PostDescription } from '@/components/common/PostDescription';
-import { CommentSection } from '@/components/common/CommentSection';
+// import { CommentSection } from '@/components/common/CommentSection';
 import { Card } from '@/components/common/Card';
 import ApplyModal from '@/components/common/ApplyModal';
 import { blendingAPI } from '@/lib/api/blending';
@@ -126,16 +126,16 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
     return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
   };
 
-  // Mock 댓글 데이터 (댓글 API가 없으므로 유지)
-  const comments = [
-    { author: '블린', time: '5분 전', content: '스터디 정보 부탁드립니다. 어떤 스택 사용하시나요 ?' },
-    { author: '트렌드디자인', time: '1시간 전', content: '신청합니다 ! 좋은 시간 보냈으면 좋겠어요.' },
-  ];
+  // // Mock 댓글 데이터 (댓글 API가 없으므로 유지)
+  // const comments = [
+  //   { author: '블린', time: '5분 전', content: '스터디 정보 부탁드립니다. 어떤 스택 사용하시나요 ?' },
+  //   { author: '트렌드디자인', time: '1시간 전', content: '신청합니다 ! 좋은 시간 보냈으면 좋겠어요.' },
+  // ];
 
-  const handleSubmitComment = (content: string) => {
-    console.log('Comment submitted:', content);
-    // TODO: API 호출로 댓글 등록
-  };
+  // const handleSubmitComment = (content: string) => {
+  //   console.log('Comment submitted:', content);
+  //   // TODO: API 호출로 댓글 등록
+  // };
 
   const handleApply = async (message: string) => {
     try {
@@ -295,10 +295,10 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
             </div>
 
             {/* Comments Section */}
-            <CommentSection
+            {/* <CommentSection
               comments={comments}
               onSubmitComment={handleSubmitComment}
-            />
+            /> */}
           </div>
         </div>
       </div>
