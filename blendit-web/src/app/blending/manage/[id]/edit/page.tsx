@@ -1,5 +1,9 @@
 import { NetworkingEditClient } from './NetworkingEditClient';
 
+export async function generateStaticParams() {
+  return [{ id: '1' }, { id: '2' }, { id: '3' }];
+}
+
 interface EditPageProps {
   params: Promise<{ id: string }>;
 }
