@@ -39,7 +39,7 @@ jobs:
         working-directory: blendit-web
         run: npm ci --legacy-peer-deps
 
-      - name: Create .env file
+      - name: Create .env file for production
         working-directory: blendit-web
         run: |
           echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" >> .env
