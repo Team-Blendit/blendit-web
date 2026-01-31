@@ -322,9 +322,9 @@ export const Card: React.FC<CardProps> = ({
               <p className="text-[18px] leading-[24px] text-[var(--text-tertiary)]">
                 오픈채팅
               </p>
-              <p className="text-[18px] leading-[24px] text-[#006fe5]">
+              <a href={openChatLink} target="_blank" rel="noopener noreferrer" className="text-[18px] leading-[24px] text-[#006fe5]">
                 {openChatLink}
-              </p>
+              </a>
             </div>
           </div>
 
