@@ -137,7 +137,7 @@ export default function NetworkingCreatePage() {
       <div className="w-[1440px] mx-auto flex flex-col gap-[80px] items-start">
         {/* Title Section */}
         <div className="flex items-center gap-[24px] self-stretch">
-          <button className="flex p-[4px] items-center gap-[8px]">
+          <button className="flex p-[4px] items-center gap-[8px]" onClick={() => router.back()}>
             <CaretLeftIcon />
           </button>
           <h1 className="font-bold text-[28px] leading-[34px] text-(--text-primary)">
