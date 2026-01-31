@@ -10,7 +10,6 @@ import { useRouter } from 'next/navigation';
 import { blendingAPI } from '@/lib/api/blending';
 import { BlendingDetail, BlendingStatus } from '@/lib/types/blending';
 import { Position, Experience } from '@/lib/types/profile';
-import { useAuthStore } from '@/stores/authStore';
 
 // Back Arrow Icon
 const CaretLeftIcon = () => (
@@ -72,7 +71,6 @@ const statusLabels: Record<BlendingStatus, string> = {
 
 export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
   const router = useRouter();
-  const { user } = useAuthStore();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const applicantsScrollRef = useRef<HTMLDivElement>(null);
@@ -91,17 +89,13 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
         setIsLoading(true);
         const data = await blendingAPI.getBlendingDetail(id);
 
-        // 현재 사용자가 HOST인지 확인 (blendingParticipant에서 체크)
-        const currentUserParticipant = data.blendingParticipant.find(
-          p => p.uuid === user?.id
-        );
-        const isCurrentUserHost = currentUserParticipant?.blendingUserGrade === 'HOST';
-
         // 호스트가 아닌 경우 일반 상세 페이지로 리다이렉트
-        if (!isCurrentUserHost) {
+        if (!data.isHost) {
           router.replace(`/blending/${id}`);
           return;
         }
+
+        console.log('블렌딩 상세 데이터:', data);
 
         setBlendingData(data);
         setIsBookmarked(data.isBookmarked);

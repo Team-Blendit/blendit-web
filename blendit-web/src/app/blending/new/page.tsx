@@ -135,7 +135,7 @@ export default function NetworkingCreatePage() {
             <CaretLeftIcon />
           </button>
           <h1 className="font-bold text-[28px] leading-[34px] text-(--text-primary)">
-            네트워킹 만들기
+            블렌딩 만들기
           </h1>
         </div>
 

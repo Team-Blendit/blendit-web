@@ -86,18 +86,9 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
         setIsLoading(true);
         const data = await blendingAPI.getBlendingDetail(id);
 
-        // 로그인한 사용자가 HOST인지 확인 (blendingParticipant에서 체크)
-        if (user) {
-          const currentUserParticipant = data.blendingParticipant.find(
-            p => p.uuid === user.id
-          );
-          const isCurrentUserHost = currentUserParticipant?.blendingUserGrade === 'HOST';
-
-          // 호스트인 경우 관리 페이지로 리다이렉트
-          if (isCurrentUserHost) {
-            router.replace(`/blending/manage/${id}`);
-            return;
-          }
+        if (data.isHost) {
+          router.replace(`/blending/manage/${id}`);
+          return;
         }
 
         setBlendingData(data);
