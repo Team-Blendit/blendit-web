@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import Tab from '@/components/common/Tab';
 import { Button } from '@/components/common/Button';
@@ -58,14 +58,56 @@ type BookmarkPost = {
 
 export default function MyPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isAuthenticated } = useAuthStore();
-  const [activeTab, setActiveTab] = useState('profile');
+
+  // URL 쿼리에서 탭 상태 읽기
+  const tabFromQuery = searchParams.get('tab') || 'profile';
+  const subTabFromQuery = searchParams.get('subTab') as 'blending' | 'user' | null;
+  const pageFromQuery = searchParams.get('page');
+
+  const [activeTab, setActiveTab] = useState(tabFromQuery);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isHydrated, setIsHydrated] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [bookmarkSubTab, setBookmarkSubTab] = useState<'blending' | 'user'>('blending');
+  const [currentPage, setCurrentPage] = useState(pageFromQuery ? parseInt(pageFromQuery) : 1);
+  const [bookmarkSubTab, setBookmarkSubTab] = useState<'blending' | 'user'>(subTabFromQuery || 'blending');
   const [bookmarkedUsers, setBookmarkedUsers] = useState<BookmarkedUser[]>([]);
+
+  // 탭 변경 핸들러
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+    setCurrentPage(1);
+    if (tabId === 'bookmark') {
+      setBookmarkSubTab('blending');
+    }
+    const newParams = new URLSearchParams();
+    newParams.set('tab', tabId);
+    router.replace(`/mypage?${newParams.toString()}`, { scroll: false });
+  };
+
+  // 서브탭 변경 핸들러
+  const handleSubTabChange = (subTab: 'blending' | 'user') => {
+    setBookmarkSubTab(subTab);
+    setCurrentPage(1);
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set('tab', 'bookmark');
+    newParams.set('subTab', subTab);
+    newParams.delete('page');
+    router.replace(`/mypage?${newParams.toString()}`, { scroll: false });
+  };
+
+  // 페이지 변경 핸들러
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    const newParams = new URLSearchParams(searchParams.toString());
+    if (page > 1) {
+      newParams.set('page', page.toString());
+    } else {
+      newParams.delete('page');
+    }
+    router.replace(`/mypage?${newParams.toString()}`, { scroll: false });
+  };
   const [totalUserPages, setTotalUserPages] = useState(0);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const itemsPerPage = 5;
@@ -297,7 +339,7 @@ export default function MyPage() {
                 key={tab.id}
                 label={tab.label}
                 active={activeTab === tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
               />
             ))}
           </div>
@@ -423,7 +465,7 @@ export default function MyPage() {
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
-              onPageChange={setCurrentPage}
+              onPageChange={handlePageChange}
             />
           </div>
         )}
@@ -434,10 +476,7 @@ export default function MyPage() {
             {/* Bookmark Sub-tabs */}
             <div className="flex gap-[16px] items-center">
               <button
-                onClick={() => {
-                  setBookmarkSubTab('blending');
-                  setCurrentPage(1);
-                }}
+                onClick={() => handleSubTabChange('blending')}
                 className={`px-[16px] py-[8px] rounded-[99999px] min-w-[80px] flex items-center justify-center ${
                   bookmarkSubTab === 'blending'
                     ? 'bg-[var(--accent-primary-default)] text-white'
@@ -447,10 +486,7 @@ export default function MyPage() {
                 <span className="text-[18px] font-medium leading-[24px]">블렌딩</span>
               </button>
               <button
-                onClick={() => {
-                  setBookmarkSubTab('user');
-                  setCurrentPage(1);
-                }}
+                onClick={() => handleSubTabChange('user')}
                 className={`px-[16px] py-[8px] rounded-[99999px] min-w-[80px] flex items-center justify-center ${
                   bookmarkSubTab === 'user'
                     ? 'bg-[var(--accent-primary-default)] text-white'
@@ -485,7 +521,7 @@ export default function MyPage() {
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalBookmarkPages}
-                  onPageChange={setCurrentPage}
+                  onPageChange={handlePageChange}
                 />
               </div>
             )}
@@ -513,7 +549,7 @@ export default function MyPage() {
                         profileImage={user.profileImageUrl}
                         showButton={false}
                         isBookmarked={true}
-                        onClick={() => router.push(`/user/${user.userUuid}`)}
+                        onClick={() => router.push(`/profile/${user.userUuid}`)}
                         onBookmarkClick={async (e) => {
                           e?.stopPropagation();
                           try {
@@ -531,7 +567,7 @@ export default function MyPage() {
                   <Pagination
                     currentPage={currentPage}
                     totalPages={totalUserPages}
-                    onPageChange={setCurrentPage}
+                    onPageChange={handlePageChange}
                   />
                   </>
                 )}
