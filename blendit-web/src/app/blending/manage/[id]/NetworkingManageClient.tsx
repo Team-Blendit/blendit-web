@@ -64,7 +64,7 @@ const experienceLabels: Record<Experience, string> = {
 // Status를 한글로 변환
 const statusLabels: Record<BlendingStatus, string> = {
   RECRUITING: '모집중',
-  CLOSED: '마감',
+  RECRUITMENT_CLOSED: '마감',
   COMPLETED: '완료',
   CANCELLED: '취소',
 };
