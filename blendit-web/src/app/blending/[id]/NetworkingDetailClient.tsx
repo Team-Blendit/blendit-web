@@ -60,7 +60,7 @@ const experienceLabels: Record<Experience, string> = {
 // Status를 한글로 변환
 const statusLabels: Record<BlendingStatus, string> = {
   RECRUITING: '모집중',
-  CLOSED: '마감',
+  RECRUITMENT_CLOSED: '마감',
   COMPLETED: '완료',
   CANCELLED: '취소',
 };
@@ -113,12 +113,11 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
   ) || [];
 
   // 현재 사용자가 이미 신청했는지 확인
-  console.log('user?.id:', user?.id);
-  console.log('blendingParticipant uuids:', blendingData?.blendingParticipant.map(p => p.uuid));
-  const hasApplied = blendingData?.blendingParticipant.some(
-    p => p.uuid === user?.id
-  ) || false;
+  const hasApplied = blendingData?.currentUserJoinStatus === 'PENDING';
   console.log('hasApplied:', hasApplied);
+
+  const isClosed = blendingData?.status !== 'RECRUITING';
+  console.log('isClosed:', isClosed);
 
   // 날짜 포맷팅
   const formatDate = (dateString: string) => {
@@ -234,7 +233,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
             <Card
               variant="postInfo"
               userName={host?.nickname || ''}
-              userJob={blendingData.position}
+              userJob={positionLabels[blendingData.position]}
               postDate={formatDate(blendingData.createdDate)}
               meetDate={formatDate(blendingData.schedule)}
               meetLocation={blendingData.region}
@@ -244,8 +243,8 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
               openChatLink={blendingData.openChattingUrl}
               onButtonClick={() => setIsModalOpen(true)}
               profileImage={host?.profileImageUrl}
-              buttonText={hasApplied ? '신청 완료' : '블렌딩 신청하기'}
-              buttonDisabled={hasApplied}
+              buttonText={hasApplied ? '이미 신청한 블렌딩이에요' : (isClosed ? '마감된 블렌딩이에요' : '블렌딩 신청하기')}
+              buttonDisabled={hasApplied || isClosed}
             />
           </div>
 

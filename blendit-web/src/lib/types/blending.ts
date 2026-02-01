@@ -28,7 +28,7 @@ export interface UpdateBlendingRequest {
 
 export type BlendingUserGrade = 'HOST' | 'MEMBER';
 export type JoinStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
-export type BlendingStatus = 'RECRUITING' | 'CLOSED' | 'COMPLETED' | 'CANCELLED';
+export type BlendingStatus = 'RECRUITING' | 'RECRUITMENT_CLOSED' | 'COMPLETED' | 'CANCELLED';
 
 export interface BlendingParticipant {
   uuid: string;
@@ -62,4 +62,5 @@ export interface BlendingDetail {
   lastModifiedDate: string;
   isBookmarked: boolean;
   isHost: boolean;
+  currentUserJoinStatus: JoinStatus;
 }
