@@ -12,6 +12,8 @@ import { profileAPI } from '@/lib/api/profile';
 import { SearchedUser, Position, Experience } from '@/lib/types/profile';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/stores/authStore';
+import { blendingAPI } from '@/lib/api/blending';
+import { SearchedBlending } from '@/lib/types/blending';
 
 interface KeywordItem {
   uuid: string;
@@ -37,9 +39,21 @@ const experienceLabels: Record<Experience, string> = {
   SENIOR: '시니어',
 };
 
-// 직군 필터 옵션 (한글 -> Position 매핑)
+// 직군 필터 옵션 (한글 -> Position 매핑) - 유저 탭용
 const positionFilterOptions: { label: string; value: Position | '' }[] = [
-  { label: '전체', value: '' },
+  { label: '프론트엔드', value: 'FRONTEND' },
+  { label: '백엔드', value: 'BACKEND' },
+  { label: '디자이너', value: 'DESIGN' },
+  { label: 'PM', value: 'PM' },
+  { label: '마케팅', value: 'MARKETING' },
+  { label: '데이터', value: 'DATA' },
+  { label: 'AI', value: 'AI' },
+  { label: '보안', value: 'SECURITY' },
+];
+
+// 블렌딩 탭용 직군 필터 옵션 (전체는 실제 position 값)
+const blendingPositionFilterOptions: { label: string; value: Position | '' }[] = [
+  { label: '전체', value: 'ALL' },
   { label: '프론트엔드', value: 'FRONTEND' },
   { label: '백엔드', value: 'BACKEND' },
   { label: '디자이너', value: 'DESIGN' },
@@ -83,6 +97,12 @@ export default function HomeClient() {
   const [totalUserPages, setTotalUserPages] = useState(0);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const usersPerPage = 16;
+
+  // 블렌딩 탭 상태
+  const [blendings, setBlendings] = useState<SearchedBlending[]>([]);
+  const [totalBlendingPages, setTotalBlendingPages] = useState(0);
+  const [isLoadingBlendings, setIsLoadingBlendings] = useState(false);
+  const blendingsPerPage = 16;
 
   // 키워드 목록 불러오기
   useEffect(() => {
@@ -147,19 +167,45 @@ export default function HomeClient() {
     fetchUsers();
   }, [activeTab, currentPage, filterValues.job, filterValues.keyword, filterValues.region, filterValues.bookmarked, usersPerPage]);
 
-  // Mock data for blending cards
-  const mockBlendingCards = Array.from({ length: 16 }, (_, i) => ({
-    id: i + 1,
-    title: i % 2 === 0 ? '디자이너 10년차의 멘토링' : '네카라쿠배 디자이너가 알려주는 실무 팁',
-    userName: i % 3 === 0 ? '네카라쿠배의디자이너' : '김개발',
-    userJob: i % 2 === 0 ? '디자인' : '백엔드',
-    userCareer: i % 3 === 0 ? '시니어 (9년이상)' : i % 3 === 1 ? '미들 (4~6년)' : '주니어 (1~3년)',
-    userLocation: '서울 강남구',
-    keywords: ['실무 경험', '멘토링', '사이드 프로젝트'],
-    currentNum: i % 5,
-    totalNum: 5,
-    isRecruiting: i % 2 === 0,
-  }));
+  // 블렌딩 검색 API 호출
+  useEffect(() => {
+    if (activeTab !== 'blending') return;
+
+    const fetchBlendings = async () => {
+      setIsLoadingBlendings(true);
+      try {
+        const position = filterValues.job ? (filterValues.job as Position) : undefined;
+        const keywords = filterValues.keyword ? [filterValues.keyword] : [];
+        const region = filterValues.region ? [`서울특별시 ${filterValues.region}`] : [];
+
+        const data = await blendingAPI.searchBlendings(
+          position,
+          keywords,
+          region,
+          filterValues.recruiting,
+          filterValues.bookmarked,
+          '',
+          currentPage - 1,
+          blendingsPerPage,
+          []
+        );
+        console.log('✅ Blending search response:', data);
+        // 중복 제거 (blendingUuid 기준)
+        const uniqueBlendings = data.content.filter(
+          (blending, index, self) =>
+            index === self.findIndex((b) => b.blendingUuid === blending.blendingUuid)
+        );
+        setBlendings(uniqueBlendings);
+        setTotalBlendingPages(data.totalPages);
+      } catch (error) {
+        console.error('❌ Failed to fetch blendings:', error);
+      } finally {
+        setIsLoadingBlendings(false);
+      }
+    };
+
+    fetchBlendings();
+  }, [activeTab, currentPage, filterValues.job, filterValues.keyword, filterValues.region, filterValues.recruiting, filterValues.bookmarked, blendingsPerPage]);
 
   return (
     <div className="min-h-screen flex flex-col gap-[30px] pb-[309.06px] px-auto">
@@ -204,10 +250,11 @@ export default function HomeClient() {
                 {
                   type: 'dropdown',
                   label: '직군',
-                  options: positionFilterOptions.map(opt => opt.label),
-                  value: positionFilterOptions.find(opt => opt.value === filterValues.job)?.label || '전체',
+                  options: (activeTab === 'blending' ? blendingPositionFilterOptions : positionFilterOptions).map(opt => opt.label),
+                  value: (activeTab === 'blending' ? blendingPositionFilterOptions : positionFilterOptions).find(opt => opt.value === filterValues.job)?.label || '',
                   onChange: (value) => {
-                    const selected = positionFilterOptions.find(opt => opt.label === value);
+                    const options = activeTab === 'blending' ? blendingPositionFilterOptions : positionFilterOptions;
+                    const selected = options.find(opt => opt.label === value);
                     setFilterValues(prev => ({ ...prev, job: selected?.value || '' }));
                   },
                 },
@@ -276,24 +323,35 @@ export default function HomeClient() {
         <section className="flex flex-col gap-[16px] items-stretch w-full">
           <div className="grid grid-cols-4 gap-x-[24px] gap-y-[30px] w-full min-w-[1440px]">
             {activeTab === 'blending' ? (
-              mockBlendingCards.map((card) => (
-                <Card
-                  key={card.id}
-                  variant="main"
-                  title={card.title}
-                  userName={card.userName}
-                  userJob={card.userJob}
-                  userCareer={card.userCareer}
-                  userLocation={card.userLocation}
-                  keywords={card.keywords}
-                  currentNum={card.currentNum}
-                  totalNum={card.totalNum}
-                  isRecruiting={card.isRecruiting}
-                  onClick={() => router.push(`/${card.id}`)}
-                  onButtonClick={() => console.log('Detail:', card.id)}
-                  className='hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)] hover:-translate-y-0.3'
-                />
-              ))
+              isLoadingBlendings ? (
+                <div className="col-span-4 flex justify-center items-center py-20">
+                  <p className="text-[var(--text-tertiary)]">로딩 중...</p>
+                </div>
+              ) : blendings.length === 0 ? (
+                <div className="col-span-4 flex justify-center items-center py-20">
+                  <p className="text-[var(--text-tertiary)]">검색 결과가 없습니다</p>
+                </div>
+              ) : (
+                blendings.map((blending) => (
+                  <Card
+                    key={blending.blendingUuid}
+                    variant="main"
+                    title={blending.title}
+                    userName={blending.hostNickname}
+                    userJob={positionLabels[blending.position]}
+                    userCareer={experienceLabels[blending.hostExperience]}
+                    userLocation={blending.region}
+                    keywords={blending.keywords}
+                    currentNum={blending.currentUserCount}
+                    totalNum={blending.capacity}
+                    isRecruiting={blending.blendingStatus === 'RECRUITING'}
+                    isBookmarked={blending.isBookmark}
+                    onClick={() => router.push(`/blending/${blending.blendingUuid}`)}
+                    onButtonClick={() => console.log('Detail:', blending.blendingUuid)}
+                    className='hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)] hover:-translate-y-0.3'
+                  />
+                ))
+              )
             ) : isLoadingUsers ? (
               <div className="col-span-4 flex justify-center items-center py-20">
                 <p className="text-[var(--text-tertiary)]">로딩 중...</p>
@@ -345,7 +403,7 @@ export default function HomeClient() {
         <section className="flex justify-center">
           <Pagination
             currentPage={currentPage}
-            totalPages={activeTab === 'user' ? totalUserPages : 3}
+            totalPages={activeTab === 'user' ? totalUserPages : totalBlendingPages}
             onPageChange={setCurrentPage}
           />
         </section>

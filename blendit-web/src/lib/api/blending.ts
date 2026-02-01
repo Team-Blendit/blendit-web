@@ -1,7 +1,8 @@
 // src/lib/api/blending.ts
 
 import { apiClient } from '@/lib/api';
-import { CreateBlendingRequest, UpdateBlendingRequest, BlendingDetail } from '@/lib/types/blending';
+import { CreateBlendingRequest, UpdateBlendingRequest, BlendingDetail, SearchedBlending } from '@/lib/types/blending';
+import { PageableResponse } from '../types/profile';
 
 interface ApiResponse<T> {
   result: string;
@@ -47,4 +48,36 @@ export const blendingAPI = {
       `/blending/${blendingUuid}/participation/${participantUuid}/reject`
     );
   },
+
+  // 블렌딩 검색
+  searchBlendings: async (
+    position: string | undefined,
+    keywords: string[],
+    region: string[],
+    isRecruiting: boolean,
+    isBookmark: boolean,
+    query: string,
+    page: number,
+    size: number,
+    sort: string[]
+  ) : Promise<PageableResponse<SearchedBlending>> => {
+    const params: Record<string, unknown> = {
+      page,
+      size,
+    };
+
+    if (position) params.position = position;
+    if (keywords.length > 0) params.keywords = keywords;
+    if (region.length > 0) params.region = region;
+    if (isRecruiting) params.isRecruiting = isRecruiting;
+    if (isBookmark) params.isBookmark = isBookmark;
+    if (query) params.query = query;
+    if (sort.length > 0) params.sort = sort;
+
+    const response = await apiClient.get<ApiResponse<PageableResponse<SearchedBlending>>>(
+      '/blending/query',
+      { params }
+    );
+    return response.data.data;
+  }
 };

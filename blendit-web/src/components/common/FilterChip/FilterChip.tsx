@@ -66,6 +66,11 @@ export default function FilterChip({
   const [selectedValue, setSelectedValue] = useState(value || '');
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // 외부 value prop 변경 시 내부 상태 동기화
+  useEffect(() => {
+    setSelectedValue(value || '');
+  }, [value]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {

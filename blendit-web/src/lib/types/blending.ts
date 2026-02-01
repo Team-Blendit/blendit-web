@@ -64,3 +64,18 @@ export interface BlendingDetail {
   isHost: boolean;
   currentUserJoinStatus: JoinStatus;
 }
+
+export interface SearchedBlending {
+  blendingUuid: string;
+  title: string;
+  hostNickname: string;
+  hostExperience: Experience;
+  region: string;
+  blendingStatus: BlendingStatus;
+  position: Position;
+  capacity: number;
+  currentUserCount: number;
+  keywords: string[];
+  isBookmark: boolean;
+  isRecommended: boolean;
+}
