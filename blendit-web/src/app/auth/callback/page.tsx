@@ -1,7 +1,7 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { apiClient } from '@/lib/api';
 
@@ -12,15 +12,23 @@ const PROVIDER_CONFIG: Record<Provider, { endpoint: string; name: string }> = {
   google: { endpoint: '/auth/oidc/google', name: '구글' },
 };
 
-function AuthCallbackContent() {
+export default function AuthCallbackPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { login } = useAuthStore();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    const code = searchParams.get('code');
-    const error = searchParams.get('error');
-    const state = searchParams.get('state');
+    // 이미 처리 중이면 중복 실행 방지
+    if (isProcessing) return;
+
+    // window.location.search에서 직접 파라미터 파싱 (정적 빌드 호환)
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const error = urlParams.get('error');
+    const state = urlParams.get('state');
+
+    console.log('[AuthCallback] Params from window.location:', { code: code?.substring(0, 20) + '...', state, error });
+
     const provider = (state || 'kakao') as Provider;
     const config = PROVIDER_CONFIG[provider] || PROVIDER_CONFIG.kakao;
 
@@ -31,18 +39,20 @@ function AuthCallbackContent() {
     }
 
     if (!code) {
-      console.error('인가 코드가 없습니다');
+      console.error('[AuthCallback] 인가 코드가 없습니다');
       router.replace('/');
       return;
     }
 
+    setIsProcessing(true);
+
     const handleOAuthCallback = async () => {
       try {
-        console.log(`${config.name} 로그인 요청:`, { code, provider });
+        console.log(`[AuthCallback] ${config.name} 로그인 요청 시작`);
 
         const response = await apiClient.post(config.endpoint, { code });
 
-        console.log('로그인 성공:', response.data);
+        console.log('[AuthCallback] 로그인 성공:', response.data);
 
         const { data } = response.data;
 
@@ -60,14 +70,14 @@ function AuthCallbackContent() {
         );
 
         router.replace('/');
-      } catch (error) {
-        console.error(`${config.name} 로그인 처리 중 에러:`, error);
+      } catch (err) {
+        console.error(`[AuthCallback] ${config.name} 로그인 처리 중 에러:`, err);
         router.replace('/');
       }
     };
 
     handleOAuthCallback();
-  }, [searchParams, login, router]);
+  }, [isProcessing, login, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -76,22 +86,5 @@ function AuthCallbackContent() {
         <p className="text-gray-600">로그인 처리 중...</p>
       </div>
     </div>
-  );
-}
-
-export default function AuthCallbackPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4" />
-            <p className="text-gray-600">로그인 처리 중...</p>
-          </div>
-        </div>
-      }
-    >
-      <AuthCallbackContent />
-    </Suspense>
   );
 }
