@@ -6,6 +6,7 @@ import Tab from '@/components/common/Tab';
 import { NetworkingListItem } from '@/components/common/NetworkingListItem';
 import Pagination from '@/components/common/Pagination';
 import CancelConfirmModal from '@/components/common/CancelConfirmModal';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
 
 // 뒤로가기 아이콘
 const BackIcon = () => (
@@ -31,11 +32,17 @@ type NetworkingPost = {
 
 export default function ManageListClient() {
   const router = useRouter();
+  const { isAuthenticated } = useRequireAuth();
   const [activeTab, setActiveTab] = useState('신청');
   const [currentPage, setCurrentPage] = useState(1);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
   const [modalType, setModalType] = useState<'cancel' | 'delete'>('cancel');
+
+  // 비로그인 시 리디렉션 중에는 아무것도 렌더링하지 않음
+  if (!isAuthenticated) {
+    return null;
+  }
 
   // Mock 데이터 - 신청 목록
   const appliedPosts: NetworkingPost[] = [

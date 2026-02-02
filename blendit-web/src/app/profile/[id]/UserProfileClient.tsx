@@ -8,6 +8,8 @@ import { profileAPI } from '@/lib/api/profile';
 import { OtherUserProfile, Position, Experience } from '@/lib/types/profile';
 import { PostDescription } from '@/components/common/PostDescription';
 import { useAuthStore } from '@/stores/authStore';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
+import { LoginModal } from '@/components/common/LoginModal/LoginModal';
 
 const positionLabels: Record<Position, string> = {
   ALL: '전체',
@@ -37,6 +39,7 @@ export default function UserProfileClient({ id }: UserProfileClientProps) {
   const router = useRouter();
   const { user } = useAuthStore();
   const isMyProfile = user?.id === userUuid;
+  const { requireAuth, showLoginModal, closeLoginModal } = useAuthGuard();
 
   const [profile, setProfile] = useState<OtherUserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -60,17 +63,19 @@ export default function UserProfileClient({ id }: UserProfileClientProps) {
     }
   }, [userUuid]);
 
-  const handleBookmarkClick = async () => {
-    try {
-      if (isBookmarked) {
-        await profileAPI.removeBookmark(userUuid);
-      } else {
-        await profileAPI.addBookmark(userUuid);
+  const handleBookmarkClick = () => {
+    requireAuth(async () => {
+      try {
+        if (isBookmarked) {
+          await profileAPI.removeBookmark(userUuid);
+        } else {
+          await profileAPI.addBookmark(userUuid);
+        }
+        setIsBookmarked(!isBookmarked);
+      } catch (error) {
+        console.error('북마크 처리 실패:', error);
       }
-      setIsBookmarked(!isBookmarked);
-    } catch (error) {
-      console.error('북마크 처리 실패:', error);
-    }
+    });
   };
 
   const getLocation = () => {
@@ -183,6 +188,18 @@ export default function UserProfileClient({ id }: UserProfileClientProps) {
           </div>
         </div>
       </main>
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={closeLoginModal}
+        onKakaoLogin={() => {
+          window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/kakao`;
+        }}
+        onGoogleLogin={() => {
+          window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/google`;
+        }}
+      />
     </div>
   );
 }

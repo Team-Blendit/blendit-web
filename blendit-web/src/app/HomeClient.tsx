@@ -14,6 +14,8 @@ import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/stores/authStore';
 import { blendingAPI } from '@/lib/api/blending';
 import { SearchedBlending } from '@/lib/types/blending';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
+import { LoginModal } from '@/components/common/LoginModal/LoginModal';
 
 interface KeywordItem {
   uuid: string;
@@ -74,6 +76,7 @@ const seoulDistricts = [
 export default function HomeClient() {
   const { user } = useAuthStore();
   const loggedInUserId = user?.id;
+  const { requireAuth, showLoginModal, closeLoginModal } = useAuthGuard();
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -375,22 +378,24 @@ export default function HomeClient() {
                   onClick={() => router.push(`/profile/${user.userUuid}`)}
                   showButton={false}
                   hideBookmark={(user.userUuid===loggedInUserId)}
-                  onBookmarkClick={async (e) => {
+                  onBookmarkClick={(e) => {
                     e?.stopPropagation();
-                    try {
-                      if (user.isBookmarked) {
-                        await profileAPI.removeBookmark(user.userUuid);
-                      } else {
-                        await profileAPI.addBookmark(user.userUuid);
+                    requireAuth(async () => {
+                      try {
+                        if (user.isBookmarked) {
+                          await profileAPI.removeBookmark(user.userUuid);
+                        } else {
+                          await profileAPI.addBookmark(user.userUuid);
+                        }
+                        setUsers(prev => prev.map(u =>
+                          u.userUuid === user.userUuid
+                            ? { ...u, isBookmarked: !u.isBookmarked }
+                            : u
+                        ));
+                      } catch (error) {
+                        console.error('북마크 처리 실패:', error);
                       }
-                      setUsers(prev => prev.map(u =>
-                        u.userUuid === user.userUuid
-                          ? { ...u, isBookmarked: !u.isBookmarked }
-                          : u
-                      ));
-                    } catch (error) {
-                      console.error('북마크 처리 실패:', error);
-                    }
+                    });
                   }}
                   className='hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)] hover:-translate-y-0.3'
                 />
@@ -408,6 +413,18 @@ export default function HomeClient() {
           />
         </section>
       </main>
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={closeLoginModal}
+        onKakaoLogin={() => {
+          window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/kakao`;
+        }}
+        onGoogleLogin={() => {
+          window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/google`;
+        }}
+      />
     </div>
   );
 }

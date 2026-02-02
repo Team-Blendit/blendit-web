@@ -13,6 +13,7 @@ import { blendingAPI } from '@/lib/api/blending';
 import { Position } from '@/lib/types/profile';
 import { useOnboardingGuard } from '@/hooks/useOnboardingGuard';
 import { useAuthStore } from '@/stores/authStore';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
 
 interface KeywordItem {
   uuid: string;
@@ -40,6 +41,7 @@ const CaretLeftIcon = () => (
 
 export default function NetworkingCreatePage() {
   const router = useRouter();
+  const { isAuthenticated } = useRequireAuth();
   const { setNewUserComplete } = useAuthStore();
   const {
     showOnboardingModal,
@@ -131,6 +133,11 @@ export default function NetworkingCreatePage() {
 
   // 키워드 목록 상태
   const [keywordList, setKeywordList] = useState<KeywordItem[]>([]);
+
+  // 비로그인 시 리디렉션 중에는 아무것도 렌더링하지 않음
+  if (!isAuthenticated) {
+    return null;
+  }
 
   // 키워드 목록 불러오기
   useEffect(() => {

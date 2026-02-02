@@ -14,6 +14,8 @@ import { BlendingDetail, BlendingStatus } from '@/lib/types/blending';
 import { Position, Experience } from '@/lib/types/profile';
 import { useAuthStore } from '@/stores/authStore';
 import { useOnboardingGuard } from '@/hooks/useOnboardingGuard';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
+import { LoginModal } from '@/components/common/LoginModal';
 
 // Back Arrow Icon
 const CaretLeftIcon = () => (
@@ -77,6 +79,11 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
     guardAction,
     handleOnboardingComplete: onOnboardingComplete,
   } = useOnboardingGuard();
+  const {
+    showLoginModal,
+    closeLoginModal,
+    requireAuth,
+  } = useAuthGuard();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -163,6 +170,37 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
     onOnboardingComplete();
   };
 
+  // 북마크 토글 핸들러
+  const handleBookmarkClick = () => {
+    requireAuth(() => {
+      setIsBookmarked(!isBookmarked);
+      // TODO: API 호출로 북마크 상태 저장
+    });
+  };
+
+  // 블렌딩 신청 버튼 핸들러 (로그인 -> 온보딩 -> 신청 모달)
+  const handleApplyClick = () => {
+    requireAuth(() => {
+      guardAction(() => setIsModalOpen(true));
+    });
+  };
+
+  // 카카오 로그인 핸들러
+  const handleKakaoLogin = () => {
+    const KAKAO_CLIENT_ID = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
+    const REDIRECT_URI = process.env.NEXT_PUBLIC_REDIRECT_URI;
+    const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&state=kakao`;
+    window.location.href = KAKAO_AUTH_URL;
+  };
+
+  // 구글 로그인 핸들러
+  const handleGoogleLogin = () => {
+    const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const REDIRECT_URI = process.env.NEXT_PUBLIC_REDIRECT_URI;
+    const GOOGLE_AUTH_URL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=openid%20email%20profile&state=google`;
+    window.location.href = GOOGLE_AUTH_URL;
+  };
+
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!scrollRef.current) return;
     setIsDragging(true);
@@ -234,7 +272,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
           </div>
           <button
             className="p-[8px]"
-            onClick={() => setIsBookmarked(!isBookmarked)}
+            onClick={handleBookmarkClick}
           >
             <BookmarkIcon filled={isBookmarked} />
           </button>
@@ -255,7 +293,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
               currentNum={approvedParticipants.length}
               totalNum={blendingData.capacity}
               openChatLink={blendingData.openChattingUrl}
-              onButtonClick={() => guardAction(() => setIsModalOpen(true))}
+              onButtonClick={handleApplyClick}
               profileImage={host?.profileImageUrl}
               buttonText={hasApplied ? '이미 신청한 블렌딩이에요' : (isClosed ? '마감된 블렌딩이에요' : '블렌딩 신청하기')}
               buttonDisabled={hasApplied || isClosed}
@@ -330,6 +368,14 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
           openChatLink: blendingData.openChattingUrl || '',
         }}
         onSubmit={handleApply}
+      />
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={closeLoginModal}
+        onKakaoLogin={handleKakaoLogin}
+        onGoogleLogin={handleGoogleLogin}
       />
 
       {/* Onboarding Modal */}
