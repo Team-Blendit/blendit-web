@@ -31,7 +31,7 @@ export interface SkillItem {
 
 export interface UpdateProfileRequest {
   nickname: string;
-  description?: string;
+  description: string;
   experience: Experience;
   position: Position;
   province: string;
@@ -39,8 +39,9 @@ export interface UpdateProfileRequest {
   email: string;
   keywordUuidList: string[];
   affiliation?: string;
-  skills: SkillItem[];
-  links: ProfileLink[];
+  skills?: SkillItem[];
+  links?: ProfileLink[];
+  profileImage?: File | Blob;
 }
 
 export interface BookmarkedUser {

@@ -15,8 +15,24 @@ export const profileAPI = {
   },
 
   // 프로필 수정
+  // TODO: 백엔드에서 @RequestBody → @ModelAttribute 수정 완료 후 FormData 방식으로 변경 필요
   updateProfile: async (data: UpdateProfileRequest): Promise<void> => {
-    await apiClient.put<ApiResponse<void>>('/user/profile', data);
+    const jsonData = {
+      nickname: data.nickname,
+      description: data.description,
+      experience: data.experience,
+      position: data.position,
+      province: data.province,
+      district: data.district,
+      email: data.email,
+      keywordUuidList: data.keywordUuidList,
+      affiliation: data.affiliation,
+      skills: data.skills,
+      links: data.links,
+      // profileImage: 백엔드 수정 후 활성화
+    };
+
+    await apiClient.put<ApiResponse<void>>('/user/profile', jsonData);
   },
 
   // 북마크한 유저 목록 조회

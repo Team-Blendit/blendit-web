@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { UserProfile } from '@/components/layout/UserProfile';
@@ -66,6 +66,8 @@ export default function ProfileEdit() {
   const [originalEmail, setOriginalEmail] = useState('');
 
   const [profileImage, setProfileImage] = useState<string | undefined>(undefined);
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     nickname: '',
     introduction: '',
@@ -434,6 +436,7 @@ export default function ProfileEdit() {
         affiliation: formData.company || undefined,
         skills: skillsArray,
         links: linksArray,
+        profileImage: profileImageFile || undefined,
       };
 
       console.log('프로필 업데이트 요청 데이터:', updateData);
@@ -455,6 +458,20 @@ export default function ProfileEdit() {
     router.push('/mypage');
   };
 
+  const handleProfileImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfileImageFile(file);
+      // 미리보기용 URL 생성
+      const previewUrl = URL.createObjectURL(file);
+      setProfileImage(previewUrl);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-[var(--bg-canvas)]">
@@ -472,7 +489,7 @@ export default function ProfileEdit() {
       <Header />
 
       {/* Main Content */}
-      <main className="max-w-[1440px] mx-auto w-full px-[40px] flex flex-col gap-[40px] items-center mt-[24px]">
+      <main className="max-w-[1440px] mx-auto w-full flex flex-col gap-[40px] items-center mt-[24px]">
         {/* Title Section */}
         <div className="w-full flex items-center gap-[24px]">
           <button
@@ -506,11 +523,22 @@ export default function ProfileEdit() {
                       nickname={formData.nickname}
                   />
                   {/* Edit Button */}
-                  <button className="absolute bottom-0 right-0 w-[40px] h-[40px] rounded-full bg-[var(--bg-section)] border border-[#999] flex items-center justify-center">
+                  <button
+                    type="button"
+                    onClick={handleProfileImageClick}
+                    className="absolute bottom-0 right-0 w-[40px] h-[40px] rounded-full bg-[var(--bg-section)] border border-[#999] flex items-center justify-center"
+                  >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M21.3103 6.87915L17.1216 2.68946C16.9823 2.55014 16.8169 2.43962 16.6349 2.36421C16.4529 2.28881 16.2578 2.25 16.0608 2.25C15.8638 2.25 15.6687 2.28881 15.4867 2.36421C15.3047 2.43962 15.1393 2.55014 15 2.68946L3.43969 14.2507C3.2998 14.3895 3.18889 14.5547 3.11341 14.7367C3.03792 14.9188 2.99938 15.114 3.00001 15.311V19.5007C3.00001 19.8985 3.15804 20.2801 3.43935 20.5614C3.72065 20.8427 4.10218 21.0007 4.50001 21.0007H8.6897C8.88675 21.0013 9.08197 20.9628 9.26399 20.8873C9.44602 20.8118 9.61122 20.7009 9.75001 20.561L21.3103 9.00071C21.4496 8.86142 21.5602 8.69604 21.6356 8.51403C21.711 8.33202 21.7498 8.13694 21.7498 7.93993C21.7498 7.74292 21.711 7.54784 21.6356 7.36582C21.5602 7.18381 21.4496 7.01844 21.3103 6.87915ZM18 10.1895L13.8103 6.00071L16.0603 3.75071L20.25 7.93946L18 10.1895Z" fill="#666666"/>
                     </svg>
                   </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
                 </div>
               </div>
 
