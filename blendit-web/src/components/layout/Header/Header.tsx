@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/common/Button';
 import { LoginModal } from '@/components/common/LoginModal';
 import { OnboardingModal, OnboardingData } from '@/components/common/OnboardingModal';
 import { UserProfile } from '@/components/layout/UserProfile';
 import { UserDropdown } from '@/components/layout/UserDropdown';
 import { useAuthStore } from '@/stores/authStore';
+import { useOnboardingGuard } from '@/hooks/useOnboardingGuard';
 
 // const BellIcon = () => (
 //   <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -23,12 +25,31 @@ import { useAuthStore } from '@/stores/authStore';
 // );
 
 export const Header: React.FC = () => {
+  const router = useRouter();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isOnboardingModalOpen, setIsOnboardingModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Zustand store에서 인증 상태 가져오기
   const { isAuthenticated, user, setNewUserComplete } = useAuthStore();
+
+  // 온보딩 가드 (블렌딩 생성 버튼용)
+  const {
+    showOnboardingModal: showOnboardingGuardModal,
+    closeOnboardingModal: closeOnboardingGuardModal,
+    guardAction,
+    handleOnboardingComplete: onGuardOnboardingComplete,
+  } = useOnboardingGuard();
+
+  const handleCreateBlending = () => {
+    guardAction(() => router.push('/blending/new'));
+  };
+
+  const handleGuardOnboardingComplete = (data: OnboardingData) => {
+    console.log('온보딩 완료 (guard):', data);
+    setNewUserComplete();
+    onGuardOnboardingComplete();
+  };
 
   // 카카오 로그인 핸들러
   const handleKakaoLogin = () => {
@@ -81,15 +102,14 @@ export const Header: React.FC = () => {
           {/* Right Section - Login Button or User Menu */}
           {isAuthenticated ? (
             <div className="flex gap-[20px] items-center relative">
-              <Link href="/blending/new">
-                <Button
-                  variant='primary'
-                  size='sm'
-                  className='rounded-full'
-                >
-                  블렌딩 생성
-                </Button>
-              </Link>
+              <Button
+                variant='primary'
+                size='sm'
+                className='rounded-full'
+                onClick={handleCreateBlending}
+              >
+                블렌딩 생성
+              </Button>
 
               {/* Notification Bell - TODO: 호버 효과 제거 */}
               {/* <button className="flex items-center justify-center rounded-full hover:bg-[var(--color-gray-100)]">
@@ -143,11 +163,18 @@ export const Header: React.FC = () => {
         // onNaverLogin={handleNaverLogin}
       />
 
-      {/* Onboarding Modal */}
+      {/* Onboarding Modal - 신규 회원 자동 표시용 */}
       <OnboardingModal
         isOpen={isOnboardingModalOpen}
         onClose={() => setIsOnboardingModalOpen(false)}
         onComplete={handleOnboardingComplete}
+      />
+
+      {/* Onboarding Modal - 액션 가드용 */}
+      <OnboardingModal
+        isOpen={showOnboardingGuardModal}
+        onClose={closeOnboardingGuardModal}
+        onComplete={handleGuardOnboardingComplete}
       />
     </>
   );

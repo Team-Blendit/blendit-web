@@ -199,7 +199,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     }
   };
 
-  const handleSubmitOnboarding = async (): Promise<boolean> => {
+  const handleSubmitOnboarding = async (skipCallback = false): Promise<boolean> => {
     if (isSubmitting || !user) return false;
 
     setIsSubmitting(true);
@@ -214,7 +214,9 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
         nickname: formData.nickname,
       });
 
-      onComplete(formData);
+      if (!skipCallback) {
+        onComplete(formData);
+      }
       return true;
     } catch (error) {
       console.error('온보딩 처리 중 에러:', error);
@@ -238,12 +240,16 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
       if (!isNicknameAvailable) {
         return; // 중복이면 다음 단계로 넘어가지 않음
       }
+      // 4단계 완료 시 온보딩 데이터 제출 후 5단계로 이동
+      const success = await handleSubmitOnboarding(true);
+      if (success) {
+        setStep(5);
+      }
+      return;
     }
 
     if (step < 5) {
       setStep(step + 1);
-    } else {
-      handleSubmitOnboarding();
     }
   };
 
@@ -443,30 +449,24 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
             <Button
               variant="secondary"
               size="lg"
-              onClick={async () => {
-                const success = await handleSubmitOnboarding();
-                if (success) {
-                  onClose();
-                }
+              onClick={() => {
+                onComplete(formData);
+                onClose();
               }}
-              disabled={isSubmitting}
               className="flex-1"
             >
-              {isSubmitting ? '제출 중...' : '건너뛰기'}
+              건너뛰기
             </Button>
             <Button
               variant="primary"
               size="lg"
-              onClick={async () => {
-                const success = await handleSubmitOnboarding();
-                if (success) {
-                  router.push('/mypage');
-                }
+              onClick={() => {
+                onComplete(formData);
+                router.push('/mypage');
               }}
-              disabled={isSubmitting}
               className="flex-1"
             >
-              {isSubmitting ? '제출 중...' : '프로필 완성하기'}
+              프로필 완성하기
             </Button>
           </div>
         </div>
@@ -488,7 +488,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
         <FlowModalHeader
           currentStep={step as 1 | 2 | 3 | 4}
           showStepIndicator={step !== 5}
-          showBackButton={step == 1 ? false : true}
+          showBackButton={step === 1 || step === 5 ? false : true}
           onBack={handleBack}
           onClose={step !== 5 ? onClose : undefined}
         />
@@ -511,7 +511,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
             disabled={!canProceed()}
             className="w-full"
           >
-            다음
+            {step !== 4 ? '다음' : '완료'}
           </Button>
         )}
       </div>

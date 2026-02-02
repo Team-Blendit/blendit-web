@@ -7,9 +7,12 @@ import { InputField } from '@/components/common/InputField';
 import { QuillEditor } from '@/components/common/QuillEditor';
 import { Button } from '@/components/common/Button';
 import { Header } from '@/components/layout/Header';
+import { OnboardingModal, OnboardingData } from '@/components/common/OnboardingModal';
 import { apiClient } from '@/lib/api';
 import { blendingAPI } from '@/lib/api/blending';
 import { Position } from '@/lib/types/profile';
+import { useOnboardingGuard } from '@/hooks/useOnboardingGuard';
+import { useAuthStore } from '@/stores/authStore';
 
 interface KeywordItem {
   uuid: string;
@@ -37,6 +40,13 @@ const CaretLeftIcon = () => (
 
 export default function NetworkingCreatePage() {
   const router = useRouter();
+  const { setNewUserComplete } = useAuthStore();
+  const {
+    showOnboardingModal,
+    closeOnboardingModal,
+    guardAction,
+    handleOnboardingComplete: onOnboardingComplete,
+  } = useOnboardingGuard();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     jobCategory: '',
@@ -59,7 +69,7 @@ export default function NetworkingCreatePage() {
     openChatLink: '',
   });
 
-  const handleSubmit = async () => {
+  const submitBlending = async () => {
     if (isSubmitting) return;
 
     setIsSubmitting(true);
@@ -96,6 +106,15 @@ export default function NetworkingCreatePage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleSubmit = () => {
+    guardAction(submitBlending);
+  };
+
+  const handleOnboardingComplete = (_data: OnboardingData) => {
+    setNewUserComplete();
+    onOnboardingComplete();
   };
 
   const isFormValid =
@@ -343,6 +362,13 @@ export default function NetworkingCreatePage() {
           </Button>
         </div>
       </div>
+
+      {/* Onboarding Modal */}
+      <OnboardingModal
+        isOpen={showOnboardingModal}
+        onClose={closeOnboardingModal}
+        onComplete={handleOnboardingComplete}
+      />
     </div>
   );
 }

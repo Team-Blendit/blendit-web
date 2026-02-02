@@ -8,10 +8,12 @@ import { PostDescription } from '@/components/common/PostDescription';
 // import { CommentSection } from '@/components/common/CommentSection';
 import { Card } from '@/components/common/Card';
 import ApplyModal from '@/components/common/ApplyModal';
+import { OnboardingModal, OnboardingData } from '@/components/common/OnboardingModal';
 import { blendingAPI } from '@/lib/api/blending';
 import { BlendingDetail, BlendingStatus } from '@/lib/types/blending';
 import { Position, Experience } from '@/lib/types/profile';
 import { useAuthStore } from '@/stores/authStore';
+import { useOnboardingGuard } from '@/hooks/useOnboardingGuard';
 
 // Back Arrow Icon
 const CaretLeftIcon = () => (
@@ -68,6 +70,13 @@ const statusLabels: Record<BlendingStatus, string> = {
 export default function NetworkingDetailClient({ id }: NetworkingDetailClientProps) {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
+  const setNewUserComplete = useAuthStore((state) => state.setNewUserComplete);
+  const {
+    showOnboardingModal,
+    closeOnboardingModal,
+    guardAction,
+    handleOnboardingComplete: onOnboardingComplete,
+  } = useOnboardingGuard();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -147,6 +156,11 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
       console.error('블렌딩 참여 신청 실패:', err);
       alert('참여 신청에 실패했습니다. 다시 시도해주세요.');
     }
+  };
+
+  const handleOnboardingComplete = (_data: OnboardingData) => {
+    setNewUserComplete();
+    onOnboardingComplete();
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -241,7 +255,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
               currentNum={approvedParticipants.length}
               totalNum={blendingData.capacity}
               openChatLink={blendingData.openChattingUrl}
-              onButtonClick={() => setIsModalOpen(true)}
+              onButtonClick={() => guardAction(() => setIsModalOpen(true))}
               profileImage={host?.profileImageUrl}
               buttonText={hasApplied ? '이미 신청한 블렌딩이에요' : (isClosed ? '마감된 블렌딩이에요' : '블렌딩 신청하기')}
               buttonDisabled={hasApplied || isClosed}
@@ -316,6 +330,13 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
           openChatLink: blendingData.openChattingUrl || '',
         }}
         onSubmit={handleApply}
+      />
+
+      {/* Onboarding Modal */}
+      <OnboardingModal
+        isOpen={showOnboardingModal}
+        onClose={closeOnboardingModal}
+        onComplete={handleOnboardingComplete}
       />
     </div>
   );
