@@ -14,25 +14,47 @@ export const profileAPI = {
     return response.data.data;
   },
 
-  // 프로필 수정
-  // TODO: 백엔드에서 @RequestBody → @ModelAttribute 수정 완료 후 FormData 방식으로 변경 필요
+  // 프로필 수정 (multipart/form-data)
   updateProfile: async (data: UpdateProfileRequest): Promise<void> => {
-    const jsonData = {
-      nickname: data.nickname,
-      description: data.description,
-      experience: data.experience,
-      position: data.position,
-      province: data.province,
-      district: data.district,
-      email: data.email,
-      keywordUuidList: data.keywordUuidList,
-      affiliation: data.affiliation,
-      skills: data.skills,
-      links: data.links,
-      // profileImage: 백엔드 수정 후 활성화
-    };
+    const formData = new FormData();
 
-    await apiClient.put<ApiResponse<void>>('/user/profile', jsonData);
+    formData.append('nickname', data.nickname);
+    formData.append('description', data.description);
+    formData.append('experience', data.experience);
+    formData.append('position', data.position);
+    formData.append('province', data.province);
+    formData.append('district', data.district);
+    formData.append('email', data.email);
+
+    data.keywordUuidList.forEach((uuid) => {
+      formData.append('keywordUuidList', uuid);
+    });
+
+    if (data.affiliation) {
+      formData.append('affiliation', data.affiliation);
+    }
+    if (data.skills) {
+      data.skills.forEach((skill, index) => {
+        formData.append(`skills[${index}].title`, skill.title);
+        formData.append(`skills[${index}].orderNum`, String(skill.orderNum));
+      });
+    }
+    if (data.links) {
+      data.links.forEach((link, index) => {
+        formData.append(`links[${index}].title`, link.title);
+        formData.append(`links[${index}].url`, link.url);
+        formData.append(`links[${index}].orderNum`, String(link.orderNum));
+      });
+    }
+    if (data.profileImage) {
+      formData.append('profileImage', data.profileImage);
+    }
+
+    await apiClient.put<ApiResponse<void>>('/user/profile', formData, {
+      headers: {
+        'Content-Type': undefined,
+      },
+    });
   },
 
   // 북마크한 유저 목록 조회
