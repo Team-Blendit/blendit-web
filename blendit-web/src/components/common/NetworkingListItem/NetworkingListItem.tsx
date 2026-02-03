@@ -42,7 +42,7 @@ export const NetworkingListItem: React.FC<NetworkingListItemProps> = ({
 }) => {
   return (
     <div className="bg-white border-b border-[var(--border-default)] p-[30px] relative">
-      <div className="flex flex-col items-start self-stretch gap-[20px]">
+      <div className="flex flex-col items-start w-full gap-[20px]">
         {/* Top Section */}
         <div className="flex items-center justify-between self-stretch">
           <div className="flex gap-[12px] items-center">
@@ -79,7 +79,7 @@ export const NetworkingListItem: React.FC<NetworkingListItemProps> = ({
         </div>
 
         {/* Bottom Section */}
-        <div className="flex items-end justify-between gap-[20px] self-stretch">
+        <div className="flex items-end justify-between gap-[20px] w-full">
           <PostMetaSection
             job={job}
             keywords={keywords}

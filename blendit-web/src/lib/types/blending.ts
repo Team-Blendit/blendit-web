@@ -79,3 +79,29 @@ export interface SearchedBlending {
   isBookmark: boolean;
   isRecommended: boolean;
 }
+
+export interface CreatedBlending {
+  blendingUuid: string;
+  title: string;
+  position: Position;
+  keywords: string[];
+  region: string;
+  currentUserCount: number;
+  schedule: string;
+  openChattingUrl?: string;
+  blendingStatus: BlendingStatus;
+  useFlag: boolean;
+}
+
+export interface AppliedBlending {
+  blendingUuid: string;
+  title: string;
+  position: Position;
+  keywords: string[];
+  region: string;
+  currentUserCount: number;
+  schedule: string;
+  openChattingUrl?: string;
+  joinStatus: JoinStatus;
+  useFlag: boolean;
+}

@@ -49,8 +49,8 @@ export const PostMetaSection: React.FC<PostMetaSectionProps> = ({
       <div className="flex flex-col gap-[12px] items-start w-[339px]">
         {/* Keywords */}
         <div className="flex gap-[36px] items-center">
-          <span className="text-[18px] leading-[24px] text-[var(--text-secondary)]">키워드</span>
-          <div className="flex gap-[8px] items-center">
+          <span className="text-[18px] leading-[24px] text-[var(--text-secondary)] whitespace-nowrap">키워드</span>
+          <div className="flex gap-[8px] items-center flex-nowrap">
             {keywords.slice(0, 3).map((keyword, index) => (
               <Badge
                 key={index}

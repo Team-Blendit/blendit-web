@@ -35,7 +35,7 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose }) =
   const handleItemClick = (action: string) => {
     onClose();
     
-    if (action === '네트워킹 관리') {
+    if (action === '블렌딩 관리') {
       router.push('/blending/manage');
     }
     if (action === '마이페이지') {
@@ -55,11 +55,11 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose }) =
       <div className="absolute top-[calc(100%+8px)] right-0 z-50 bg-white border border-[var(--border-focus)] rounded-[20px] p-[20px] shadow-[2px_4px_12px_0px_rgba(0,0,0,0.08)] min-w-[174px]">
         <div className="flex flex-col items-start gap-[8px] w-full">
           <button
-            onClick={() => handleItemClick('네트워킹 관리')}
+            onClick={() => handleItemClick('블렌딩 관리')}
             className="flex items-center justify-center px-[8px] py-[12px] w-full whitespace-nowrap hover:bg-[var(--accent-secondary-hover)] rounded-lg transition-colors"
           >
             <span className="font-semibold text-[22px] leading-[28px] text-[var(--text-tertiary)]">
-              네트워킹 관리
+              블렌딩 관리
             </span>
           </button>
           

@@ -1,12 +1,45 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Tab from '@/components/common/Tab';
 import { NetworkingListItem } from '@/components/common/NetworkingListItem';
 import Pagination from '@/components/common/Pagination';
 import CancelConfirmModal from '@/components/common/CancelConfirmModal';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
+import { blendingAPI } from '@/lib/api/blending';
+import { CreatedBlending, AppliedBlending, BlendingStatus, JoinStatus } from '@/lib/types/blending';
+import { Position } from '@/lib/types/profile';
+
+const positionLabels: Record<Position, string> = {
+  ALL: '전체',
+  FRONTEND: '프론트엔드',
+  BACKEND: '백엔드',
+  DESIGN: '디자이너',
+  PM: 'PM',
+  AI: 'AI',
+  DATA: '데이터',
+  SECURITY: '보안',
+  MARKETING: '마케팅',
+};
+
+const blendingStatusLabels: Record<BlendingStatus, string> = {
+  RECRUITING: '모집중',
+  RECRUITMENT_CLOSED: '마감',
+  COMPLETED: '완료',
+  CANCELLED: '취소',
+};
+
+const joinStatusLabels: Record<JoinStatus, string> = {
+  PENDING: '대기중',
+  APPROVED: '승인',
+  REJECTED: '거절',
+};
+
+const tabLabels: Record<string, string> = {
+  applied: '신청',
+  created: '생성',
+};
 
 // 뒤로가기 아이콘
 const BackIcon = () => (
@@ -15,159 +48,116 @@ const BackIcon = () => (
   </svg>
 );
 
-// Mock 데이터 타입
-type NetworkingPost = {
-  id: number;
-  title: string;
-  status: string;
-  job: string;
-  keywords: string[];
-  location: string;
-  memberCount: number;
-  date: string;
-  chatLink: string;
-  hasNewApplication?: boolean;
-  isCancelled?: boolean; // 신청 탭용: 취소 완료 여부
-};
+const PAGE_SIZE = 5;
 
 export default function ManageListClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const tabFromQuery = searchParams.get('tab') || 'applied';
+  const pageFromQuery = searchParams.get('page');
+
   const { isAuthenticated } = useRequireAuth();
-  const [activeTab, setActiveTab] = useState('신청');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [activeTab, setActiveTab] = useState(tabFromQuery);
+  const [currentPage, setCurrentPage] = useState(pageFromQuery ? parseInt(pageFromQuery) : 1);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+  const [selectedPostUuid, setSelectedPostUuid] = useState<string | null>(null);
   const [modalType, setModalType] = useState<'cancel' | 'delete'>('cancel');
+
+  const [createdBlendings, setCreatedBlendings] = useState<CreatedBlending[]>([]);
+  const [appliedBlendings, setAppliedBlendings] = useState<AppliedBlending[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+
+  const fetchData = useCallback(async () => {
+    if (!isAuthenticated) return;
+    setLoading(true);
+    try {
+      if (activeTab === 'created') {
+        const res = await blendingAPI.getMyCreatedBlendings(currentPage - 1, PAGE_SIZE);
+        setCreatedBlendings(res.content);
+        setTotalPages(res.totalPages);
+      } else {
+        const res = await blendingAPI.getMyAppliedBlendings(currentPage - 1, PAGE_SIZE);
+        setAppliedBlendings(res.content);
+        setTotalPages(res.totalPages);
+      }
+    } catch (error) {
+      console.error('블렌딩 목록 조회 실패:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [isAuthenticated, activeTab, currentPage]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // 탭 변경 시 페이지 초기화
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setCurrentPage(1);
+    const newParams = new URLSearchParams();
+    newParams.set('tab', tab);
+    router.replace(`/blending/manage?${newParams.toString()}`, { scroll: false });
+  };
 
   // 비로그인 시 리디렉션 중에는 아무것도 렌더링하지 않음
   if (!isAuthenticated) {
     return null;
   }
 
-  // Mock 데이터 - 신청 목록
-  const appliedPosts: NetworkingPost[] = [
-    {
-      id: 1,
-      title: 'Backend 3년차의 멘토링',
-      status: '승인',
-      job: '백엔드',
-      keywords: ['멘토링', '취업', '커리어'],
-      location: '서울 00구',
-      memberCount: 5,
-      date: '0000.00.00',
-      chatLink: 'http://',
-      hasNewApplication: true,
-      isCancelled: false,
-    },
-    {
-      id: 2,
-      title: 'Frontend 스터디 모집',
-      status: '미승인',
-      job: '프론트엔드',
-      keywords: ['스터디', '취업', '커리어'],
-      location: '서울 00구',
-      memberCount: 3,
-      date: '0000.00.00',
-      chatLink: 'http://',
-      isCancelled: false,
-    },
-    {
-      id: 3,
-      title: 'React 스터디',
-      status: '취소',
-      job: '프론트엔드',
-      keywords: ['React', '스터디'],
-      location: '서울 00구',
-      memberCount: 4,
-      date: '0000.00.00',
-      chatLink: 'http://',
-      isCancelled: true,
-    },
-  ];
-
-  // Mock 데이터 - 생성 목록
-  const createdPosts: NetworkingPost[] = [
-    {
-      id: 11,
-      title: 'Backend 멘토링 진행합니다',
-      status: '모집중',
-      job: '백엔드',
-      keywords: ['멘토링', '취업', '커리어'],
-      location: '서울 00구',
-      memberCount: 5,
-      date: '0000.00.00',
-      chatLink: 'http://',
-      hasNewApplication: true,
-    },
-    {
-      id: 12,
-      title: 'DevOps 스터디',
-      status: '마감',
-      job: 'DevOps',
-      keywords: ['스터디', 'AWS'],
-      location: '서울 00구',
-      memberCount: 5,
-      date: '0000.00.00',
-      chatLink: 'http://',
-    },
-    {
-      id: 13,
-      title: '알고리즘 스터디',
-      status: '완료',
-      job: '백엔드',
-      keywords: ['알고리즘', '코딩테스트'],
-      location: '서울 00구',
-      memberCount: 4,
-      date: '0000.00.00',
-      chatLink: 'http://',
-    },
-  ];
-
-  const mockPosts = activeTab === '신청' ? appliedPosts : createdPosts;
-
-  const tabs = ['신청', '생성'];
+  const tabs = ['applied', 'created'];
 
   const handleBack = () => {
     router.back();
   };
 
-  const handleDetailView = (id: number) => {
-    router.push(`/blending/manage/${id}`);
+  const handleDetailView = (uuid: string) => {
+    router.push(`/blending/manage/${uuid}`);
   };
 
-  const handleCancelApplication = (id: number) => {
-    setSelectedPostId(id);
+  const handleCancelApplication = (uuid: string) => {
+    setSelectedPostUuid(uuid);
     setModalType('cancel');
     setIsConfirmModalOpen(true);
   };
 
   const handleConfirm = () => {
-    if (selectedPostId) {
+    if (selectedPostUuid) {
       if (modalType === 'cancel') {
-        console.log('Cancel application confirmed:', selectedPostId);
+        console.log('Cancel application confirmed:', selectedPostUuid);
         // TODO: API 호출로 신청 취소
       } else if (modalType === 'delete') {
-        console.log('Delete post confirmed:', selectedPostId);
+        console.log('Delete post confirmed:', selectedPostUuid);
         // TODO: API 호출로 게시글 삭제
       }
     }
     setIsConfirmModalOpen(false);
-    setSelectedPostId(null);
+    setSelectedPostUuid(null);
   };
 
-  const handleDeletePost = (id: number) => {
-    setSelectedPostId(id);
+  const handleDeletePost = (uuid: string) => {
+    setSelectedPostUuid(uuid);
     setModalType('delete');
     setIsConfirmModalOpen(true);
   };
 
   // 상태에 따른 뱃지 색상
-  const getStatusBadgeColor = (status: string, tab: string): 'green' | 'gray' | 'red' => {
-    if (tab === '신청') {
-      return status === '승인' ? 'green' : 'gray';
-    } else {
-      return status === '모집중' ? 'red' : 'gray';
-    }
+  const getCreatedStatusColor = (status: BlendingStatus): 'green' | 'gray' | 'red' => {
+    return status === 'RECRUITING' ? 'red' : 'gray';
+  };
+
+  const getAppliedStatusColor = (status: JoinStatus): 'green' | 'gray' | 'red' => {
+    return status === 'APPROVED' ? 'green' : 'gray';
+  };
+
+  const formatSchedule = (schedule: string) => {
+    const date = new Date(schedule);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}.${m}.${d}`;
   };
 
   return (
@@ -188,52 +178,89 @@ export default function ManageListClient() {
           {tabs.map((tab) => (
             <Tab
               key={tab}
-              label={tab}
+              label={tabLabels[tab]}
               active={activeTab === tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => handleTabChange(tab)}
             />
           ))}
         </div>
 
         {/* List Container */}
         <div className="flex flex-col w-full">
-          {mockPosts.map((post) => (
-            <NetworkingListItem
-              key={post.id}
-              title={post.title}
-              status={post.status}
-              statusColor={getStatusBadgeColor(post.status, activeTab)}
-              job={post.job}
-              keywords={post.keywords}
-              location={post.location}
-              memberCount={post.memberCount}
-              date={post.date}
-              chatLink={post.chatLink}
-              hasNewNotification={post.hasNewApplication}
-              buttonText={activeTab === '신청' ? (post.isCancelled ? '취소 완료' : '신청 취소') : '삭제하기'}
-              buttonDisabled={activeTab === '신청' && post.isCancelled}
-              onMoreClick={() => handleDetailView(post.id)}
-              onButtonClick={() => activeTab === '신청' ? handleCancelApplication(post.id) : handleDeletePost(post.id)}
-            />
-          ))}
+          {loading ? (
+            <div className="flex justify-center items-center py-[60px]">
+              <p className="text-[var(--text-secondary)]">불러오는 중...</p>
+            </div>
+          ) : activeTab === 'applied' ? (
+            appliedBlendings.length > 0 ? (
+              appliedBlendings.map((post) => (
+                <NetworkingListItem
+                  key={post.blendingUuid}
+                  title={post.title}
+                  status={joinStatusLabels[post.joinStatus]}
+                  statusColor={getAppliedStatusColor(post.joinStatus)}
+                  job={positionLabels[post.position] || post.position}
+                  keywords={post.keywords}
+                  location={post.region}
+                  memberCount={post.currentUserCount}
+                  date={formatSchedule(post.schedule)}
+                  chatLink={post.openChattingUrl || ''}
+                  buttonText={post.joinStatus === 'REJECTED' ? '거절됨' : '신청 취소'}
+                  buttonDisabled={post.joinStatus === 'REJECTED'}
+                  onMoreClick={() => handleDetailView(post.blendingUuid)}
+                  onButtonClick={() => handleCancelApplication(post.blendingUuid)}
+                />
+              ))
+            ) : (
+              <div className="flex justify-center items-center py-[60px]">
+                <p className="text-[var(--text-secondary)]">신청한 블렌딩이 없습니다.</p>
+              </div>
+            )
+          ) : (
+            createdBlendings.length > 0 ? (
+              createdBlendings.map((post) => (
+                <NetworkingListItem
+                  key={post.blendingUuid}
+                  title={post.title}
+                  status={blendingStatusLabels[post.blendingStatus]}
+                  statusColor={getCreatedStatusColor(post.blendingStatus)}
+                  job={positionLabels[post.position] || post.position}
+                  keywords={post.keywords}
+                  location={post.region}
+                  memberCount={post.currentUserCount}
+                  date={formatSchedule(post.schedule)}
+                  chatLink={post.openChattingUrl || ''}
+                  buttonText="삭제하기"
+                  onMoreClick={() => handleDetailView(post.blendingUuid)}
+                  onButtonClick={() => handleDeletePost(post.blendingUuid)}
+                />
+              ))
+            ) : (
+              <div className="flex justify-center items-center py-[60px]">
+                <p className="text-[var(--text-secondary)]">생성한 블렌딩이 없습니다.</p>
+              </div>
+            )
+          )}
         </div>
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-center items-center mt-[30px]">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={3}
-          onPageChange={setCurrentPage}
-        />
-      </div>
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center mt-[30px]">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </div>
+      )}
 
       {/* Confirmation Modal */}
       <CancelConfirmModal
         isOpen={isConfirmModalOpen}
         onClose={() => setIsConfirmModalOpen(false)}
         onConfirm={handleConfirm}
-        title={modalType === 'cancel' ? '블랜딩을 취소하시겠습니까?' : '블랜딩을 삭제하시겠습니까?'}
+        title={modalType === 'cancel' ? '블렌딩을 취소하시겠습니까?' : '블렌딩을 삭제하시겠습니까?'}
       />
     </div>
   );

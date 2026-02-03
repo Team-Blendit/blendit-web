@@ -1,7 +1,7 @@
 // src/lib/api/blending.ts
 
 import { apiClient } from '@/lib/api';
-import { CreateBlendingRequest, UpdateBlendingRequest, BlendingDetail, SearchedBlending } from '@/lib/types/blending';
+import { CreateBlendingRequest, UpdateBlendingRequest, BlendingDetail, SearchedBlending, CreatedBlending, AppliedBlending } from '@/lib/types/blending';
 import { PageableResponse } from '../types/profile';
 
 interface ApiResponse<T> {
@@ -79,5 +79,31 @@ export const blendingAPI = {
       { params }
     );
     return response.data.data;
-  }
+  },
+
+  // 내가 생성한 블렌딩 목록 조회
+  getMyCreatedBlendings: async (
+    page: number = 0,
+    size: number = 5,
+    sort: string[] = ['createdDate,DESC']
+  ): Promise<PageableResponse<CreatedBlending>> => {
+    const response = await apiClient.get<ApiResponse<PageableResponse<CreatedBlending>>>(
+      '/blending/query/my/created',
+      { params: { page, size, sort } }
+    );
+    return response.data.data;
+  },
+
+  // 내가 신청한 블렌딩 목록 조회
+  getMyAppliedBlendings: async (
+    page: number = 0,
+    size: number = 5,
+    sort: string[] = ['createdDate,DESC']
+  ): Promise<PageableResponse<AppliedBlending>> => {
+    const response = await apiClient.get<ApiResponse<PageableResponse<AppliedBlending>>>(
+      '/blending/query/my/applied',
+      { params: { page, size, sort } }
+    );
+    return response.data.data;
+  },
 };
