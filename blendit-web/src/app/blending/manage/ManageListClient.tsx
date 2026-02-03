@@ -34,6 +34,7 @@ const joinStatusLabels: Record<JoinStatus, string> = {
   PENDING: '대기중',
   APPROVED: '승인',
   REJECTED: '거절',
+  CANCEL: '취소',
 };
 
 const tabLabels: Record<string, string> = {
@@ -123,14 +124,17 @@ export default function ManageListClient() {
     setIsConfirmModalOpen(true);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (selectedPostUuid) {
-      if (modalType === 'cancel') {
-        console.log('Cancel application confirmed:', selectedPostUuid);
-        // TODO: API 호출로 신청 취소
-      } else if (modalType === 'delete') {
-        console.log('Delete post confirmed:', selectedPostUuid);
-        // TODO: API 호출로 게시글 삭제
+      try {
+        if (modalType === 'cancel') {
+          await blendingAPI.cancelParticipation(selectedPostUuid);
+        } else if (modalType === 'delete') {
+          await blendingAPI.deleteBlending(selectedPostUuid);
+        }
+        await fetchData();
+      } catch (error) {
+        console.error('블렌딩 처리 실패:', error);
       }
     }
     setIsConfirmModalOpen(false);
@@ -205,8 +209,8 @@ export default function ManageListClient() {
                   memberCount={post.currentUserCount}
                   date={formatSchedule(post.schedule)}
                   chatLink={post.openChattingUrl || ''}
-                  buttonText={post.joinStatus === 'REJECTED' ? '거절됨' : '신청 취소'}
-                  buttonDisabled={post.joinStatus === 'REJECTED'}
+                  buttonText={post.joinStatus === 'REJECTED' ? '거절됨' : post.joinStatus === 'CANCEL' ? '취소 완료' : '신청 취소'}
+                  buttonDisabled={post.joinStatus === 'REJECTED' || post.joinStatus === 'CANCEL'}
                   onMoreClick={() => handleDetailView(post.blendingUuid)}
                   onButtonClick={() => handleCancelApplication(post.blendingUuid)}
                 />

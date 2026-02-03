@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -11,12 +11,29 @@ import { useAuthStore } from '@/stores/authStore';
 export function useRequireAuth() {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
+  const [hasHydrated, setHasHydrated] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    // persist hydration이 완료된 후 상태를 확인
+    const unsubscribe = useAuthStore.persist.onFinishHydration(() => {
+      setHasHydrated(true);
+    });
+
+    // 이미 hydration이 완료된 경우
+    if (useAuthStore.persist.hasHydrated()) {
+      setHasHydrated(true);
+    }
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (hasHydrated && !isAuthenticated) {
       router.replace('/');
     }
-  }, [isAuthenticated, router]);
+  }, [hasHydrated, isAuthenticated, router]);
 
-  return { isAuthenticated };
+  return { isAuthenticated: hasHydrated && isAuthenticated };
 }

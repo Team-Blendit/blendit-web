@@ -126,4 +126,12 @@ export const blendingAPI = {
   removeBookmark: async (blendingUuid: string): Promise<void> => {
     await apiClient.delete<ApiResponse<void>>(`/blending/${blendingUuid}/bookmark`);
   },
+
+  cancelParticipation: async (blendingUuid: string): Promise<void> => {
+    await apiClient.patch<ApiResponse<void>>(`/blending/${blendingUuid}/participation`);
+  },
+
+  deleteBlending: async (blendingUuid: string): Promise<void> => {
+    await apiClient.delete<ApiResponse<void>>(`/blending/${blendingUuid}`);
+  }
 };

@@ -27,7 +27,7 @@ export interface UpdateBlendingRequest {
 }
 
 export type BlendingUserGrade = 'HOST' | 'MEMBER';
-export type JoinStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+export type JoinStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCEL';
 export type BlendingStatus = 'RECRUITING' | 'RECRUITMENT_CLOSED' | 'COMPLETED' | 'CANCELLED';
 
 export interface BlendingParticipant {
