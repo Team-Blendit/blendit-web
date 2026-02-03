@@ -9,7 +9,9 @@ import { Card } from '@/components/common/Card';
 import Pagination from '@/components/common/Pagination';
 import { NetworkingListItem } from '@/components/common/NetworkingListItem';
 import { profileAPI } from '@/lib/api/profile';
+import { blendingAPI } from '@/lib/api/blending';
 import { UserProfile, Position, Experience, BookmarkedUser } from '@/lib/types/profile';
+import { BlendingHistory, BlendingStatus } from '@/lib/types/blending';
 import { useAuthStore } from '@/stores/authStore';
 import { PostDescription } from '@/components/common/PostDescription';
 
@@ -32,16 +34,11 @@ const experienceLabels: Record<Experience, string> = {
   SENIOR: '시니어',
 };
 
-// Mock 데이터 타입
-type ActivityPost = {
-  id: number;
-  title: string;
-  job: string;
-  keywords: string[];
-  location: string;
-  memberCount: number;
-  date: string;
-  chatLink: string;
+const blendingStatusLabels: Record<BlendingStatus, string> = {
+  RECRUITING: '모집중',
+  RECRUITMENT_CLOSED: '마감',
+  COMPLETED: '완료',
+  CANCELLED: '취소',
 };
 
 type BookmarkPost = {
@@ -73,6 +70,9 @@ export default function MyPageClient() {
   const [currentPage, setCurrentPage] = useState(pageFromQuery ? parseInt(pageFromQuery) : 1);
   const [bookmarkSubTab, setBookmarkSubTab] = useState<'blending' | 'user'>(subTabFromQuery || 'blending');
   const [bookmarkedUsers, setBookmarkedUsers] = useState<BookmarkedUser[]>([]);
+  const [activityPosts, setActivityPosts] = useState<BlendingHistory[]>([]);
+  const [totalActivityPages, setTotalActivityPages] = useState(0);
+  const [isLoadingActivity, setIsLoadingActivity] = useState(false);
 
   // 탭 변경 핸들러
   const handleTabChange = (tabId: string) => {
@@ -141,6 +141,27 @@ export default function MyPageClient() {
     fetchProfile();
   }, [isHydrated, isAuthenticated, router]);
 
+  // 활동 내역 조회
+  useEffect(() => {
+    if (!isHydrated || !isAuthenticated) return;
+    if (activeTab !== 'activity') return;
+
+    const fetchActivity = async () => {
+      setIsLoadingActivity(true);
+      try {
+        const data = await blendingAPI.getMyBlendingHistory(currentPage - 1, itemsPerPage);
+        setActivityPosts(data.content);
+        setTotalActivityPages(data.totalPages);
+      } catch (error) {
+        console.error('Failed to fetch blending history:', error);
+      } finally {
+        setIsLoadingActivity(false);
+      }
+    };
+
+    fetchActivity();
+  }, [isHydrated, isAuthenticated, activeTab, currentPage, itemsPerPage]);
+
   // 북마크 유저 목록 조회
   useEffect(() => {
     if (!isHydrated || !isAuthenticated) return;
@@ -169,75 +190,6 @@ export default function MyPageClient() {
     { id: 'bookmark', label: '북마크' },
   ];
 
-  // Mock 데이터 - 완료한 블렌딩
-  const activityPosts: ActivityPost[] = [
-    {
-      id: 1,
-      title: 'Backend 3년차의 멘토링',
-      job: '백엔드',
-      keywords: ['멘토링', '취업', '커리어'],
-      location: '서울 강남구',
-      memberCount: 5,
-      date: '2024.01.15',
-      chatLink: 'https://open.kakao.com/example1',
-    },
-    {
-      id: 2,
-      title: 'Frontend 스터디 모집',
-      job: '프론트엔드',
-      keywords: ['스터디', 'React', 'TypeScript'],
-      location: '서울 서초구',
-      memberCount: 4,
-      date: '2024.01.20',
-      chatLink: 'https://open.kakao.com/example2',
-    },
-    {
-      id: 3,
-      title: 'DevOps 실무 경험 공유',
-      job: 'DevOps',
-      keywords: ['멘토링', 'AWS', 'Docker'],
-      location: '서울 강동구',
-      memberCount: 6,
-      date: '2024.02.01',
-      chatLink: 'https://open.kakao.com/example3',
-    },
-    {
-      id: 4,
-      title: 'UX/UI 디자인 스터디',
-      job: '디자인',
-      keywords: ['스터디', 'Figma', '프로토타입'],
-      location: '서울 마포구',
-      memberCount: 5,
-      date: '2024.02.10',
-      chatLink: 'https://open.kakao.com/example4',
-    },
-    {
-      id: 5,
-      title: 'PM 커리어 토크',
-      job: 'PM',
-      keywords: ['멘토링', '커리어', '이직'],
-      location: '서울 종로구',
-      memberCount: 8,
-      date: '2024.02.15',
-      chatLink: 'https://open.kakao.com/example5',
-    },
-    {
-      id: 6,
-      title: '알고리즘 코딩 테스트 대비',
-      job: '백엔드',
-      keywords: ['스터디', '알고리즘', '코딩테스트'],
-      location: '서울 송파구',
-      memberCount: 4,
-      date: '2024.02.20',
-      chatLink: 'https://open.kakao.com/example6',
-    },
-  ];
-
-  const totalPages = Math.ceil(activityPosts.length / itemsPerPage);
-  const paginatedPosts = activityPosts.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
 
   // Mock 데이터 - 북마크한 블렌딩
   const bookmarkPosts: BookmarkPost[] = [
@@ -310,6 +262,14 @@ export default function MyPageClient() {
     currentPage * itemsPerPage
   );
 
+
+  const formatSchedule = (schedule: string) => {
+    const date = new Date(schedule);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}.${m}.${d}`;
+  };
 
   const getLocation = () => {
     if (!profile?.province) return undefined;
@@ -442,32 +402,44 @@ export default function MyPageClient() {
         {/* Activity Tab */}
         {activeTab === 'activity' && (
           <div className="flex flex-col gap-[30px] w-full items-center mb-[54px]">
-            {/* Activity List */}
-            <div className="flex flex-col w-full">
-              {paginatedPosts.map((post) => (
-                <NetworkingListItem
-                  key={post.id}
-                  title={post.title}
-                  status="완료"
-                  statusColor="gray"
-                  job={post.job}
-                  keywords={post.keywords}
-                  location={post.location}
-                  memberCount={post.memberCount}
-                  date={post.date}
-                  chatLink={post.chatLink}
-                  onMoreClick={() => router.push(`/${post.id}`)}
-                />
-              ))}
-            </div>
+            {isLoadingActivity ? (
+              <div className="flex items-center justify-center py-20">
+                불러오는 중...
+              </div>
+            ) : activityPosts.length > 0 ? (
+              <>
+                {/* Activity List */}
+                <div className="flex flex-col w-full">
+                  {activityPosts.map((post) => (
+                    <NetworkingListItem
+                      key={post.blendingUuid}
+                      title={post.title}
+                      status={blendingStatusLabels[post.blendingStatus]}
+                      statusColor="gray"
+                      job={positionLabels[post.position] || post.position}
+                      keywords={post.keywords}
+                      location={post.region}
+                      memberCount={post.currentUserCount}
+                      date={formatSchedule(post.schedule)}
+                      chatLink=""
+                      onMoreClick={() => router.push(`/blending/${post.blendingUuid}`)}
+                    />
+                  ))}
+                </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
+                {/* Pagination */}
+                {totalActivityPages > 1 && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalActivityPages}
+                    onPageChange={handlePageChange}
+                  />
+                )}
+              </>
+            ) : (
+              <div className="flex justify-center items-center py-[60px]">
+                <p className="text-[var(--text-secondary)]">활동 내역이 없습니다.</p>
+              </div>
             )}
           </div>
         )}

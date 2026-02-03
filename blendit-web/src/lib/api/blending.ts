@@ -1,7 +1,7 @@
 // src/lib/api/blending.ts
 
 import { apiClient } from '@/lib/api';
-import { CreateBlendingRequest, UpdateBlendingRequest, BlendingDetail, SearchedBlending, CreatedBlending, AppliedBlending } from '@/lib/types/blending';
+import { CreateBlendingRequest, UpdateBlendingRequest, BlendingDetail, SearchedBlending, CreatedBlending, AppliedBlending, BlendingHistory } from '@/lib/types/blending';
 import { PageableResponse } from '../types/profile';
 
 interface ApiResponse<T> {
@@ -102,6 +102,18 @@ export const blendingAPI = {
   ): Promise<PageableResponse<AppliedBlending>> => {
     const response = await apiClient.get<ApiResponse<PageableResponse<AppliedBlending>>>(
       '/blending/query/my/applied',
+      { params: { page, size, sort } }
+    );
+    return response.data.data;
+  },
+
+  getMyBlendingHistory: async (
+    page: number = 0,
+    size: number = 5,
+    sort: string[] = ['createdDate,DESC']
+  ): Promise<PageableResponse<BlendingHistory>> => {
+    const response = await apiClient.get<ApiResponse<PageableResponse<BlendingHistory>>>(
+      '/blending/query/my/history',
       { params: { page, size, sort } }
     );
     return response.data.data;

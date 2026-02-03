@@ -105,3 +105,15 @@ export interface AppliedBlending {
   joinStatus: JoinStatus;
   useFlag: boolean;
 }
+
+export interface BlendingHistory {
+  blendingUuid: string;
+  title: string;
+  position: Position;
+  keywords: string[];
+  region: string;
+  currentUserCount: number;
+  schedule: string;
+  blendingStatus: BlendingStatus;
+  useFlag: boolean;
+}
