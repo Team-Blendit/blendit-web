@@ -63,6 +63,7 @@ export function NetworkingEditClient({ id }: NetworkingEditClientProps) {
   });
   const [errors, setErrors] = useState({
     keywords: '',
+    schedule: '',
     title: '',
     content: '',
     openChatLink: '',
@@ -141,6 +142,24 @@ export function NetworkingEditClient({ id }: NetworkingEditClientProps) {
     }
   }, [keywordList, formData.keywordNames, formData.keywords.length]);
 
+  const validateSchedule = (year: string, month: string, day: string) => {
+    if (!year || !month || !day) {
+      setErrors(prev => ({ ...prev, schedule: '' }));
+      return;
+    }
+    const y = parseInt(year.replace('년', ''));
+    const m = parseInt(month.replace('월', ''));
+    const d = parseInt(day.replace('일', ''));
+    const selected = new Date(y, m - 1, d);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (selected <= today) {
+      setErrors(prev => ({ ...prev, schedule: '미래의 일정만 선택 가능합니다' }));
+    } else {
+      setErrors(prev => ({ ...prev, schedule: '' }));
+    }
+  };
+
   const handleSubmit = async () => {
     if (isSubmitting) return;
 
@@ -150,7 +169,7 @@ export function NetworkingEditClient({ id }: NetworkingEditClientProps) {
       const year = parseInt(formData.year.replace('년', ''));
       const month = parseInt(formData.month.replace('월', ''));
       const day = parseInt(formData.day.replace('일', ''));
-      const schedule = new Date(year, month - 1, day).toISOString();
+      const schedule = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T00:00:00`;
 
       // 인원 파싱 (예: "5명" -> 5)
       const capacity = parseInt(formData.participants.replace('명', ''));
@@ -358,9 +377,28 @@ export function NetworkingEditClient({ id }: NetworkingEditClientProps) {
               options1={Array.from({ length: 6 }, (_, i) => `${(new Date().getFullYear() + i).toString()}년`)}
               options2={Array.from({ length: 12 }, (_, i) => `${i + 1}월`)}
               options3={Array.from({ length: 31 }, (_, i) => `${i + 1}일`)}
-              onSelect1={(value) => setFormData(prev => ({ ...prev, year: Array.isArray(value) ? value[0] : value }))}
-              onSelect2={(value) => setFormData(prev => ({ ...prev, month: Array.isArray(value) ? value[0] : value }))}
-              onSelect3={(value) => setFormData(prev => ({ ...prev, day: Array.isArray(value) ? value[0] : value }))}
+              onSelect1={(value) => {
+                const year = Array.isArray(value) ? value[0] : value;
+                setFormData(prev => {
+                  validateSchedule(year, prev.month, prev.day);
+                  return { ...prev, year };
+                });
+              }}
+              onSelect2={(value) => {
+                const month = Array.isArray(value) ? value[0] : value;
+                setFormData(prev => {
+                  validateSchedule(prev.year, month, prev.day);
+                  return { ...prev, month };
+                });
+              }}
+              onSelect3={(value) => {
+                const day = Array.isArray(value) ? value[0] : value;
+                setFormData(prev => {
+                  validateSchedule(prev.year, prev.month, day);
+                  return { ...prev, day };
+                });
+              }}
+              error={errors.schedule}
             />
 
             {/* 오픈채팅 */}

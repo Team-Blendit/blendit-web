@@ -261,7 +261,7 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
             <Card
               variant="postInfo"
               userName={host?.nickname || ''}
-              userJob={blendingData.position}
+              userJob={positionLabels[blendingData.position]}
               postDate={formatDate(blendingData.createdDate)}
               meetDate={formatDate(blendingData.schedule)}
               meetLocation={blendingData.region}
