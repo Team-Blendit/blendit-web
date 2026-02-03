@@ -462,11 +462,13 @@ export default function MyPageClient() {
             </div>
 
             {/* Pagination */}
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            )}
           </div>
         )}
 
@@ -518,11 +520,13 @@ export default function MyPageClient() {
                 </div>
 
                 {/* Pagination */}
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalBookmarkPages}
-                  onPageChange={handlePageChange}
-                />
+                {totalBookmarkPages > 1 && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalBookmarkPages}
+                    onPageChange={handlePageChange}
+                  />
+                )}
               </div>
             )}
 
@@ -564,11 +568,13 @@ export default function MyPageClient() {
                   </div>
 
                   {/* Pagination */}
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalUserPages}
-                    onPageChange={handlePageChange}
-                  />
+                  {totalUserPages > 1 && (
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalUserPages}
+                      onPageChange={handlePageChange}
+                    />
+                  )}
                   </>
                 )}
               </div>

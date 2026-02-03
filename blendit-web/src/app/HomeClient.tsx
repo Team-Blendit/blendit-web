@@ -405,13 +405,15 @@ export default function HomeClient() {
         </section>
 
         {/* Pagination */}
-        <section className="flex justify-center">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={activeTab === 'user' ? totalUserPages : totalBlendingPages}
-            onPageChange={setCurrentPage}
-          />
-        </section>
+        {(activeTab === 'user' ? totalUserPages : totalBlendingPages) > 1 && (
+          <section className="flex justify-center">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={activeTab === 'user' ? totalUserPages : totalBlendingPages}
+              onPageChange={setCurrentPage}
+            />
+          </section>
+        )}
       </main>
 
       {/* Login Modal */}
