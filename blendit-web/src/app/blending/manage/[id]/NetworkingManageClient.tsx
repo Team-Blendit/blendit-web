@@ -237,7 +237,18 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
           </div>
           <button
             className="p-[8px]"
-            onClick={() => setIsBookmarked(!isBookmarked)}
+            onClick={async () => {
+              try {
+                if (isBookmarked) {
+                  await blendingAPI.removeBookmark(id);
+                } else {
+                  await blendingAPI.addBookmark(id);
+                }
+                setIsBookmarked(!isBookmarked);
+              } catch (error) {
+                console.error('북마크 변경 실패:', error);
+              }
+            }}
           >
             <BookmarkIcon filled={isBookmarked} />
           </button>

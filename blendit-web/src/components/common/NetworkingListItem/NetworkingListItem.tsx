@@ -13,14 +13,15 @@ interface NetworkingListItemProps {
   keywords: string[];
   location: string;
   memberCount: number;
-  date: string;
-  chatLink: string;
+  date?: string;
+  chatLink?: string;
   hasNewNotification?: boolean;
   isBookmarked?: boolean;
   buttonText?: string;
   buttonDisabled?: boolean;
   onMoreClick?: () => void;
   onButtonClick?: () => void;
+  onBookmarkClick?: () => void;
 }
 
 export const NetworkingListItem: React.FC<NetworkingListItemProps> = ({
@@ -39,6 +40,7 @@ export const NetworkingListItem: React.FC<NetworkingListItemProps> = ({
   buttonDisabled = false,
   onMoreClick,
   onButtonClick,
+  onBookmarkClick,
 }) => {
   return (
     <div className="bg-white border-b border-[var(--border-default)] p-[30px] relative">
@@ -58,11 +60,11 @@ export const NetworkingListItem: React.FC<NetworkingListItemProps> = ({
             
             {/* Status Badge or Bookmark Icon */}
             {isBookmarked ? (
-              <div className="w-[32px] h-[32px] relative">
+              <button onClick={onBookmarkClick} className="w-[32px] h-[32px] relative">
                 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M7.99996 4.67749C7.99996 4.30257 8.30257 3.99996 8.67749 3.99996H23.3225C23.6974 3.99996 24 4.30257 24 4.67749V26.6668C24 27.2087 23.3893 27.5075 22.9752 27.1603L15.5809 21.1155C15.5599 21.0984 15.5335 21.089 15.5063 21.089C15.4791 21.089 15.4527 21.0984 15.4317 21.1155L8.02479 27.1707C7.61069 27.5179 7 27.2191 7 26.6772V4.67749C7 4.30257 7.30261 3.99996 7.67753 3.99996H7.99996Z" fill="#999999" stroke="#999999" strokeWidth="1.5"/>
                 </svg>
-              </div>
+              </button>
             ) : status ? (
               <Badge color={statusColor} style='solid' text={status} className='min-w-[66px]'/>
             ) : null}

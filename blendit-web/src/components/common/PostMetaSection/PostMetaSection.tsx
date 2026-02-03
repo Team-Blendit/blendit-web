@@ -8,8 +8,8 @@ interface PostMetaSectionProps {
   keywords: string[];
   location: string;
   memberCount: number;
-  date: string;
-  chatLink: string;
+  date?: string;
+  chatLink?: string;
 }
 
 export const PostMetaSection: React.FC<PostMetaSectionProps> = ({
@@ -41,7 +41,7 @@ export const PostMetaSection: React.FC<PostMetaSectionProps> = ({
         {/* Date */}
         <div className="flex gap-[20px] items-center text-[18px] leading-[24px]">
           <span className="text-[var(--text-secondary)]">일정</span>
-          <span className="text-[var(--text-primary)]">{date}</span>
+          <span className="text-[var(--text-primary)]">{date || '-'}</span>
         </div>
       </div>
 
@@ -69,9 +69,13 @@ export const PostMetaSection: React.FC<PostMetaSectionProps> = ({
         {/* Link */}
         <div className="flex gap-[20px] items-center self-stretch text-[18px] leading-[24px]">
           <span className="text-[var(--text-secondary)] whitespace-nowrap">오픈채팅</span>
-          <a href={chatLink} className="text-(--color-blue-500)">
-            {chatLink}
-          </a>
+          {chatLink ? (
+            <a href={chatLink} className="text-(--color-blue-500)">
+              {chatLink}
+            </a>
+          ) : (
+            <span className="text-[var(--text-primary)]">-</span>
+          )}
         </div>
       </div>
     </div>

@@ -118,4 +118,12 @@ export const blendingAPI = {
     );
     return response.data.data;
   },
+
+  addBookmark: async (blendingUuid: string): Promise<void> => {
+    await apiClient.post<ApiResponse<void>>(`/blending/${blendingUuid}/bookmark`);
+  },
+  
+  removeBookmark: async (blendingUuid: string): Promise<void> => {
+    await apiClient.delete<ApiResponse<void>>(`/blending/${blendingUuid}/bookmark`);
+  },
 };

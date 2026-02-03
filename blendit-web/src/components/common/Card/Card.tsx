@@ -362,8 +362,8 @@ export const Card: React.FC<CardProps> = ({
                 currentNum={currentNum}
                 totalNum={totalNum}
               />
-              <button onClick={onBookmarkClick} className="shrink-0">
-                <BookmarkIcon />
+              <button onClick={(e) => { e.stopPropagation(); onBookmarkClick?.(e); }} className="shrink-0">
+                {isBookmarked ? <BookmarkFilledIcon /> : <BookmarkIcon />}
               </button>
             </div>
           </div>

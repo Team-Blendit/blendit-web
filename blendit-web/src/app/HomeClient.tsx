@@ -350,6 +350,23 @@ export default function HomeClient() {
                     isRecruiting={blending.blendingStatus === 'RECRUITING'}
                     isBookmarked={blending.isBookmark}
                     onClick={() => router.push(`/blending/${blending.blendingUuid}`)}
+                    onBookmarkClick={async (e) => {
+                      e?.stopPropagation();
+                      try {
+                        if (blending.isBookmark) {
+                          await blendingAPI.removeBookmark(blending.blendingUuid);
+                        } else {
+                          await blendingAPI.addBookmark(blending.blendingUuid);
+                        }
+                        setBlendings(prev => prev.map(b =>
+                          b.blendingUuid === blending.blendingUuid
+                            ? { ...b, isBookmark: !b.isBookmark }
+                            : b
+                        ));
+                      } catch (error) {
+                        console.error('북마크 변경 실패:', error);
+                      }
+                    }}
                     onButtonClick={() => console.log('Detail:', blending.blendingUuid)}
                     className='hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)] hover:-translate-y-0.3'
                   />

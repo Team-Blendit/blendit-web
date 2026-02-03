@@ -172,9 +172,17 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
 
   // 북마크 토글 핸들러
   const handleBookmarkClick = () => {
-    requireAuth(() => {
-      setIsBookmarked(!isBookmarked);
-      // TODO: API 호출로 북마크 상태 저장
+    requireAuth(async () => {
+      try {
+        if (isBookmarked) {
+          await blendingAPI.removeBookmark(id);
+        } else {
+          await blendingAPI.addBookmark(id);
+        }
+        setIsBookmarked(!isBookmarked);
+      } catch (error) {
+        console.error('북마크 변경 실패:', error);
+      }
     });
   };
 
