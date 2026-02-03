@@ -50,7 +50,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
       {/* Modal */}
       <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
-        <div className="bg-(--bg-canvas) rounded-[20px] pt-[28px] pb-[36px] px-[36px] w-[640px] flex flex-col gap-[30px] justify-between items-center">
+        <div className="bg-(--bg-canvas) rounded-[20px] pt-[28px] pb-[36px] px-[36px] w-[640px] flex flex-col justify-between items-center">
           {/* Close Button */}
           <div className="flex justify-between items-center w-full">
             <div className ="w-[24px] h-[24px]" /> {/* Placeholder for centering */}
@@ -63,8 +63,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           </div>
 
           {/* Logo Area */}
-          <div className="flex justify-center">
-            <div className="w-[220px] h-[176px] bg-[#DBDBDB] rounded-lg" />
+          <div className="flex justify-center mt-[16px] mb-[46px]">
+            <img src="/logo-vertical.svg" />
           </div>
 
           <div className="flex flex-col gap-[16px] items-start self-stretch">
