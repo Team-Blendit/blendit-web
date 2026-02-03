@@ -13,6 +13,7 @@ import { SearchedUser, Position, Experience } from '@/lib/types/profile';
 import { apiClient } from '@/lib/api';
 import { useAuthStore } from '@/stores/authStore';
 import { blendingAPI } from '@/lib/api/blending';
+import { HomeBanner } from '@/components/home/HomeBanner';
 import { SearchedBlending } from '@/lib/types/blending';
 import { useAuthGuard } from '@/hooks/useAuthGuard';
 import { LoginModal } from '@/components/common/LoginModal/LoginModal';
@@ -211,16 +212,15 @@ export default function HomeClient() {
   }, [activeTab, currentPage, filterValues.job, filterValues.keyword, filterValues.region, filterValues.recruiting, filterValues.bookmarked, blendingsPerPage]);
 
   return (
-    <div className="min-h-screen flex flex-col gap-[30px] pb-[309.06px] px-auto">
+    <div className="min-h-screen flex flex-col gap-[52px] pb-[309.06px] px-auto">
       {/* Header */}
       <Header />
 
+      {/* Banner */}
+      <HomeBanner />
+
       {/* Main Content */}
       <main className="max-w-[1440px] mx-auto flex flex-col gap-[30px]">
-        {/* Banner */}
-        <section className="w-full h-[400px] bg-[#EEEEEE] rounded-[20px] flex items-center justify-center">
-          <p className="text-2xl font-medium text-[#999999]">배너 영역 (디자인 확정 대기)</p>
-        </section>
 
         {/* Top */}
         <div className="flex flex-col gap-[24px]">
