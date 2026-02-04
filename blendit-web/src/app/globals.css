@@ -163,6 +163,19 @@ body {
   background-color: --var(--bg-canvas);
 }
 
+/* 뷰포트 너비에 따른 전체 배율 조정 (1920px 디자인 기준) */
+@layer base {
+  @media (min-width: 1920px) {
+    html { zoom: 1; }
+  }
+  @media (min-width: 1440px) and (max-width: 1919px) {
+    html { zoom: 0.8; }
+  }
+  @media (max-width: 1439px) {
+    html { zoom: 0.75; }
+  }
+}
+
 /* Hide scrollbar for drag scroll */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
