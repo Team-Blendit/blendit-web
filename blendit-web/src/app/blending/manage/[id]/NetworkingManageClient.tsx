@@ -271,6 +271,16 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
               openChatLink={blendingData.openChattingUrl}
               buttonIcon={<GearIcon/>}
               buttonText='블렌딩 수정하기'
+              isManagement
+              blendingStatus={blendingData.status}
+              onStatusChange={async (status) => {
+                try {
+                  await blendingAPI.updateBlendingStatus(id, status);
+                  setBlendingData(prev => prev ? { ...prev, status } : prev);
+                } catch (err) {
+                  console.error('블렌딩 상태 변경 실패:', err);
+                }
+              }}
               onButtonClick={() => router.push(`/blending/manage/${id}/edit`)}
               profileImage={host?.profileImageUrl}
             />

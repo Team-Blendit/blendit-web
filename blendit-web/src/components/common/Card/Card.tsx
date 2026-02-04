@@ -1,9 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Badge } from '@/components/common/Badge';
 import { Button } from '@/components/common/Button';
 import { UserProfile } from '@/components/layout/UserProfile';
+import { BlendingStatusModal } from '@/components/common/BlendingStatusModal';
+import { BlendingStatus } from '@/lib/types/blending';
 import { cn } from '@/lib/utils';
 
 // Bookmark Icon (unfilled)
@@ -68,6 +70,7 @@ export interface CardProps {
   currentNum?: number;
   totalNum?: number;
   openChatLink?: string;
+  isManagement?: boolean;
   
   // MainCard & UserCard specific
   title?: string;
@@ -82,6 +85,10 @@ export interface CardProps {
   buttonText?: string;
   buttonIcon?: React.ReactNode;
   buttonDisabled?: boolean;
+
+  // Status props
+  blendingStatus?: BlendingStatus;
+  onStatusChange?: (status: BlendingStatus) => void;
 
   className?: string;
   onClick?: () => void;
@@ -109,12 +116,15 @@ export const Card: React.FC<CardProps> = ({
   openChatLink,
   title,
   isRecruiting,
+  isManagement = false,
   showButton = true,
   isBookmarked = false,
   hideBookmark = false,
   buttonText,
   buttonIcon,
   buttonDisabled,
+  blendingStatus = 'RECRUITING',
+  onStatusChange,
   className,
   onClick,
   onButtonClick,
@@ -122,6 +132,8 @@ export const Card: React.FC<CardProps> = ({
   onApproveClick,
   onRejectClick,
 }) => {
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  
   const isMainCard = variant === 'main';
   const isMyProfileCard = variant === 'myProfile';
   const isPostInfoCard = variant === 'postInfo';
@@ -329,16 +341,43 @@ export const Card: React.FC<CardProps> = ({
           </div>
 
           {/* Button */}
-          <Button
-            variant="primary"
-            size="md"
-            className="w-full"
-            onClick={onButtonClick}
-            disabled={buttonDisabled}
-          >
-            {buttonIcon && <span className="flex items-center">{buttonIcon}</span>}
-            {buttonText || '블렌딩 신청하기'}
-          </Button>
+          { isManagement ? (
+            <div className='flex items-start gap-[10px] w-full'>
+              <Button
+                variant="secondary"
+                size="sm"
+                className='w-[127px] whitespace-nowrap'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsStatusModalOpen(true);
+                }}
+              >
+                상태 변경
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                className="flex-1"
+                onClick={onButtonClick}
+                disabled={buttonDisabled}
+              >
+                {buttonIcon && <span className="flex items-center">{buttonIcon}</span>}
+                {buttonText || '블렌딩 신청하기'}
+              </Button>
+            </div>
+          ) : (
+            <Button
+              variant="primary"
+              size="sm"
+              className="w-full"
+              onClick={onButtonClick}
+              disabled={buttonDisabled}
+            >
+              {buttonIcon && <span className="flex items-center">{buttonIcon}</span>}
+              {buttonText || '블렌딩 신청하기'}
+            </Button>
+          )}
+          
         </>
       )}
 
@@ -491,6 +530,16 @@ export const Card: React.FC<CardProps> = ({
           )}
         </>
       )}
+
+      {/* Blending Status Modal */}
+      <BlendingStatusModal
+        isOpen={isStatusModalOpen}
+        onClose={() => setIsStatusModalOpen(false)}
+        currentStatus={blendingStatus}
+        onStatusChange={(status) => {
+          onStatusChange?.(status);
+        }}
+      />
     </div>
   );
 };

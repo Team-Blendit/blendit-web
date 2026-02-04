@@ -1,7 +1,7 @@
 // src/lib/api/blending.ts
 
 import { apiClient } from '@/lib/api';
-import { CreateBlendingRequest, UpdateBlendingRequest, BlendingDetail, SearchedBlending, CreatedBlending, AppliedBlending, BlendingHistory } from '@/lib/types/blending';
+import { CreateBlendingRequest, UpdateBlendingRequest, BlendingDetail, SearchedBlending, CreatedBlending, AppliedBlending, BlendingHistory, BlendingStatus } from '@/lib/types/blending';
 import { PageableResponse } from '../types/profile';
 
 interface ApiResponse<T> {
@@ -133,5 +133,11 @@ export const blendingAPI = {
 
   deleteBlending: async (blendingUuid: string): Promise<void> => {
     await apiClient.delete<ApiResponse<void>>(`/blending/${blendingUuid}`);
+  },
+
+  updateBlendingStatus: async (blendingUuid: string, blendingStatus: BlendingStatus): Promise<void> => {
+    await apiClient.patch<ApiResponse<void>>(`/blending/${blendingUuid}/status`, null, {
+      params: { blendingStatus },
+    });
   }
 };
