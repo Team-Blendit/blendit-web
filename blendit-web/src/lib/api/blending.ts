@@ -52,8 +52,9 @@ export const blendingAPI = {
   // 블렌딩 검색
   searchBlendings: async (
     position: string | undefined,
-    keywords: string[],
+    keywordUuidList: string[],
     region: string[],
+    capacity: number | undefined,
     isRecruiting: boolean,
     isBookmark: boolean,
     query: string,
@@ -67,8 +68,9 @@ export const blendingAPI = {
     };
 
     if (position) params.position = position;
-    if (keywords.length > 0) params.keywords = keywords;
+    if (keywordUuidList.length > 0) params.keywordUuidList = keywordUuidList;
     if (region.length > 0) params.region = region;
+    if (capacity !== undefined) params.capacity = capacity;
     if (isRecruiting) params.isRecruiting = isRecruiting;
     if (isBookmark) params.isBookmark = isBookmark;
     if (query) params.query = query;

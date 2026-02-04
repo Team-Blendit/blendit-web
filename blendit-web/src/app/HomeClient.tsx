@@ -179,13 +179,15 @@ export default function HomeClient() {
       setIsLoadingBlendings(true);
       try {
         const position = filterValues.job ? (filterValues.job as Position) : undefined;
-        const keywords = filterValues.keyword ? [filterValues.keyword] : [];
+        const keywordUuidList = filterValues.keyword ? [filterValues.keyword] : [];
         const region = filterValues.region ? [`서울특별시 ${filterValues.region}`] : [];
+        const capacity = filterValues.people ? Number(filterValues.people) : undefined;
 
         const data = await blendingAPI.searchBlendings(
           position,
-          keywords,
+          keywordUuidList,
           region,
+          capacity,
           filterValues.recruiting,
           filterValues.bookmarked,
           '',
@@ -209,7 +211,7 @@ export default function HomeClient() {
     };
 
     fetchBlendings();
-  }, [activeTab, currentPage, filterValues.job, filterValues.keyword, filterValues.region, filterValues.recruiting, filterValues.bookmarked, blendingsPerPage]);
+  }, [activeTab, currentPage, filterValues.job, filterValues.keyword, filterValues.region, filterValues.people, filterValues.recruiting, filterValues.bookmarked, blendingsPerPage]);
 
   return (
     <div className="min-h-screen flex flex-col gap-[52px] pb-[309.06px] px-auto">
@@ -282,9 +284,12 @@ export default function HomeClient() {
                   {
                     type: 'dropdown' as const,
                     label: '인원수',
-                    options: ['1-2명', '3-5명', '6-10명', '10명 이상'],
-                    value: filterValues.people,
-                    onChange: (value: string | boolean) => setFilterValues(prev => ({ ...prev, people: value as string })),
+                    options: ['2명', '3명', '4명', '5명', '6명', '7명', '8명', '9명', '10명'],
+                    value: filterValues.people ? `${filterValues.people}명` : '',
+                    onChange: (value: string | boolean) => {
+                      const str = value as string;
+                      setFilterValues(prev => ({ ...prev, people: str.replace('명', '') }));
+                    },
                   },
                   {
                     type: 'select' as const,
@@ -339,6 +344,7 @@ export default function HomeClient() {
                   <Card
                     key={blending.blendingUuid}
                     variant="main"
+                    profileImage={blending.userProfileImage}
                     title={blending.title}
                     userName={blending.hostNickname}
                     userJob={positionLabels[blending.position]}

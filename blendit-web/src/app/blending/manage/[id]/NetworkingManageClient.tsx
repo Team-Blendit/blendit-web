@@ -8,8 +8,10 @@ import { Card } from '@/components/common/Card';
 import { Header } from '@/components/layout/Header';
 import { useRouter } from 'next/navigation';
 import { blendingAPI } from '@/lib/api/blending';
-import { BlendingDetail, BlendingStatus } from '@/lib/types/blending';
+import { profileAPI } from '@/lib/api/profile';
+import { BlendingDetail, BlendingParticipant, BlendingStatus } from '@/lib/types/blending';
 import { Position, Experience } from '@/lib/types/profile';
+import { useAuthStore } from '@/stores/authStore';
 
 // Back Arrow Icon
 const CaretLeftIcon = () => (
@@ -71,6 +73,8 @@ const statusLabels: Record<BlendingStatus, string> = {
 
 export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
   const router = useRouter();
+  const { user } = useAuthStore();
+  const loggedInUserId = user?.id;
   const [isBookmarked, setIsBookmarked] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const applicantsScrollRef = useRef<HTMLDivElement>(null);
@@ -81,6 +85,30 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
   const [blendingData, setBlendingData] = useState<BlendingDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [bookmarkedUsers, setBookmarkedUsers] = useState<Set<string>>(new Set());
+
+  const handleUserBookmark = async (e: React.MouseEvent | undefined, participant: BlendingParticipant) => {
+    e?.stopPropagation();
+    try {
+      const isBookmarkedUser = bookmarkedUsers.has(participant.uuid);
+      if (isBookmarkedUser) {
+        await profileAPI.removeBookmark(participant.uuid);
+      } else {
+        await profileAPI.addBookmark(participant.uuid);
+      }
+      setBookmarkedUsers(prev => {
+        const next = new Set(prev);
+        if (isBookmarkedUser) {
+          next.delete(participant.uuid);
+        } else {
+          next.add(participant.uuid);
+        }
+        return next;
+      });
+    } catch (err) {
+      console.error('유저 북마크 변경 실패:', err);
+    }
+  };
 
   // API에서 블렌딩 상세 데이터 조회
   useEffect(() => {
@@ -99,6 +127,9 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
 
         setBlendingData(data);
         setIsBookmarked(data.isBookmarked);
+        setBookmarkedUsers(new Set(
+          data.blendingParticipant.filter(p => p.isBookmarked).map(p => p.uuid)
+        ));
       } catch (err) {
         console.error('블렌딩 상세 조회 실패:', err);
         setError('블렌딩 정보를 불러오는데 실패했습니다.');
@@ -282,7 +313,7 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
                 }
               }}
               onButtonClick={() => router.push(`/blending/manage/${id}/edit`)}
-              profileImage={host?.profileImageUrl}
+              profileImage={host?.profileImage}
             />
           </div>
 
@@ -322,13 +353,17 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
                       key={idx}
                       variant="user"
                       userName={participant.nickname}
+                      profileImage={participant.profileImage}
                       userJob={positionLabels[participant.position]}
                       userCareer={experienceLabels[participant.experience]}
                       userLocation={`${participant.province} ${participant.district}`}
                       keywords={participant.keywords}
                       showButton={true}
+                      isBookmarked={bookmarkedUsers.has(participant.uuid)}
+                      hideBookmark={participant.uuid === loggedInUserId}
                       className="shrink-0"
-                      onBookmarkClick={() => console.log('Bookmark clicked:', participant.nickname)}
+                      onClick={() => router.push(`/profile/${participant.uuid}`)}
+                      onBookmarkClick={(e) => handleUserBookmark(e, participant)}
                       onApproveClick={() => handleApproveParticipant(participant.uuid)}
                       onRejectClick={() => handleRejectParticipant(participant.uuid)}
                     />
@@ -361,13 +396,17 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
                     key={idx}
                     variant="user"
                     userName={participant.nickname}
+                    profileImage={participant.profileImage}
                     userJob={positionLabels[participant.position]}
                     userCareer={experienceLabels[participant.experience]}
                     userLocation={`${participant.province} ${participant.district}`}
                     keywords={participant.keywords}
                     showButton={false}
+                    isBookmarked={bookmarkedUsers.has(participant.uuid)}
+                    hideBookmark={participant.uuid === loggedInUserId}
                     className="shrink-0"
-                    onBookmarkClick={() => console.log('Bookmark clicked:', participant.nickname)}
+                    onClick={() => router.push(`/profile/${participant.uuid}`)}
+                    onBookmarkClick={(e) => handleUserBookmark(e, participant)}
                   />
                 ))}
               </div>

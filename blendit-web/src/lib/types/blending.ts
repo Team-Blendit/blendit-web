@@ -33,6 +33,7 @@ export type BlendingStatus = 'RECRUITING' | 'RECRUITMENT_CLOSED' | 'COMPLETED' |
 export interface BlendingParticipant {
   uuid: string;
   nickname: string;
+  profileImage: string;
   position: Position;
   experience: Experience;
   province: string;
@@ -41,6 +42,7 @@ export interface BlendingParticipant {
   blendingUserGrade: BlendingUserGrade;
   joinStatus: JoinStatus;
   profileImageUrl?: string;
+  isBookmarked: boolean;
 }
 
 export interface BlendingDetail {
@@ -70,6 +72,7 @@ export interface SearchedBlending {
   title: string;
   hostNickname: string;
   hostExperience: Experience;
+  userProfileImage: string;
   region: string;
   blendingStatus: BlendingStatus;
   position: Position;

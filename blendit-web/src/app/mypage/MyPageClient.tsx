@@ -187,8 +187,9 @@ export default function MyPageClient() {
       try {
         const data = await blendingAPI.searchBlendings(
           undefined, // position
-          [],         // keywords
+          [],         // keywordUuidList
           [],         // region
+          undefined,  // capacity
           false,      // isRecruiting
           true,       // isBookmark
           '',         // query

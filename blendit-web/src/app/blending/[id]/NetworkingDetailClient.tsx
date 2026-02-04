@@ -10,7 +10,8 @@ import { Card } from '@/components/common/Card';
 import ApplyModal from '@/components/common/ApplyModal';
 import { OnboardingModal, OnboardingData } from '@/components/common/OnboardingModal';
 import { blendingAPI } from '@/lib/api/blending';
-import { BlendingDetail, BlendingStatus } from '@/lib/types/blending';
+import { profileAPI } from '@/lib/api/profile';
+import { BlendingDetail, BlendingParticipant, BlendingStatus } from '@/lib/types/blending';
 import { Position, Experience } from '@/lib/types/profile';
 import { useAuthStore } from '@/stores/authStore';
 import { useOnboardingGuard } from '@/hooks/useOnboardingGuard';
@@ -94,6 +95,30 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
   const [blendingData, setBlendingData] = useState<BlendingDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [bookmarkedUsers, setBookmarkedUsers] = useState<Set<string>>(new Set());
+
+  const handleUserBookmark = async (e: React.MouseEvent | undefined, participant: BlendingParticipant) => {
+    e?.stopPropagation();
+    try {
+      const isBookmarkedUser = bookmarkedUsers.has(participant.uuid);
+      if (isBookmarkedUser) {
+        await profileAPI.removeBookmark(participant.uuid);
+      } else {
+        await profileAPI.addBookmark(participant.uuid);
+      }
+      setBookmarkedUsers(prev => {
+        const next = new Set(prev);
+        if (isBookmarkedUser) {
+          next.delete(participant.uuid);
+        } else {
+          next.add(participant.uuid);
+        }
+        return next;
+      });
+    } catch (err) {
+      console.error('유저 북마크 변경 실패:', err);
+    }
+  };
 
   // API에서 블렌딩 상세 데이터 조회
   useEffect(() => {
@@ -109,6 +134,9 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
 
         setBlendingData(data);
         setIsBookmarked(data.isBookmarked);
+        setBookmarkedUsers(new Set(
+          data.blendingParticipant.filter(p => p.isBookmarked).map(p => p.uuid)
+        ));
       } catch (err) {
         console.error('블렌딩 상세 조회 실패:', err);
         setError('블렌딩 정보를 불러오는데 실패했습니다.');
@@ -302,7 +330,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
               totalNum={blendingData.capacity}
               openChatLink={blendingData.openChattingUrl}
               onButtonClick={handleApplyClick}
-              profileImage={host?.profileImageUrl}
+              profileImage={host?.profileImage}
               buttonText={hasApplied ? '이미 신청한 블렌딩이에요' : (isClosed ? '마감된 블렌딩이에요' : '블렌딩 신청하기')}
               buttonDisabled={hasApplied || isClosed}
             />
@@ -341,13 +369,17 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
                     key={idx}
                     variant="user"
                     userName={participant.nickname}
+                    profileImage={participant.profileImage}
                     userJob={positionLabels[participant.position]}
                     userCareer={experienceLabels[participant.experience]}
                     userLocation={`${participant.province} ${participant.district}`}
                     keywords={participant.keywords}
                     showButton={false}
+                    isBookmarked={bookmarkedUsers.has(participant.uuid)}
+                    hideBookmark={participant.uuid === user?.id}
                     className="shrink-0"
-                    onBookmarkClick={() => console.log('Bookmark clicked:', participant.nickname)}
+                    onClick={() => router.push(`/profile/${participant.uuid}`)}
+                    onBookmarkClick={(e) => handleUserBookmark(e, participant)}
                   />
                 ))}
               </div>
