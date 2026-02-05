@@ -56,7 +56,7 @@ const experienceReverseMap: Record<Experience, string> = {
 
 export default function ProfileEdit() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, updateUser } = useAuthStore();
   const [isHydrated, setIsHydrated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -444,6 +444,13 @@ export default function ProfileEdit() {
       console.log('원본 이메일:', originalEmail, '-> 새 이메일:', formData.email);
 
       await profileAPI.updateProfile(updateData);
+
+      // auth store 업데이트하여 헤더 프로필 이미지 반영
+      const updatedProfile = await profileAPI.getMyProfile();
+      updateUser({
+        nickname: updatedProfile.nickname,
+        profileImage: updatedProfile.profileImage,
+      });
 
       router.push('/mypage');
     } catch (error) {
