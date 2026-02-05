@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { Badge } from '@/components/common/Badge';
 import { PostDescription } from '@/components/common/PostDescription';
@@ -71,6 +71,8 @@ const statusLabels: Record<BlendingStatus, string> = {
 };
 
 export default function NetworkingDetailClient({ id }: NetworkingDetailClientProps) {
+  const params = useParams();
+  const blendingId = id || (Array.isArray(params.id) ? params.id[0] : params.id) || '';
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const setNewUserComplete = useAuthStore((state) => state.setNewUserComplete);
@@ -125,10 +127,10 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
     const fetchBlendingDetail = async () => {
       try {
         setIsLoading(true);
-        const data = await blendingAPI.getBlendingDetail(id);
+        const data = await blendingAPI.getBlendingDetail(blendingId);
 
         if (data.isHost) {
-          router.replace(`/blending/manage/${id}`);
+          router.replace(`/blending/manage/${blendingId}`);
           return;
         }
 
@@ -146,7 +148,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
     };
 
     fetchBlendingDetail();
-  }, [id, router, user]);
+  }, [blendingId, router, user]);
 
   // 호스트 정보 추출
   const host = blendingData?.blendingParticipant.find(p => p.blendingUserGrade === 'HOST');
@@ -182,10 +184,10 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
 
   const handleApply = async (message: string) => {
     try {
-      await blendingAPI.applyBlending(id, message);
+      await blendingAPI.applyBlending(blendingId, message);
       setIsModalOpen(false);
       // 신청 완료 후 데이터 새로고침
-      const data = await blendingAPI.getBlendingDetail(id);
+      const data = await blendingAPI.getBlendingDetail(blendingId);
       setBlendingData(data);
     } catch (err) {
       console.error('블렌딩 참여 신청 실패:', err);
@@ -203,9 +205,9 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
     requireAuth(async () => {
       try {
         if (isBookmarked) {
-          await blendingAPI.removeBookmark(id);
+          await blendingAPI.removeBookmark(blendingId);
         } else {
-          await blendingAPI.addBookmark(id);
+          await blendingAPI.addBookmark(blendingId);
         }
         setIsBookmarked(!isBookmarked);
       } catch (error) {

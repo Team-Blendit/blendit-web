@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { SelectField } from '@/components/common/SelectField';
 import { InputField } from '@/components/common/InputField';
 import { QuillEditor } from '@/components/common/QuillEditor';
@@ -41,6 +41,8 @@ const CaretLeftIcon = () => (
 );
 
 export function NetworkingEditClient({ id }: NetworkingEditClientProps) {
+  const params = useParams();
+  const editId = id || (typeof params.id === 'string' ? params.id : '');
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -90,7 +92,7 @@ export function NetworkingEditClient({ id }: NetworkingEditClientProps) {
     const fetchBlendingDetail = async () => {
       try {
         setIsLoading(true);
-        const data: BlendingDetail = await blendingAPI.getBlendingDetail(id);
+        const data: BlendingDetail = await blendingAPI.getBlendingDetail(editId);
 
         // 날짜 파싱
         const scheduleDate = new Date(data.schedule);
@@ -130,7 +132,7 @@ export function NetworkingEditClient({ id }: NetworkingEditClientProps) {
     };
 
     fetchBlendingDetail();
-  }, [id]);
+  }, [editId]);
 
   // 키워드 이름을 UUID로 매핑 (keywordList와 formData.keywordNames가 모두 로드된 후)
   useEffect(() => {
@@ -183,7 +185,7 @@ export function NetworkingEditClient({ id }: NetworkingEditClientProps) {
       );
       const position = (positionOption?.value as Position) || 'ALL';
 
-      await blendingAPI.updateBlending(id, {
+      await blendingAPI.updateBlending(editId, {
         title: formData.title,
         content: formData.content,
         position,
@@ -196,7 +198,7 @@ export function NetworkingEditClient({ id }: NetworkingEditClientProps) {
       });
 
       alert('블렌딩이 수정되었습니다.');
-      router.push(`/blending/manage/${id}`);
+      router.push(`/blending/manage/${editId}`);
     } catch (error) {
       console.error('블렌딩 수정 실패:', error);
       alert('블렌딩 수정에 실패했습니다.');

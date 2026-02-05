@@ -6,7 +6,7 @@ import { PostDescription } from '@/components/common/PostDescription';
 // import { CommentSection } from '@/components/common/CommentSection';
 import { Card } from '@/components/common/Card';
 import { Header } from '@/components/layout/Header';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { blendingAPI } from '@/lib/api/blending';
 import { profileAPI } from '@/lib/api/profile';
 import { BlendingDetail, BlendingParticipant, BlendingStatus } from '@/lib/types/blending';
@@ -72,6 +72,8 @@ const statusLabels: Record<BlendingStatus, string> = {
 };
 
 export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
+  const params = useParams();
+  const manageId = id || (typeof params.id === 'string' ? params.id : '') ;
   const router = useRouter();
   const { user } = useAuthStore();
   const loggedInUserId = user?.id;
@@ -115,11 +117,11 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
     const fetchBlendingDetail = async () => {
       try {
         setIsLoading(true);
-        const data = await blendingAPI.getBlendingDetail(id);
+        const data = await blendingAPI.getBlendingDetail(manageId);
 
         // 호스트가 아닌 경우 일반 상세 페이지로 리다이렉트
         if (!data.isHost) {
-          router.replace(`/blending/${id}`);
+          router.replace(`/blending/${manageId}`);
           return;
         }
 
@@ -139,7 +141,7 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
     };
 
     fetchBlendingDetail();
-  }, [id, router]);
+  }, [manageId, router]);
 
   // 호스트 정보 추출
   const host = blendingData?.blendingParticipant.find(p => p.blendingUserGrade === 'HOST');
@@ -174,9 +176,9 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
   // 참여 승인 핸들러
   const handleApproveParticipant = async (participantUuid: string) => {
     try {
-      await blendingAPI.approveParticipation(id, participantUuid);
+      await blendingAPI.approveParticipation(manageId, participantUuid);
       // 승인 후 데이터 새로고침
-      const data = await blendingAPI.getBlendingDetail(id);
+      const data = await blendingAPI.getBlendingDetail(manageId);
       setBlendingData(data);
     } catch (err) {
       console.error('참여 승인 실패:', err);
@@ -187,9 +189,9 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
   // 참여 거부 핸들러
   const handleRejectParticipant = async (participantUuid: string) => {
     try {
-      await blendingAPI.rejectParticipation(id, participantUuid);
+      await blendingAPI.rejectParticipation(manageId, participantUuid);
       // 거부 후 데이터 새로고침
-      const data = await blendingAPI.getBlendingDetail(id);
+      const data = await blendingAPI.getBlendingDetail(manageId);
       setBlendingData(data);
     } catch (err) {
       console.error('참여 거부 실패:', err);
@@ -271,9 +273,9 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
             onClick={async () => {
               try {
                 if (isBookmarked) {
-                  await blendingAPI.removeBookmark(id);
+                  await blendingAPI.removeBookmark(manageId);
                 } else {
-                  await blendingAPI.addBookmark(id);
+                  await blendingAPI.addBookmark(manageId);
                 }
                 setIsBookmarked(!isBookmarked);
               } catch (error) {
@@ -306,13 +308,13 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
               blendingStatus={blendingData.status}
               onStatusChange={async (status) => {
                 try {
-                  await blendingAPI.updateBlendingStatus(id, status);
+                  await blendingAPI.updateBlendingStatus(manageId, status);
                   setBlendingData(prev => prev ? { ...prev, status } : prev);
                 } catch (err) {
                   console.error('블렌딩 상태 변경 실패:', err);
                 }
               }}
-              onButtonClick={() => router.push(`/blending/manage/${id}/edit`)}
+              onButtonClick={() => router.push(`/blending/manage/${manageId}/edit`)}
               profileImage={host?.profileImage}
             />
           </div>
