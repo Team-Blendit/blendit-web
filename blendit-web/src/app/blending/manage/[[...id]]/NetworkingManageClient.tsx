@@ -74,9 +74,15 @@ const statusLabels: Record<BlendingStatus, string> = {
 export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
   const params = useParams();
   const pathname = usePathname();
-  const paramId = typeof params.id === 'string' ? params.id : '';
-  const pathId = pathname.split('/')[3] || '';
-  const manageId = pathId || paramId || id;
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const paramId = Array.isArray(params.id) ? params.id[0] : (typeof params.id === 'string' ? params.id : '');
+  const pathSegments = pathname.split('/').filter(Boolean);
+  const pathCandidate = pathSegments[0] === 'blending' && pathSegments[1] === 'manage'
+    ? pathSegments[2] || ''
+    : '';
+  const pathId = uuidRegex.test(pathCandidate) ? pathCandidate : '';
+  const propId = uuidRegex.test(id) ? id : '';
+  const manageId = pathId || paramId || propId;
   const router = useRouter();
   const { user } = useAuthStore();
   const loggedInUserId = user?.id;

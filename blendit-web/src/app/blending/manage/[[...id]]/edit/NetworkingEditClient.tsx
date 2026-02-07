@@ -43,9 +43,15 @@ const CaretLeftIcon = () => (
 export function NetworkingEditClient({ id }: NetworkingEditClientProps) {
   const params = useParams();
   const pathname = usePathname();
-  const paramId = typeof params.id === 'string' ? params.id : '';
-  const pathId = pathname.split('/')[3] || '';
-  const editId = pathId || paramId || id;
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const paramId = Array.isArray(params.id) ? params.id[0] : (typeof params.id === 'string' ? params.id : '');
+  const pathSegments = pathname.split('/').filter(Boolean);
+  const pathCandidate = pathSegments[0] === 'blending' && pathSegments[1] === 'manage'
+    ? pathSegments[2] || ''
+    : '';
+  const pathId = uuidRegex.test(pathCandidate) ? pathCandidate : '';
+  const propId = uuidRegex.test(id) ? id : '';
+  const editId = pathId || paramId || propId;
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
