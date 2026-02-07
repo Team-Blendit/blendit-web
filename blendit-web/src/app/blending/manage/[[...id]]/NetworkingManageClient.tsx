@@ -97,6 +97,17 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [bookmarkedUsers, setBookmarkedUsers] = useState<Set<string>>(new Set());
+  const getStoredUserId = () => {
+    if (typeof window === 'undefined') return '';
+    try {
+      const authStorage = localStorage.getItem('auth-storage');
+      if (!authStorage) return '';
+      const parsed = JSON.parse(authStorage);
+      return parsed?.state?.user?.id || '';
+    } catch {
+      return '';
+    }
+  };
 
   const handleUserBookmark = async (e: React.MouseEvent | undefined, participant: BlendingParticipant) => {
     e?.stopPropagation();
@@ -129,9 +140,14 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
       try {
         setIsLoading(true);
         const data = await blendingAPI.getBlendingDetail(manageId);
+        const hostUuid = data.blendingParticipant.find(
+          (participant) => participant.blendingUserGrade === 'HOST'
+        )?.uuid;
+        const currentUserId = loggedInUserId || getStoredUserId();
+        const isHostUser = Boolean(hostUuid && currentUserId && hostUuid === currentUserId);
 
         // 호스트가 아닌 경우 일반 상세 페이지로 리다이렉트
-        if (!data.isHost) {
+        if (!isHostUser) {
           router.replace(`/blending/${manageId}`);
           return;
         }
@@ -149,7 +165,7 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
     };
 
     fetchBlendingDetail();
-  }, [manageId, router]);
+  }, [loggedInUserId, manageId, router]);
 
   // 호스트 정보 추출
   const host = blendingData?.blendingParticipant.find(p => p.blendingUserGrade === 'HOST');

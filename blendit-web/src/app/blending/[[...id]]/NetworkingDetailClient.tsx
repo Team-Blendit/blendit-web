@@ -153,7 +153,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
           hostUuid && currentUserId && hostUuid === currentUserId
         );
 
-        if (data.isHost || shouldRedirectToManage) {
+        if (shouldRedirectToManage) {
           // Static export 환경에서 dynamic route client transition이 간헐적으로 실패할 수 있어 hard navigation 사용
           window.location.replace(`/blending/manage/${blendingId}`);
           return;
