@@ -124,6 +124,8 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
 
   // API에서 블렌딩 상세 데이터 조회
   useEffect(() => {
+    if (!blendingId) return;
+
     const fetchBlendingDetail = async () => {
       try {
         setIsLoading(true);

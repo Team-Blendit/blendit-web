@@ -89,6 +89,8 @@ export function NetworkingEditClient({ id }: NetworkingEditClientProps) {
 
   // 블렌딩 상세 데이터 불러오기
   useEffect(() => {
+    if (!editId) return;
+
     const fetchBlendingDetail = async () => {
       try {
         setIsLoading(true);

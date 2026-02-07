@@ -114,6 +114,8 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
 
   // API에서 블렌딩 상세 데이터 조회
   useEffect(() => {
+    if (!manageId) return;
+
     const fetchBlendingDetail = async () => {
       try {
         setIsLoading(true);
