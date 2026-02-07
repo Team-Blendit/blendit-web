@@ -167,15 +167,18 @@ export default function ProfileEdit() {
     if (trimmed.length > 10) {
       return { isValid: false, error: '닉네임은 최대 10자까지 입력할 수 있어요.' };
     }
-    
-    const onlyConsonantOrVowel = /^[ㄱ-ㅎㅏ-ㅣ\s]+$/.test(trimmed);
-    if (onlyConsonantOrVowel) {
-      return { isValid: false, error: '자음이나 모음만으로는 닉네임을 만들 수 없어요.' };
+
+    if (/\s/.test(nickname)) {
+      return { isValid: false, error: '닉네임에는 공백이나 특수문자를 사용할 수 없어요.' };
+    }
+
+    if (!/^[가-힣a-zA-Z0-9]+$/.test(trimmed)) {
+      return { isValid: false, error: '닉네임에는 공백이나 특수문자를 사용할 수 없어요.' };
     }
     
-    const hasValidChar = /[가-힣a-zA-Z0-9]/.test(trimmed);
-    if (!hasValidChar) {
-      return { isValid: false, error: '공백이나 특수문자만 입력된 닉네임은 사용할 수 없어요.' };
+    const onlyConsonantOrVowel = /^[ㄱ-ㅎㅏ-ㅣ]+$/.test(trimmed);
+    if (onlyConsonantOrVowel) {
+      return { isValid: false, error: '자음이나 모음만으로는 닉네임을 만들 수 없어요.' };
     }
     
     return { isValid: true, error: '' };

@@ -124,17 +124,21 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     if (trimmed.length > 10) {
       return { isValid: false, error: '닉네임은 최대 10자까지 입력할 수 있어요.' };
     }
-    
-    // 3. 자음이나 모음만 있는지 체크 (한글 자음: ㄱ-ㅎ, 모음: ㅏ-ㅣ)
-    const onlyConsonantOrVowel = /^[ㄱ-ㅎㅏ-ㅣ\s]+$/.test(trimmed);
-    if (onlyConsonantOrVowel) {
-      return { isValid: false, error: '자음이나 모음만으로는 닉네임을 만들 수 없어요.' };
+
+    // 3. 공백 포함 여부 체크
+    if (/\s/.test(nickname)) {
+      return { isValid: false, error: '닉네임에는 공백이나 특수문자를 사용할 수 없어요.' };
+    }
+
+    // 4. 허용 문자(한글/영문/숫자)만 사용했는지 체크
+    if (!/^[가-힣a-zA-Z0-9]+$/.test(trimmed)) {
+      return { isValid: false, error: '닉네임에는 공백이나 특수문자를 사용할 수 없어요.' };
     }
     
-    // 4. 유효한 문자(한글, 영문, 숫자)가 하나라도 있는지 체크
-    const hasValidChar = /[가-힣a-zA-Z0-9]/.test(trimmed);
-    if (!hasValidChar) {
-      return { isValid: false, error: '공백이나 특수문자만 입력된 닉네임은 사용할 수 없어요.' };
+    // 5. 자음이나 모음만 있는지 체크 (한글 자음: ㄱ-ㅎ, 모음: ㅏ-ㅣ)
+    const onlyConsonantOrVowel = /^[ㄱ-ㅎㅏ-ㅣ]+$/.test(trimmed);
+    if (onlyConsonantOrVowel) {
+      return { isValid: false, error: '자음이나 모음만으로는 닉네임을 만들 수 없어요.' };
     }
     
     return { isValid: true, error: '' };
