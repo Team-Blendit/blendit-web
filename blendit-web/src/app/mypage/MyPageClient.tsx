@@ -396,7 +396,7 @@ export default function MyPageClient() {
               </>
             ) : (
               <div className="flex justify-center items-center py-[60px]">
-                <p className="text-[var(--text-secondary)]">활동 내역이 없습니다.</p>
+                <p className="text-[var(--text-secondary)]">활동 내역이 없습니다.<br />활동 내역에는 완료한 블렌딩만 표시됩니다.</p>
               </div>
             )}
           </div>
