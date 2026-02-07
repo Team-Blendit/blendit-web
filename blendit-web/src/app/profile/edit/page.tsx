@@ -146,8 +146,8 @@ export default function ProfileEdit() {
             url: link.url,
           })));
         }
-      } catch (error) {
-        console.error('데이터 불러오기 실패:', error);
+      } catch {
+        // 데이터 불러오기 실패
       } finally {
         setIsLoading(false);
       }
@@ -214,7 +214,6 @@ export default function ProfileEdit() {
 
       return false;
     } catch (error: any) {
-      console.error('닉네임 중복 검사 에러:', error);
       const errorMessage = error?.response?.data?.error?.message || '닉네임 중복 검사에 실패했습니다.';
       setErrors(prev => ({ ...prev, nickname: errorMessage }));
       return false;
@@ -243,7 +242,6 @@ export default function ProfileEdit() {
 
       return false;
     } catch (error: any) {
-      console.error('이메일 중복 검사 에러:', error);
       const errorMessage = error?.response?.data?.error?.message || '이메일 중복 검사에 실패했습니다.';
       setErrors(prev => ({ ...prev, email: errorMessage }));
       return false;
@@ -439,10 +437,6 @@ export default function ProfileEdit() {
         profileImage: profileImageFile || undefined,
       };
 
-      console.log('프로필 업데이트 요청 데이터:', updateData);
-      console.log('이메일 변경 여부:', formData.email !== originalEmail);
-      console.log('원본 이메일:', originalEmail, '-> 새 이메일:', formData.email);
-
       await profileAPI.updateProfile(updateData);
 
       // auth store 업데이트하여 헤더 프로필 이미지 반영
@@ -453,8 +447,7 @@ export default function ProfileEdit() {
       });
 
       router.push('/mypage');
-    } catch (error) {
-      console.error('프로필 저장 실패:', error);
+    } catch {
       alert('프로필 저장에 실패했습니다.');
     } finally {
       setIsSaving(false);

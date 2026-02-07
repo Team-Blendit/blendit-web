@@ -45,8 +45,7 @@ export const Header: React.FC = () => {
     guardAction(() => router.push('/blending/new'));
   };
 
-  const handleGuardOnboardingComplete = (data: OnboardingData) => {
-    console.log('온보딩 완료 (guard):', data);
+  const handleGuardOnboardingComplete = (_data: OnboardingData) => {
     setNewUserComplete();
     onGuardOnboardingComplete();
   };
@@ -76,8 +75,7 @@ export const Header: React.FC = () => {
   //   // TODO: 네이버 로그인 구현
   // };
 
-  const handleOnboardingComplete = (data: OnboardingData) => {
-    console.log('온보딩 완료:', data);
+  const handleOnboardingComplete = (_data: OnboardingData) => {
     setIsOnboardingModalOpen(false);
     setNewUserComplete();
     // TODO: 온보딩 데이터를 백엔드로 전송

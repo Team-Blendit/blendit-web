@@ -88,8 +88,8 @@ export function NetworkingEditClient({ id }: NetworkingEditClientProps) {
         if (response.data.result === 'SUCCESS' && response.data.data) {
           setKeywordList(response.data.data);
         }
-      } catch (error) {
-        console.error('키워드 목록 불러오기 실패:', error);
+      } catch {
+        // 키워드 목록 불러오기 실패
       }
     };
 
@@ -134,8 +134,7 @@ export function NetworkingEditClient({ id }: NetworkingEditClientProps) {
           content: data.content,
           autoApproval: data.autoApproval,
         });
-      } catch (err) {
-        console.error('블렌딩 상세 조회 실패:', err);
+      } catch {
         setError('블렌딩 정보를 불러오는데 실패했습니다.');
       } finally {
         setIsLoading(false);
@@ -210,8 +209,7 @@ export function NetworkingEditClient({ id }: NetworkingEditClientProps) {
 
       alert('블렌딩이 수정되었습니다.');
       router.push(`/blending/manage/${editId}`);
-    } catch (error) {
-      console.error('블렌딩 수정 실패:', error);
+    } catch {
       alert('블렌딩 수정에 실패했습니다.');
     } finally {
       setIsSubmitting(false);

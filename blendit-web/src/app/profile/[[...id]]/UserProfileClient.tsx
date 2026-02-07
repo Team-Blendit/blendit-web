@@ -55,8 +55,8 @@ export default function UserProfileClient({ id }: UserProfileClientProps) {
         const data = await profileAPI.getUserProfile(userUuid);
         setProfile(data);
         setIsBookmarked(data.isBookmarked);
-      } catch (error) {
-        console.error('Failed to fetch profile:', error);
+      } catch {
+        // Failed to fetch profile
       } finally {
         setIsLoading(false);
       }
@@ -76,8 +76,8 @@ export default function UserProfileClient({ id }: UserProfileClientProps) {
           await profileAPI.addBookmark(userUuid);
         }
         setIsBookmarked(!isBookmarked);
-      } catch (error) {
-        console.error('북마크 처리 실패:', error);
+      } catch {
+        // 북마크 처리 실패
       }
     });
   };

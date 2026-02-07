@@ -120,8 +120,8 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
         }
         return next;
       });
-    } catch (err) {
-      console.error('유저 북마크 변경 실패:', err);
+    } catch {
+      // 유저 북마크 변경 실패
     }
   };
 
@@ -144,8 +144,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
         setBookmarkedUsers(new Set(
           data.blendingParticipant.filter(p => p.isBookmarked).map(p => p.uuid)
         ));
-      } catch (err) {
-        console.error('블렌딩 상세 조회 실패:', err);
+      } catch {
         setError('블렌딩 정보를 불러오는데 실패했습니다.');
       } finally {
         setIsLoading(false);
@@ -165,10 +164,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
 
   // 현재 사용자가 이미 신청했는지 확인
   const hasApplied = blendingData?.currentUserJoinStatus === 'PENDING';
-  console.log('hasApplied:', hasApplied);
-
   const isClosed = blendingData?.status !== 'RECRUITING';
-  console.log('isClosed:', isClosed);
 
   // 날짜 포맷팅
   const formatDate = (dateString: string) => {
@@ -194,8 +190,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
       // 신청 완료 후 데이터 새로고침
       const data = await blendingAPI.getBlendingDetail(blendingId);
       setBlendingData(data);
-    } catch (err) {
-      console.error('블렌딩 참여 신청 실패:', err);
+    } catch {
       alert('참여 신청에 실패했습니다. 다시 시도해주세요.');
     }
   };
@@ -215,8 +210,8 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
           await blendingAPI.addBookmark(blendingId);
         }
         setIsBookmarked(!isBookmarked);
-      } catch (error) {
-        console.error('북마크 변경 실패:', error);
+      } catch {
+        // 북마크 변경 실패
       }
     });
   };

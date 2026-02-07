@@ -22,9 +22,8 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose }) =
       if (refreshToken) {
         await apiClient.post(`/auth/logout?refreshToken=${refreshToken}`);
       }
-      console.log('로그아웃 성공');
-    } catch (error) {
-      console.error('로그아웃 API 호출 실패:', error);
+    } catch {
+      // 로그아웃 API 호출 실패
     } finally {
       // API 호출 실패해도 로컬 상태는 초기화
       logout();

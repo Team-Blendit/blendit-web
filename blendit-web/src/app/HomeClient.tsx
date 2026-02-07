@@ -117,8 +117,8 @@ export default function HomeClient() {
         if (response.data.result === 'SUCCESS' && response.data.data) {
           setKeywordList(response.data.data);
         }
-      } catch (error) {
-        console.error('키워드 목록 불러오기 실패:', error);
+      } catch {
+        // 키워드 목록 불러오기 실패
       }
     };
 
@@ -151,19 +151,16 @@ export default function HomeClient() {
         districtList: filterValues.regions,
         isBookmarked: filterValues.bookmarked,
       };
-      console.log('🔍 User search request:', requestParams, 'page:', currentPage - 1, 'size:', usersPerPage);
-
       try {
         const data = await profileAPI.searchUsers(
           requestParams as Parameters<typeof profileAPI.searchUsers>[0],
           currentPage - 1,
           usersPerPage
         );
-        console.log('✅ User search response:', data);
         setUsers(data.content);
         setTotalUserPages(data.totalPages);
-      } catch (error) {
-        console.error('❌ Failed to fetch users:', error);
+      } catch {
+        // Failed to fetch users
       } finally {
         setIsLoadingUsers(false);
       }
@@ -196,7 +193,6 @@ export default function HomeClient() {
           blendingsPerPage,
           []
         );
-        console.log('✅ Blending search response:', data);
         // 중복 제거 (blendingUuid 기준)
         const uniqueBlendings = data.content.filter(
           (blending, index, self) =>
@@ -204,8 +200,8 @@ export default function HomeClient() {
         );
         setBlendings(uniqueBlendings);
         setTotalBlendingPages(data.totalPages);
-      } catch (error) {
-        console.error('❌ Failed to fetch blendings:', error);
+      } catch {
+        // Failed to fetch blendings
       } finally {
         setIsLoadingBlendings(false);
       }
@@ -391,11 +387,11 @@ export default function HomeClient() {
                             ? { ...b, isBookmark: !b.isBookmark }
                             : b
                         ));
-                      } catch (error) {
-                        console.error('북마크 변경 실패:', error);
+                      } catch {
+                        // 북마크 변경 실패
                       }
                     }}
-                    onButtonClick={() => console.log('Detail:', blending.blendingUuid)}
+                    onButtonClick={() => router.push(`/blending/${blending.blendingUuid}`)}
                     className='hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)] hover:-translate-y-0.3'
                   />
                 ))
@@ -437,8 +433,8 @@ export default function HomeClient() {
                             ? { ...u, isBookmarked: !u.isBookmarked }
                             : u
                         ));
-                      } catch (error) {
-                        console.error('북마크 처리 실패:', error);
+                      } catch {
+                        // 북마크 처리 실패
                       }
                     });
                   }}

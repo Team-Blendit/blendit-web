@@ -809,7 +809,6 @@ export default function TestPage() {
       setError('');
     } catch (err: any) {
       setError(err.message);
-      console.error('API Error:', err);
     }
   };
 

@@ -121,8 +121,7 @@ export default function NetworkingCreatePage() {
 
       alert('블렌딩이 생성되었습니다.');
       router.push('/');
-    } catch (error) {
-      console.error('블렌딩 생성 실패:', error);
+    } catch {
       alert('블렌딩 생성에 실패했습니다.');
     } finally {
       setIsSubmitting(false);
@@ -162,8 +161,8 @@ export default function NetworkingCreatePage() {
         if (response.data.result === 'SUCCESS' && response.data.data) {
           setKeywordList(response.data.data);
         }
-      } catch (error) {
-        console.error('키워드 목록 불러오기 실패:', error);
+      } catch {
+        // 키워드 목록 불러오기 실패
       }
     };
 

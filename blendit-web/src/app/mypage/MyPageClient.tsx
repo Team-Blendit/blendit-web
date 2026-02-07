@@ -122,10 +122,9 @@ export default function MyPageClient() {
     const fetchProfile = async () => {
       try {
         const data = await profileAPI.getMyProfile();
-        console.log('Profile API response:', data);
         setProfile(data);
-      } catch (error) {
-        console.error('Failed to fetch profile:', error);
+      } catch {
+        // Failed to fetch profile
       } finally {
         setIsLoading(false);
       }
@@ -145,8 +144,8 @@ export default function MyPageClient() {
         const data = await blendingAPI.getMyBlendingHistory(currentPage - 1, itemsPerPage);
         setActivityPosts(data.content);
         setTotalActivityPages(data.totalPages);
-      } catch (error) {
-        console.error('Failed to fetch blending history:', error);
+      } catch {
+        // Failed to fetch blending history
       } finally {
         setIsLoadingActivity(false);
       }
@@ -164,11 +163,10 @@ export default function MyPageClient() {
       setIsLoadingUsers(true);
       try {
         const data = await profileAPI.getBookmarkedUsers(currentPage - 1, usersPerPage);
-        console.log('📋 Bookmarked users response:', JSON.stringify(data, null, 2));
         setBookmarkedUsers(data.content);
         setTotalUserPages(data.totalPages);
-      } catch (error) {
-        console.error('Failed to fetch bookmarked users:', error);
+      } catch {
+        // Failed to fetch bookmarked users
       } finally {
         setIsLoadingUsers(false);
       }
@@ -197,7 +195,6 @@ export default function MyPageClient() {
           itemsPerPage,
           ['createdDate,DESC']
         );
-        console.log('📋 Bookmarked blendings response:', JSON.stringify(data, null, 2));
         // 서버 버그 방어: isBookmark 필터 누락 + 중복 항목 제거
         const filtered = data.content.filter(b => b.isBookmark);
         const unique = filtered.filter((b, i, arr) =>
@@ -205,8 +202,8 @@ export default function MyPageClient() {
         );
         setBookmarkedBlendings(unique);
         setTotalBookmarkBlendingPages(data.totalPages);
-      } catch (error) {
-        console.error('Failed to fetch bookmarked blendings:', error);
+      } catch {
+        // Failed to fetch bookmarked blendings
       } finally {
         setIsLoadingBookmarkBlendings(false);
       }
@@ -457,8 +454,8 @@ export default function MyPageClient() {
                             try {
                               await blendingAPI.removeBookmark(post.blendingUuid);
                               setBookmarkedBlendings(prev => prev.filter(b => b.blendingUuid !== post.blendingUuid));
-                            } catch (error) {
-                              console.error('북마크 삭제 실패:', error);
+                            } catch {
+                              // 북마크 삭제 실패
                             }
                           }}
                           onMoreClick={() => router.push(`/blending/${post.blendingUuid}`)}
@@ -512,8 +509,8 @@ export default function MyPageClient() {
                           try {
                             await profileAPI.removeBookmark(user.userUuid);
                             setBookmarkedUsers(prev => prev.filter(u => u.userUuid !== user.userUuid));
-                          } catch (error) {
-                            console.error('북마크 삭제 실패:', error);
+                          } catch {
+                            // 북마크 삭제 실패
                           }
                         }}
                       />

@@ -27,19 +27,15 @@ export default function AuthCallbackPage() {
     const error = urlParams.get('error');
     const state = urlParams.get('state');
 
-    console.log('[AuthCallback] Params from window.location:', { code: code?.substring(0, 20) + '...', state, error });
-
     const provider = (state || 'kakao') as Provider;
     const config = PROVIDER_CONFIG[provider] || PROVIDER_CONFIG.kakao;
 
     if (error) {
-      console.error(`${config.name} 로그인 에러:`, error);
       router.replace('/');
       return;
     }
 
     if (!code) {
-      console.error('[AuthCallback] 인가 코드가 없습니다');
       router.replace('/');
       return;
     }
@@ -48,11 +44,7 @@ export default function AuthCallbackPage() {
 
     const handleOAuthCallback = async () => {
       try {
-        console.log(`[AuthCallback] ${config.name} 로그인 요청 시작`);
-
         const response = await apiClient.post(config.endpoint, { code });
-
-        console.log('[AuthCallback] 로그인 성공:', response.data);
 
         const { data } = response.data;
 
@@ -70,8 +62,7 @@ export default function AuthCallbackPage() {
         );
 
         router.replace('/');
-      } catch (err) {
-        console.error(`[AuthCallback] ${config.name} 로그인 처리 중 에러:`, err);
+      } catch {
         router.replace('/');
       }
     };

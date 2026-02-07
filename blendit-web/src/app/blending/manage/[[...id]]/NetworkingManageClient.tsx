@@ -116,8 +116,8 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
         }
         return next;
       });
-    } catch (err) {
-      console.error('유저 북마크 변경 실패:', err);
+    } catch {
+      // 유저 북마크 변경 실패
     }
   };
 
@@ -136,15 +136,12 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
           return;
         }
 
-        console.log('블렌딩 상세 데이터:', data);
-
         setBlendingData(data);
         setIsBookmarked(data.isBookmarked);
         setBookmarkedUsers(new Set(
           data.blendingParticipant.filter(p => p.isBookmarked).map(p => p.uuid)
         ));
-      } catch (err) {
-        console.error('블렌딩 상세 조회 실패:', err);
+      } catch {
         setError('블렌딩 정보를 불러오는데 실패했습니다.');
       } finally {
         setIsLoading(false);
@@ -191,8 +188,7 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
       // 승인 후 데이터 새로고침
       const data = await blendingAPI.getBlendingDetail(manageId);
       setBlendingData(data);
-    } catch (err) {
-      console.error('참여 승인 실패:', err);
+    } catch {
       alert('참여 승인에 실패했습니다.');
     }
   };
@@ -204,8 +200,7 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
       // 거부 후 데이터 새로고침
       const data = await blendingAPI.getBlendingDetail(manageId);
       setBlendingData(data);
-    } catch (err) {
-      console.error('참여 거부 실패:', err);
+    } catch {
       alert('참여 거부에 실패했습니다.');
     }
   };
@@ -296,8 +291,8 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
                   await blendingAPI.addBookmark(manageId);
                 }
                 setIsBookmarked(!isBookmarked);
-              } catch (error) {
-                console.error('북마크 변경 실패:', error);
+              } catch {
+                // 북마크 변경 실패
               }
             }}
           >
@@ -328,8 +323,8 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
                 try {
                   await blendingAPI.updateBlendingStatus(manageId, status);
                   setBlendingData(prev => prev ? { ...prev, status } : prev);
-                } catch (err) {
-                  console.error('블렌딩 상태 변경 실패:', err);
+                } catch {
+                  // 블렌딩 상태 변경 실패
                 }
               }}
               onButtonClick={handleMoveToEditPage}

@@ -83,8 +83,8 @@ export default function ManageListClient() {
         setAppliedBlendings(res.content);
         setTotalPages(res.totalPages);
       }
-    } catch (error) {
-      console.error('블렌딩 목록 조회 실패:', error);
+    } catch {
+      // 블렌딩 목록 조회 실패
     } finally {
       setLoading(false);
     }
@@ -133,8 +133,8 @@ export default function ManageListClient() {
           await blendingAPI.deleteBlending(selectedPostUuid);
         }
         await fetchData();
-      } catch (error) {
-        console.error('블렌딩 처리 실패:', error);
+      } catch {
+        // 블렌딩 처리 실패
       }
     }
     setIsConfirmModalOpen(false);

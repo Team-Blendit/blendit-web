@@ -65,8 +65,8 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           if (response.data.result === 'SUCCESS' && response.data.data) {
             setKeywordList(response.data.data);
           }
-        } catch (error) {
-          console.error('키워드 목록 불러오기 실패:', error);
+        } catch {
+          // 키워드 목록 불러오기 실패
         }
       };
 
@@ -162,7 +162,6 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
       return false;
     } catch (error: any) {
-      console.error('이메일 중복 검사 에러:', error);
       const errorMessage = error?.response?.data?.error?.message || '이메일 중복 검사에 실패했습니다.';
       setEmailError(errorMessage);
       return false;
@@ -192,7 +191,6 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
       return false;
     } catch (error: any) {
-      console.error('닉네임 중복 검사 에러:', error);
       const errorMessage = error?.response?.data?.error?.message || '닉네임 중복 검사에 실패했습니다.';
       setNicknameError(errorMessage);
       return false;
@@ -218,8 +216,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
         onComplete(formData);
       }
       return true;
-    } catch (error) {
-      console.error('온보딩 처리 중 에러:', error);
+    } catch {
       alert('온보딩 정보 저장에 실패했습니다. 다시 시도해주세요.');
       return false;
     } finally {
