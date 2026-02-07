@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, usePathname } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { Badge } from '@/components/common/Badge';
 import { PostDescription } from '@/components/common/PostDescription';
@@ -72,7 +72,10 @@ const statusLabels: Record<BlendingStatus, string> = {
 
 export default function NetworkingDetailClient({ id }: NetworkingDetailClientProps) {
   const params = useParams();
-  const blendingId = id || (Array.isArray(params.id) ? params.id[0] : params.id) || '';
+  const pathname = usePathname();
+  const paramId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const pathId = pathname.startsWith('/blending/') ? pathname.split('/')[2] || '' : '';
+  const blendingId = id || paramId || pathId || '';
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const setNewUserComplete = useAuthStore((state) => state.setNewUserComplete);

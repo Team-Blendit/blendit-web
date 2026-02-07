@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, usePathname } from 'next/navigation';
 import { SelectField } from '@/components/common/SelectField';
 import { InputField } from '@/components/common/InputField';
 import { QuillEditor } from '@/components/common/QuillEditor';
@@ -42,7 +42,10 @@ const CaretLeftIcon = () => (
 
 export function NetworkingEditClient({ id }: NetworkingEditClientProps) {
   const params = useParams();
-  const editId = id || (typeof params.id === 'string' ? params.id : '');
+  const pathname = usePathname();
+  const paramId = typeof params.id === 'string' ? params.id : '';
+  const pathId = pathname.split('/')[3] || '';
+  const editId = id || paramId || pathId;
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);

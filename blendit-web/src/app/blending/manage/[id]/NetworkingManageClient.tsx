@@ -6,7 +6,7 @@ import { PostDescription } from '@/components/common/PostDescription';
 // import { CommentSection } from '@/components/common/CommentSection';
 import { Card } from '@/components/common/Card';
 import { Header } from '@/components/layout/Header';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, usePathname } from 'next/navigation';
 import { blendingAPI } from '@/lib/api/blending';
 import { profileAPI } from '@/lib/api/profile';
 import { BlendingDetail, BlendingParticipant, BlendingStatus } from '@/lib/types/blending';
@@ -73,7 +73,10 @@ const statusLabels: Record<BlendingStatus, string> = {
 
 export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
   const params = useParams();
-  const manageId = id || (typeof params.id === 'string' ? params.id : '') ;
+  const pathname = usePathname();
+  const paramId = typeof params.id === 'string' ? params.id : '';
+  const pathId = pathname.split('/')[3] || '';
+  const manageId = id || paramId || pathId;
   const router = useRouter();
   const { user } = useAuthStore();
   const loggedInUserId = user?.id;

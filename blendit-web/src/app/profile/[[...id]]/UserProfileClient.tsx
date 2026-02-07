@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Card } from '@/components/common/Card';
@@ -36,7 +36,10 @@ interface UserProfileClientProps {
 
 export default function UserProfileClient({ id }: UserProfileClientProps) {
   const params = useParams();
-  const userUuid = id || (Array.isArray(params.id) ? params.id[0] : params.id) || '';
+  const pathname = usePathname();
+  const paramId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const pathId = pathname.startsWith('/profile/') ? pathname.split('/')[2] || '' : '';
+  const userUuid = id || paramId || pathId || '';
   const router = useRouter();
   const { user } = useAuthStore();
   const isMyProfile = user?.id === userUuid;
