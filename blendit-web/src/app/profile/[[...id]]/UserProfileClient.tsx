@@ -39,7 +39,7 @@ export default function UserProfileClient({ id }: UserProfileClientProps) {
   const pathname = usePathname();
   const paramId = Array.isArray(params.id) ? params.id[0] : params.id;
   const pathId = pathname.startsWith('/profile/') ? pathname.split('/')[2] || '' : '';
-  const userUuid = id || paramId || pathId || '';
+  const userUuid = paramId || pathId || id || '';
   const router = useRouter();
   const { user } = useAuthStore();
   const isMyProfile = user?.id === userUuid;

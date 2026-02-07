@@ -45,7 +45,7 @@ export function NetworkingEditClient({ id }: NetworkingEditClientProps) {
   const pathname = usePathname();
   const paramId = typeof params.id === 'string' ? params.id : '';
   const pathId = pathname.split('/')[3] || '';
-  const editId = id || paramId || pathId;
+  const editId = paramId || pathId || id;
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
