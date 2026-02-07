@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "BlendIt",
     description: "IT 직군을 위한 네트워킹 플랫폼 BlendIt",
-    images: ["images/thumbnail.png"],
+    images: ["/images/thumbnail.png"],
     type: "website",
     url: "https://blendit.kr",
   },
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "BlendIt",
     description: "IT 직군을 위한 네트워킹 플랫폼 BlendIt",
-    images: ["images/thumbnail.png"],
+    images: ["/images/thumbnail.png"],
   },
 };
 
