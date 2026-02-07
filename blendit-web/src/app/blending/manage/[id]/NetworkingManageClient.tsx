@@ -227,6 +227,13 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
     setIsDragging(false);
   };
 
+  const handleMoveToEditPage = () => {
+    if (!manageId) return;
+    const targetPath = `/blending/manage/${manageId}/edit`;
+    // Static export 환경에서 동적 경로 client transition이 실패할 수 있어 hard navigation 사용
+    window.location.assign(targetPath);
+  };
+
   const handleBack = () => {
     router.back();
   };
@@ -319,7 +326,7 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
                   console.error('블렌딩 상태 변경 실패:', err);
                 }
               }}
-              onButtonClick={() => router.push(`/blending/manage/${manageId}/edit`)}
+              onButtonClick={handleMoveToEditPage}
               profileImage={host?.profileImage}
             />
           </div>
