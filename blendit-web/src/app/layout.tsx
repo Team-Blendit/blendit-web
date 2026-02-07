@@ -4,7 +4,7 @@ import { Providers } from './providers';
 
 export const metadata: Metadata = {
   title: "BlendIt",
-  description: "네트워킹 플랫폼 BlendIt",
+  description: "IT 직군을 위한 네트워킹 플랫폼 BlendIt",
 };
 
 export default function RootLayout({
