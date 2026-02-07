@@ -30,14 +30,16 @@ export default function HomeBanner() {
         <img
           src="/images/3d-paper.png"
           alt="3D Paper"
-          className="absolute right-[57px] bottom-[61px]"
+          draggable={false}
+          className="absolute right-[57px] bottom-[61px] pointer-events-none"
         />
 
         {/* 3D Pen */}
         <img
           src="/images/3d-pen.png"
           alt="3D Pen"
-          className="absolute right-0 bottom-[30px]"
+          draggable={false}
+          className="absolute right-0 bottom-[30px] pointer-events-none"
         />
       </div>
     </section>
