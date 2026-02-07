@@ -3,7 +3,10 @@ import "./globals.css";
 import { Providers } from './providers';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://blendit.kr'),
+  metadataBase: new URL("https://blendit.kr/"),
+  alternates: {
+    canonical: "/",
+  },
   title: "BlendIt",
   description: "IT 직군을 위한 네트워킹 플랫폼 BlendIt",
   openGraph: {
@@ -11,7 +14,7 @@ export const metadata: Metadata = {
     description: "IT 직군을 위한 네트워킹 플랫폼 BlendIt",
     images: ["/images/thumbnail.png"],
     type: "website",
-    url: "https://blendit.kr",
+    url: "https://blendit.kr/",
   },
   twitter: {
     card: "summary_large_image",
