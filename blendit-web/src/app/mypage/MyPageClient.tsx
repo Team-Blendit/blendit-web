@@ -330,7 +330,7 @@ export default function MyPageClient() {
               <div className="flex-1 min-h-[755px] bg-[var(--bg-section)] rounded-[28px] flex items-center justify-center">
                 <div className="flex flex-col gap-[36px] items-center text-center">
                   {/* Empty State Graphic */}
-                  <div className="w-[240px] h-[240px] rounded-[40px] bg-[var(--accent-secondary-default)]" />
+                  <img src="/images/empty-profile.svg" alt="empty" />
 
                   {/* Text */}
                   <div className="flex flex-col gap-[12px]">
