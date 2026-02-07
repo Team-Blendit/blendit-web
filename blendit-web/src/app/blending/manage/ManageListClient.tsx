@@ -115,7 +115,7 @@ export default function ManageListClient() {
   };
 
   const handleDetailView = (uuid: string) => {
-    window.location.href = `/blending/manage/${uuid}`;
+    router.push(`/blending/manage/${uuid}`);
   };
 
   const handleCancelApplication = (uuid: string) => {

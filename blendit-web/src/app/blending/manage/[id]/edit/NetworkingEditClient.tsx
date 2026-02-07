@@ -198,7 +198,7 @@ export function NetworkingEditClient({ id }: NetworkingEditClientProps) {
       });
 
       alert('블렌딩이 수정되었습니다.');
-      window.location.href = `/blending/manage/${editId}`;
+      router.push(`/blending/manage/${editId}`);
     } catch (error) {
       console.error('블렌딩 수정 실패:', error);
       alert('블렌딩 수정에 실패했습니다.');
