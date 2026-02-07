@@ -84,6 +84,7 @@ export default function HomeClient() {
   const tabFromUrl = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(tabFromUrl === 'user' ? 'user' : 'blending');
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
   const [filterValues, setFilterValues] = useState({
     job: '' as Position | '',
     keyword: '',
@@ -190,7 +191,7 @@ export default function HomeClient() {
           capacity,
           filterValues.recruiting,
           filterValues.bookmarked,
-          '',
+          searchQuery,
           currentPage - 1,
           blendingsPerPage,
           []
@@ -211,7 +212,7 @@ export default function HomeClient() {
     };
 
     fetchBlendings();
-  }, [activeTab, currentPage, filterValues.job, filterValues.keyword, filterValues.region, filterValues.people, filterValues.recruiting, filterValues.bookmarked, blendingsPerPage]);
+  }, [activeTab, currentPage, filterValues.job, filterValues.keyword, filterValues.region, filterValues.people, filterValues.recruiting, filterValues.bookmarked, searchQuery, blendingsPerPage]);
 
   return (
     <div className="min-h-screen flex flex-col gap-[52px] pb-[309.06px] px-auto">
@@ -323,7 +324,18 @@ export default function HomeClient() {
                 },
               ]}
             />
-            <SearchBar placeholder="검색" className="w-[287px]" />
+            {activeTab === 'blending' && (
+              <SearchBar
+                placeholder="검색"
+                className="w-[287px]"
+                value={searchQuery}
+                onChange={(value) => setSearchQuery(value)}
+                onSearch={(value) => {
+                  setSearchQuery(value);
+                  setCurrentPage(1);
+                }}
+              />
+            )}
           </section>
         </div>
 
