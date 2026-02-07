@@ -75,7 +75,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
   const pathname = usePathname();
   const paramId = Array.isArray(params.id) ? params.id[0] : params.id;
   const pathId = pathname.startsWith('/blending/') ? pathname.split('/')[2] || '' : '';
-  const blendingId = paramId || pathId || id || '';
+  const blendingId = pathId || paramId || id || '';
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const setNewUserComplete = useAuthStore((state) => state.setNewUserComplete);

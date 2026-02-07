@@ -76,7 +76,7 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
   const pathname = usePathname();
   const paramId = typeof params.id === 'string' ? params.id : '';
   const pathId = pathname.split('/')[3] || '';
-  const manageId = paramId || pathId || id;
+  const manageId = pathId || paramId || id;
   const router = useRouter();
   const { user } = useAuthStore();
   const loggedInUserId = user?.id;
