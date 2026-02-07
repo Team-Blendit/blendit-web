@@ -440,7 +440,7 @@ export const Card: React.FC<CardProps> = ({
           </div>
 
           {/* BadgeSet */}
-          <div className="flex gap-[6px] items-start self-stretch flex-wrap">
+          <div className="flex gap-[6px] items-start self-stretch flex-nowrap">
             {keywords.slice(0, 3).map((keyword, index) => (
               <Badge key={index} color="blue" style="solid" text={keyword} />
             ))}
