@@ -367,7 +367,7 @@ export default function HomeClient() {
                     totalNum={blending.capacity}
                     isRecruiting={blending.blendingStatus === 'RECRUITING'}
                     isBookmarked={blending.isBookmark}
-                    onClick={() => router.push(`/blending/${blending.blendingUuid}`)}
+                    onClick={() => { window.location.href = `/blending/${blending.blendingUuid}`; }}
                     onBookmarkClick={async (e) => {
                       e?.stopPropagation();
                       try {
@@ -410,7 +410,7 @@ export default function HomeClient() {
                   profileImage={user.profileImageUrl}
                   keywords={user.keywordList}
                   isBookmarked={user.isBookmarked}
-                  onClick={() => router.push(`/profile/${user.userUuid}`)}
+                  onClick={() => { window.location.href = `/profile/${user.userUuid}`; }}
                   showButton={false}
                   hideBookmark={(user.userUuid===loggedInUserId)}
                   onBookmarkClick={(e) => {

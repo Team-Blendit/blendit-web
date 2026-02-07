@@ -383,7 +383,7 @@ export default function MyPageClient() {
                       memberCount={post.currentUserCount}
                       date={formatSchedule(post.schedule)}
                       chatLink=""
-                      onMoreClick={() => router.push(`/blending/${post.blendingUuid}`)}
+                      onMoreClick={() => { window.location.href = `/blending/${post.blendingUuid}`; }}
                     />
                   ))}
                 </div>
@@ -461,7 +461,7 @@ export default function MyPageClient() {
                               console.error('북마크 삭제 실패:', error);
                             }
                           }}
-                          onMoreClick={() => router.push(`/blending/${post.blendingUuid}`)}
+                          onMoreClick={() => { window.location.href = `/blending/${post.blendingUuid}`; }}
                         />
                       ))}
                     </div>
@@ -506,7 +506,7 @@ export default function MyPageClient() {
                         profileImage={user.profileImageUrl}
                         showButton={false}
                         isBookmarked={true}
-                        onClick={() => router.push(`/profile/${user.userUuid}`)}
+                        onClick={() => { window.location.href = `/profile/${user.userUuid}`; }}
                         onBookmarkClick={async (e) => {
                           e?.stopPropagation();
                           try {

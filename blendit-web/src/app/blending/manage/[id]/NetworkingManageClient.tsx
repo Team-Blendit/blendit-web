@@ -121,7 +121,7 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
 
         // 호스트가 아닌 경우 일반 상세 페이지로 리다이렉트
         if (!data.isHost) {
-          router.replace(`/blending/${manageId}`);
+          window.location.href = `/blending/${manageId}`;
           return;
         }
 
@@ -314,7 +314,7 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
                   console.error('블렌딩 상태 변경 실패:', err);
                 }
               }}
-              onButtonClick={() => router.push(`/blending/manage/${manageId}/edit`)}
+              onButtonClick={() => { window.location.href = `/blending/manage/${manageId}/edit`; }}
               profileImage={host?.profileImage}
             />
           </div>
@@ -364,7 +364,7 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
                       isBookmarked={bookmarkedUsers.has(participant.uuid)}
                       hideBookmark={participant.uuid === loggedInUserId}
                       className="shrink-0"
-                      onClick={() => router.push(`/profile/${participant.uuid}`)}
+                      onClick={() => { window.location.href = `/profile/${participant.uuid}`; }}
                       onBookmarkClick={(e) => handleUserBookmark(e, participant)}
                       onApproveClick={() => handleApproveParticipant(participant.uuid)}
                       onRejectClick={() => handleRejectParticipant(participant.uuid)}
@@ -407,7 +407,7 @@ export function NetworkingManageClient({ id }: NetworkingManageClientProps) {
                     isBookmarked={bookmarkedUsers.has(participant.uuid)}
                     hideBookmark={participant.uuid === loggedInUserId}
                     className="shrink-0"
-                    onClick={() => router.push(`/profile/${participant.uuid}`)}
+                    onClick={() => { window.location.href = `/profile/${participant.uuid}`; }}
                     onBookmarkClick={(e) => handleUserBookmark(e, participant)}
                   />
                 ))}

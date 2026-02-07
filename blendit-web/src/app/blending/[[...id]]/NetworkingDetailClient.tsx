@@ -130,7 +130,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
         const data = await blendingAPI.getBlendingDetail(blendingId);
 
         if (data.isHost) {
-          router.replace(`/blending/manage/${blendingId}`);
+          window.location.href = `/blending/manage/${blendingId}`;
           return;
         }
 
@@ -380,7 +380,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
                     isBookmarked={bookmarkedUsers.has(participant.uuid)}
                     hideBookmark={participant.uuid === user?.id}
                     className="shrink-0"
-                    onClick={() => router.push(`/profile/${participant.uuid}`)}
+                    onClick={() => { window.location.href = `/profile/${participant.uuid}`; }}
                     onBookmarkClick={(e) => handleUserBookmark(e, participant)}
                   />
                 ))}
