@@ -102,6 +102,18 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
   const [error, setError] = useState<string | null>(null);
   const [bookmarkedUsers, setBookmarkedUsers] = useState<Set<string>>(new Set());
 
+  const getStoredUserId = () => {
+    if (typeof window === 'undefined') return '';
+    try {
+      const authStorage = localStorage.getItem('auth-storage');
+      if (!authStorage) return '';
+      const parsed = JSON.parse(authStorage);
+      return parsed?.state?.user?.id || '';
+    } catch {
+      return '';
+    }
+  };
+
   const handleUserBookmark = async (e: React.MouseEvent | undefined, participant: BlendingParticipant) => {
     e?.stopPropagation();
     try {
@@ -133,9 +145,17 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
       try {
         setIsLoading(true);
         const data = await blendingAPI.getBlendingDetail(blendingId);
+        const hostUuid = data.blendingParticipant.find(
+          (participant) => participant.blendingUserGrade === 'HOST'
+        )?.uuid;
+        const currentUserId = user?.id || getStoredUserId();
+        const shouldRedirectToManage = Boolean(
+          hostUuid && currentUserId && hostUuid === currentUserId
+        );
 
-        if (data.isHost) {
-          router.replace(`/blending/manage/${blendingId}`);
+        if (data.isHost || shouldRedirectToManage) {
+          // Static export 환경에서 dynamic route client transition이 간헐적으로 실패할 수 있어 hard navigation 사용
+          window.location.replace(`/blending/manage/${blendingId}`);
           return;
         }
 
@@ -152,7 +172,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
     };
 
     fetchBlendingDetail();
-  }, [blendingId, router, user]);
+  }, [blendingId, user?.id]);
 
   // 호스트 정보 추출
   const host = blendingData?.blendingParticipant.find(p => p.blendingUserGrade === 'HOST');
