@@ -8,10 +8,12 @@ type FilterItem = {
   type: 'dropdown' | 'select' | 'reset';
   label: string;
   options?: string[];
-  value?: string;
+  value?: string | string[];
   selected?: boolean;
-  onChange?: (value: string | boolean) => void;
+  onChange?: (value: string | string[] | boolean) => void;
   onClick?: () => void;
+  multiSelect?: boolean;
+  maxSelection?: number;
 };
 
 type FilterSetProps = {
@@ -30,7 +32,9 @@ export default function FilterSet({ filters, className }: FilterSetProps) {
               label={filter.label}
               options={filter.options}
               value={filter.value}
-              onChange={filter.onChange as (value: string) => void}
+              onChange={filter.onChange as (value: string | string[]) => void}
+              multiSelect={filter.multiSelect}
+              maxSelection={filter.maxSelection}
             />
           );
         } else if (filter.type === 'select') {

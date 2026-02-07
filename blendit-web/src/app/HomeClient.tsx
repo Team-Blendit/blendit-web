@@ -87,8 +87,8 @@ export default function HomeClient() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterValues, setFilterValues] = useState({
     job: '' as Position | '',
-    keyword: '',
-    region: '',
+    keywords: [] as string[],
+    regions: [] as string[],
     people: '',
     recruiting: false,
     bookmarked: false,
@@ -129,8 +129,8 @@ export default function HomeClient() {
   const handleResetFilters = () => {
     setFilterValues({
       job: '',
-      keyword: '',
-      region: '',
+      keywords: [],
+      regions: [],
       people: '',
       recruiting: false,
       bookmarked: false,
@@ -147,8 +147,8 @@ export default function HomeClient() {
       const position = filterValues.job as Position;
       const requestParams = {
         ...(position && position !== 'ALL' ? { position } : {}),
-        keywordUuidList: filterValues.keyword ? [filterValues.keyword] : [],
-        districtList: filterValues.region ? [filterValues.region] : [],
+        keywordUuidList: filterValues.keywords,
+        districtList: filterValues.regions,
         isBookmarked: filterValues.bookmarked,
       };
       console.log('🔍 User search request:', requestParams, 'page:', currentPage - 1, 'size:', usersPerPage);
@@ -170,7 +170,7 @@ export default function HomeClient() {
     };
 
     fetchUsers();
-  }, [activeTab, currentPage, filterValues.job, filterValues.keyword, filterValues.region, filterValues.bookmarked, usersPerPage]);
+  }, [activeTab, currentPage, filterValues.job, filterValues.keywords, filterValues.regions, filterValues.bookmarked, usersPerPage]);
 
   // 블렌딩 검색 API 호출
   useEffect(() => {
@@ -180,8 +180,8 @@ export default function HomeClient() {
       setIsLoadingBlendings(true);
       try {
         const position = filterValues.job ? (filterValues.job as Position) : undefined;
-        const keywordUuidList = filterValues.keyword ? [filterValues.keyword] : [];
-        const region = filterValues.region ? [`서울특별시 ${filterValues.region}`] : [];
+        const keywordUuidList = filterValues.keywords;
+        const region = filterValues.regions.map(r => `서울특별시 ${r}`);
         const capacity = filterValues.people ? Number(filterValues.people) : undefined;
 
         const data = await blendingAPI.searchBlendings(
@@ -212,7 +212,7 @@ export default function HomeClient() {
     };
 
     fetchBlendings();
-  }, [activeTab, currentPage, filterValues.job, filterValues.keyword, filterValues.region, filterValues.people, filterValues.recruiting, filterValues.bookmarked, searchQuery, blendingsPerPage]);
+  }, [activeTab, currentPage, filterValues.job, filterValues.keywords, filterValues.regions, filterValues.people, filterValues.recruiting, filterValues.bookmarked, searchQuery, blendingsPerPage]);
 
   return (
     <div className="min-h-screen flex flex-col gap-[52px] pb-[309.06px] px-auto">
@@ -268,18 +268,28 @@ export default function HomeClient() {
                   type: 'dropdown',
                   label: '키워드',
                   options: keywordList.map(k => k.name),
-                  value: keywordList.find(k => k.uuid === filterValues.keyword)?.name || '',
+                  value: filterValues.keywords.map(uuid => keywordList.find(k => k.uuid === uuid)?.name || '').filter(Boolean),
                   onChange: (value) => {
-                    const selected = keywordList.find(k => k.name === value);
-                    setFilterValues(prev => ({ ...prev, keyword: selected?.uuid || '' }));
+                    const valueArray = Array.isArray(value) ? value : [value];
+                    const selectedUuids = valueArray
+                      .map(name => keywordList.find(k => k.name === name)?.uuid)
+                      .filter((uuid): uuid is string => !!uuid);
+                    setFilterValues(prev => ({ ...prev, keywords: selectedUuids }));
                   },
+                  multiSelect: true,
+                  maxSelection: 3,
                 },
                 {
                   type: 'dropdown',
                   label: '지역',
                   options: seoulDistricts,
-                  value: filterValues.region,
-                  onChange: (value) => setFilterValues(prev => ({ ...prev, region: value as string })),
+                  value: filterValues.regions,
+                  onChange: (value) => {
+                    const valueArray = Array.isArray(value) ? value : [value];
+                    const stringArray = valueArray.filter((v): v is string => typeof v === 'string');
+                    setFilterValues(prev => ({ ...prev, regions: stringArray }));
+                  },
+                  multiSelect: true,
                 },
                 ...(activeTab === 'blending' ? [
                   {
@@ -287,7 +297,7 @@ export default function HomeClient() {
                     label: '인원수',
                     options: ['2명', '3명', '4명', '5명', '6명', '7명', '8명', '9명', '10명'],
                     value: filterValues.people ? `${filterValues.people}명` : '',
-                    onChange: (value: string | boolean) => {
+                    onChange: (value: string | string[] | boolean) => {
                       const str = value as string;
                       setFilterValues(prev => ({ ...prev, people: str.replace('명', '') }));
                     },
@@ -296,7 +306,7 @@ export default function HomeClient() {
                     type: 'select' as const,
                     label: '모집중',
                     selected: filterValues.recruiting,
-                    onChange: (selected: string | boolean) => {
+                    onChange: (selected: string | string[] | boolean) => {
                       if (selected as boolean) {
                         setFilterValues(prev => ({ ...prev, recruiting: true }));
                       } else {
@@ -305,18 +315,18 @@ export default function HomeClient() {
                     }
                   }
                 ] : []),
-                {
-                  type: 'select',
+                ...(user ? [{
+                  type: 'select' as const,
                   label: '북마크',
                   selected: filterValues.bookmarked,
-                  onChange: (selected) => {
+                  onChange: (selected: string | string[] | boolean) => {
                     if (selected as boolean) {
                       setFilterValues(prev => ({ ...prev, bookmarked: true }));
                     } else {
                       setFilterValues(prev => ({ ...prev, bookmarked: false }));
                     }
                   }
-                },
+                }] : []),
                 {
                   type: 'reset',
                   label: '초기화',

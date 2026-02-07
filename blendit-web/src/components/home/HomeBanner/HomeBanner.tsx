@@ -11,10 +11,10 @@ export default function HomeBanner() {
         {/* Text Content */}
         <div className="pt-[83px] flex flex-col gap-[12px]">
           <h2 className="text-[36px] font-semibold text-[#121212] leading-[1.5]">
-            IT 직종을 위한 블렌딩 사용법
+            IT 직종을 위한 블렌딧 사용법
           </h2>
           <p className="text-[28px] font-medium text-[#004085] leading-[1.5]">
-            블렌딩 사용 가이드 살펴보기
+            블렌딧 사용 가이드 살펴보기
           </p>
         </div>
 

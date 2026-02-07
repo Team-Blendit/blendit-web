@@ -45,7 +45,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     // 베이스 스타일
     const baseStyles =
-      'inline-flex items-center justify-center gap-[10px] rounded-lg font-medium transition-colors disabled:cursor-not-allowed';
+      'inline-flex items-center justify-center gap-[10px] rounded-lg font-medium transition-colors cursor-pointer disabled:cursor-not-allowed';
 
     // variant별 스타일
     const variantStyles = {

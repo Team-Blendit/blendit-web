@@ -37,9 +37,11 @@ const DropDownRow = ({ label, selected = false, onClick }: DropDownRowProps) => 
 type FilterChipProps = {
   label: string;
   options: string[];
-  value?: string;
-  onChange?: (value: string) => void;
+  value?: string | string[];
+  onChange?: (value: string | string[]) => void;
   className?: string;
+  multiSelect?: boolean;
+  maxSelection?: number;
 };
 
 const DownArrowIcon = ({ active }: { active: boolean }) => (
@@ -60,16 +62,24 @@ export default function FilterChip({
   options,
   value,
   onChange,
-  className 
+  className,
+  multiSelect = false,
+  maxSelection = Infinity
 }: FilterChipProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedValue, setSelectedValue] = useState(value || '');
+  const [selectedValue, setSelectedValue] = useState<string | string[]>(
+    multiSelect ? (Array.isArray(value) ? value : []) : (value || '')
+  );
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // 외부 value prop 변경 시 내부 상태 동기화
   useEffect(() => {
-    setSelectedValue(value || '');
-  }, [value]);
+    if (multiSelect) {
+      setSelectedValue(Array.isArray(value) ? value : []);
+    } else {
+      setSelectedValue(value || '');
+    }
+  }, [value, multiSelect]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -88,13 +98,49 @@ export default function FilterChip({
   }, [isOpen]);
 
   const handleSelect = (option: string) => {
-    setSelectedValue(option);
-    onChange?.(option);
-    setIsOpen(false);
+    if (multiSelect) {
+      const currentSelected = Array.isArray(selectedValue) ? selectedValue : [];
+      let newSelected: string[];
+      
+      if (currentSelected.includes(option)) {
+        // 이미 선택된 경우 제거
+        newSelected = currentSelected.filter(v => v !== option);
+      } else {
+        // 새로 선택하는 경우
+        if (currentSelected.length < maxSelection) {
+          newSelected = [...currentSelected, option];
+        } else {
+          // 최대 선택 수에 도달한 경우 그대로 유지
+          return;
+        }
+      }
+      
+      setSelectedValue(newSelected);
+      onChange?.(newSelected);
+      // 다중 선택 시에는 드롭다운을 닫지 않음
+    } else {
+      setSelectedValue(option);
+      onChange?.(option);
+      setIsOpen(false);
+    }
   };
 
-  const displayLabel = selectedValue || label;
-  const hasSelection = !!selectedValue;
+  const displayLabel = multiSelect 
+    ? (Array.isArray(selectedValue) && selectedValue.length > 0 
+        ? selectedValue.join(', ')
+        : label)
+    : (selectedValue || label);
+  
+  const hasSelection = multiSelect 
+    ? (Array.isArray(selectedValue) && selectedValue.length > 0)
+    : !!selectedValue;
+
+  const isSelected = (option: string) => {
+    if (multiSelect) {
+      return Array.isArray(selectedValue) && selectedValue.includes(option);
+    }
+    return selectedValue === option;
+  };
 
   return (
     <div ref={dropdownRef} className={cn('relative', className)}>
@@ -146,7 +192,7 @@ export default function FilterChip({
             <DropDownRow
               key={index}
               label={option}
-              selected={selectedValue === option}
+              selected={isSelected(option)}
               onClick={() => handleSelect(option)}
             />
           ))}
