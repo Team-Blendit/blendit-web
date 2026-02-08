@@ -183,7 +183,7 @@ export default function NetworkingDetailClient({ id }: NetworkingDetailClientPro
   ) || [];
 
   // 현재 사용자가 이미 신청했는지 확인
-  const hasApplied = blendingData?.currentUserJoinStatus === 'PENDING';
+  const hasApplied = blendingData?.currentUserJoinStatus === 'PENDING' || blendingData?.currentUserJoinStatus === 'APPROVED';
   const isClosed = blendingData?.status !== 'RECRUITING';
 
   // 날짜 포맷팅
